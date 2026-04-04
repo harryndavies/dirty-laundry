@@ -15,6 +15,7 @@ export function AuthPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [signedUp, setSignedUp] = useState(false)
+  const [showAbout, setShowAbout] = useState(true)
 
   if (session) return <Navigate to="/chores" replace />
 
@@ -44,13 +45,49 @@ export function AuthPage() {
     <div className="min-h-screen bg-brutal-yellow flex items-center justify-center p-4">
       <div className="w-full max-w-sm bg-brutal-white border-4 border-brutal-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6">
         <h1 className="font-mono text-3xl font-bold text-center mb-1 tracking-tight">
-          CHOREQUEST
+          WHOSETURN
         </h1>
         <p className="text-center font-mono text-xs mb-6 text-brutal-black/60">
-          GAMIFY YOUR CHORES
+          WHOSE TURN IS IT ANYWAY?
         </p>
 
-        {signedUp ? (
+        {showAbout ? (
+          <div className="space-y-4">
+            <div className="bg-brutal-yellow/30 border-2 border-brutal-black p-4">
+              <h2 className="font-mono font-bold text-sm mb-3">WHAT'S THIS ABOUT?</h2>
+              <p className="font-mono text-xs text-brutal-black/80 leading-relaxed">
+                Let's be honest — nobody keeps a mental tally of who last cleaned the bathroom.
+                But everyone <span className="font-bold">thinks</span> they do more.
+              </p>
+              <p className="font-mono text-xs text-brutal-black/80 leading-relaxed mt-2">
+                WhoseTurn settles it. Add your household chores, earn points when you do them,
+                and let the leaderboard do the talking. No arguments, just receipts.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-start gap-3 p-2">
+                <span className="bg-brutal-lime border-2 border-brutal-black w-8 h-8 flex items-center justify-center font-mono font-bold text-sm shrink-0">1</span>
+                <p className="font-mono text-xs text-brutal-black/70 pt-1">Create a group and invite your partner, housemates, whoever</p>
+              </div>
+              <div className="flex items-start gap-3 p-2">
+                <span className="bg-brutal-pink border-2 border-brutal-black w-8 h-8 flex items-center justify-center font-mono font-bold text-sm text-brutal-white shrink-0">2</span>
+                <p className="font-mono text-xs text-brutal-black/70 pt-1">Add chores and assign point values — scrubbing the oven is worth more than wiping a counter</p>
+              </div>
+              <div className="flex items-start gap-3 p-2">
+                <span className="bg-brutal-blue border-2 border-brutal-black w-8 h-8 flex items-center justify-center font-mono font-bold text-sm text-brutal-white shrink-0">3</span>
+                <p className="font-mono text-xs text-brutal-black/70 pt-1">Mark chores as done, watch your score climb, and see who's actually pulling their weight</p>
+              </div>
+            </div>
+
+            <Button
+              onClick={() => setShowAbout(false)}
+              className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+            >
+              GET STARTED
+            </Button>
+          </div>
+        ) : signedUp ? (
           <div className="text-center py-8">
             <div className="text-4xl mb-4">📬</div>
             <h2 className="font-mono font-bold text-lg mb-2">CHECK YOUR EMAIL</h2>

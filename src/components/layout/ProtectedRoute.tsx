@@ -8,7 +8,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return (
       <div className="h-screen flex items-center justify-center bg-brutal-yellow">
         <h1 className="font-mono text-4xl font-bold text-brutal-black animate-pulse">
-          CHOREQUEST
+          WHOSETURN
         </h1>
       </div>
     )

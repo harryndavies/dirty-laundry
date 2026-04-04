@@ -1,7 +1,7 @@
 {
-  "name": "ChoreQuest",
-  "short_name": "ChoreQuest",
-  "description": "Gamify your chores",
+  "name": "WhoseTurn",
+  "short_name": "WhoseTurn",
+  "description": "Whose turn is it anyway?",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFE500",
