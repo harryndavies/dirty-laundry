@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from './AuthContext'
+import { sendPushToUser } from '@/lib/pushNotifications'
 import type { Group, GroupMember, Profile } from '@/lib/database.types'
 
 interface MemberWithProfile extends GroupMember {
@@ -136,6 +137,30 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     }
 
     localStorage.setItem('dirtylaundry_group_id', foundGroup.id)
+
+    // Notify existing members
+    const { data: existingMembers } = await supabase
+      .from('group_members')
+      .select('user_id')
+      .eq('group_id', foundGroup.id)
+      .neq('user_id', user.id)
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('display_name')
+      .eq('id', user.id)
+      .single()
+
+    if (existingMembers) {
+      for (const m of existingMembers) {
+        sendPushToUser(m.user_id, {
+          title: 'New member! 🎉',
+          body: `${profile?.display_name ?? 'Someone'} just joined ${foundGroup.name}`,
+          url: '/leaderboard',
+        }).catch(() => {})
+      }
+    }
+
     await fetchGroup()
     return { error: null }
   }

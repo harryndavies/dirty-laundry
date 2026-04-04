@@ -142,6 +142,36 @@ export function useChores() {
         .update({ points: chore.points + extraPoints, boosted_by: user.id })
         .eq('id', choreId)
       if (error) throw error
+
+      // Notify group members about the boost
+      if (!group) return
+      const { data: members } = await supabase
+        .from('group_members')
+        .select('user_id')
+        .eq('group_id', group.id)
+        .neq('user_id', user.id)
+
+      const { data: choreData } = await supabase
+        .from('chores')
+        .select('name, points')
+        .eq('id', choreId)
+        .single()
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single()
+
+      if (members) {
+        for (const m of members) {
+          sendPushToUser(m.user_id, {
+            title: 'Bounty boosted! 🔥',
+            body: `${profile?.display_name ?? 'Someone'} boosted "${choreData?.name ?? 'a chore'}" to ${choreData?.points ?? 0} pts`,
+            url: '/chores',
+          }).catch(() => {})
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['chores', group?.id] })
