@@ -229,7 +229,7 @@ export function ChoresPage() {
                         </span>
                       )}
                     </div>
-                    {suggestions.get(chore.id) && (
+                    {chore.is_persistent && suggestions.get(chore.id) && (
                       <div className="mt-1.5 flex items-center gap-1.5">
                         <div
                           className="w-4 h-4 border border-brutal-black flex items-center justify-center font-mono text-[8px] font-bold text-white shrink-0"
@@ -238,7 +238,7 @@ export function ChoresPage() {
                           {suggestions.get(chore.id)!.display_name[0]}
                         </div>
                         <span className="font-mono text-[10px] text-brutal-black/50">
-                          {suggestions.get(chore.id)!.display_name}'s turn — {suggestions.get(chore.id)!.reason.toLowerCase()}
+                          {suggestions.get(chore.id)!.display_name}'s turn
                         </span>
                       </div>
                     )}
