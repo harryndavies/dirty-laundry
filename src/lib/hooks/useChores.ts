@@ -1,0 +1,77 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/context/AuthContext'
+import { useGroup } from '@/context/GroupContext'
+
+export function useChores() {
+  const { user } = useAuth()
+  const { group } = useGroup()
+  const queryClient = useQueryClient()
+
+  const choresQuery = useQuery({
+    queryKey: ['chores', group?.id],
+    queryFn: async () => {
+      if (!group) return []
+      const { data } = await supabase
+        .from('chores')
+        .select('*')
+        .eq('group_id', group.id)
+        .order('created_at', { ascending: false })
+      return data ?? []
+    },
+    enabled: !!group,
+  })
+
+  const addChore = useMutation({
+    mutationFn: async ({ name, points, isPersistent }: { name: string; points: number; isPersistent: boolean }) => {
+      if (!group || !user) throw new Error('No group or user')
+      const { data, error } = await supabase
+        .from('chores')
+        .insert({
+          group_id: group.id,
+          name,
+          points,
+          is_persistent: isPersistent,
+          created_by: user.id,
+        })
+        .select()
+        .single()
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chores', group?.id] })
+    },
+  })
+
+  const completeChore = useMutation({
+    mutationFn: async ({ choreId, points }: { choreId: string; points: number }) => {
+      if (!group || !user) throw new Error('No group or user')
+      const { error } = await supabase
+        .from('completions')
+        .insert({
+          chore_id: choreId,
+          user_id: user.id,
+          group_id: group.id,
+          points_earned: points,
+        })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chores', group?.id] })
+      queryClient.invalidateQueries({ queryKey: ['leaderboard', group?.id] })
+    },
+  })
+
+  const deleteChore = useMutation({
+    mutationFn: async (choreId: string) => {
+      const { error } = await supabase.from('chores').delete().eq('id', choreId)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chores', group?.id] })
+    },
+  })
+
+  return { chores: choresQuery.data ?? [], loading: choresQuery.isLoading, addChore, completeChore, deleteChore }
+}
