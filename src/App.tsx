@@ -6,6 +6,7 @@ import { GroupProvider } from '@/context/GroupContext'
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute'
 import { AppShell } from '@/components/layout/AppShell'
 import { ToastContainer } from '@/components/ui/Toast'
+import { InstallPrompt } from '@/components/ui/InstallPrompt'
 import { AuthPage } from '@/pages/AuthPage'
 import { ChoresPage } from '@/pages/ChoresPage'
 import { LeaderboardPage } from '@/pages/LeaderboardPage'
@@ -32,6 +33,7 @@ function App() {
         <AuthProvider>
           <GroupProvider>
             <ToastContainer />
+            <InstallPrompt />
             <Routes>
               <Route path="/auth" element={<AuthPage />} />
               <Route
