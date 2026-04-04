@@ -117,12 +117,13 @@ export function GroupProvider({ children }: { children: ReactNode }) {
   async function joinGroup(inviteCode: string) {
     if (!user) return { error: 'Not logged in' }
 
-    const { data: foundGroup } = await supabase
+    const { data: foundGroup, error: lookupError } = await supabase
       .from('groups')
       .select('*')
       .eq('invite_code', inviteCode.toUpperCase().trim())
-      .single()
+      .maybeSingle()
 
+    if (lookupError) return { error: 'Something went wrong' }
     if (!foundGroup) return { error: 'Invalid invite code' }
 
     const { error } = await supabase
