@@ -10,6 +10,7 @@ import { ChoresPage } from '@/pages/ChoresPage'
 import { LeaderboardPage } from '@/pages/LeaderboardPage'
 import { GroupPage } from '@/pages/GroupPage'
 import { ProfilePage } from '@/pages/ProfilePage'
+import { ActivityPage } from '@/pages/ActivityPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +39,7 @@ function App() {
               >
                 <Route path="/chores" element={<ChoresPage />} />
                 <Route path="/leaderboard" element={<LeaderboardPage />} />
+                <Route path="/activity" element={<ActivityPage />} />
                 <Route path="/group" element={<GroupPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
               </Route>

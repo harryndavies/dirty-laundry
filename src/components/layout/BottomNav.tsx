@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom'
-import { CheckSquare, Trophy, Users, User } from 'lucide-react'
+import { CheckSquare, Trophy, ClipboardList, Users, User } from 'lucide-react'
 
 const tabs = [
   { to: '/chores', icon: CheckSquare, label: 'CHORES' },
   { to: '/leaderboard', icon: Trophy, label: 'SCORES' },
+  { to: '/activity', icon: ClipboardList, label: 'LOG' },
   { to: '/group', icon: Users, label: 'GROUP' },
   { to: '/profile', icon: User, label: 'ME' },
 ]
