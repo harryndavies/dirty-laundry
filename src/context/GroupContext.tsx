@@ -37,7 +37,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     }
 
     // Check localStorage for cached group
-    const cachedGroupId = localStorage.getItem('whoseturn_group_id')
+    const cachedGroupId = localStorage.getItem('dirtylaundry_group_id')
 
     // Find user's group membership
     const { data: membership } = await supabase
@@ -48,7 +48,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       .single()
 
     if (!membership) {
-      localStorage.removeItem('whoseturn_group_id')
+      localStorage.removeItem('dirtylaundry_group_id')
       setGroup(null)
       setMembers([])
       setUserMember(null)
@@ -60,7 +60,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
 
     const groupId = membership.group_id
     if (cachedGroupId !== groupId) {
-      localStorage.setItem('whoseturn_group_id', groupId)
+      localStorage.setItem('dirtylaundry_group_id', groupId)
     }
 
     const { data: groupData } = await supabase
@@ -110,7 +110,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       .from('group_members')
       .insert({ group_id: newGroup.id, user_id: user.id, role: 'owner' })
 
-    localStorage.setItem('whoseturn_group_id', newGroup.id)
+    localStorage.setItem('dirtylaundry_group_id', newGroup.id)
     await fetchGroup()
   }
 
@@ -134,13 +134,13 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       return { error: error.message }
     }
 
-    localStorage.setItem('whoseturn_group_id', foundGroup.id)
+    localStorage.setItem('dirtylaundry_group_id', foundGroup.id)
     await fetchGroup()
     return { error: null }
   }
 
   function leaveGroup() {
-    localStorage.removeItem('whoseturn_group_id')
+    localStorage.removeItem('dirtylaundry_group_id')
     setGroup(null)
     setMembers([])
     setUserMember(null)

@@ -1,7 +1,7 @@
 {
-  "name": "WhoseTurn",
-  "short_name": "WhoseTurn",
-  "description": "Whose turn is it anyway?",
+  "name": "Dirty Laundry",
+  "short_name": "Dirty Laundry",
+  "description": "Airing your dirty laundry since 2026.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFE500",

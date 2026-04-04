@@ -45,10 +45,10 @@ export function AuthPage() {
     <div className="min-h-screen bg-brutal-yellow flex items-center justify-center p-4">
       <div className="w-full max-w-sm bg-brutal-white border-4 border-brutal-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6">
         <h1 className="font-mono text-3xl font-bold text-center mb-1 tracking-tight">
-          WHOSETURN
+          DIRTY LAUNDRY
         </h1>
         <p className="text-center font-mono text-xs mb-6 text-brutal-black/60">
-          WHOSE TURN IS IT ANYWAY?
+          AIRING IT OUT SINCE 2026
         </p>
 
         {showAbout ? (
@@ -60,7 +60,7 @@ export function AuthPage() {
                 But everyone <span className="font-bold">thinks</span> they do more.
               </p>
               <p className="font-mono text-xs text-brutal-black/80 leading-relaxed mt-2">
-                WhoseTurn settles it. Add your household chores, earn points when you do them,
+                Dirty Laundry settles it. Add your household chores, earn points when you do them,
                 and let the leaderboard do the talking. No arguments, just receipts.
               </p>
             </div>
