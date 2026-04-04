@@ -1,14 +1,15 @@
 import { useState, useRef } from 'react'
 import { useGroup } from '@/context/GroupContext'
 import { useChores } from '@/lib/hooks/useChores'
+import { useFairTurn } from '@/lib/hooks/useFairTurn'
 import { useAuth } from '@/context/AuthContext'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Plus, Minus, Trash2, RotateCw, Zap } from 'lucide-react'
-import { Navigate } from 'react-router-dom'
+import { Plus, Minus, Trash2, RotateCw, Zap, Dices } from 'lucide-react'
+import { Navigate, useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'persistent' | 'one-time'
 
@@ -16,6 +17,8 @@ export function ChoresPage() {
   const { group } = useGroup()
   const { user } = useAuth()
   const { chores, loading, addChore, completeChore, deleteChore } = useChores()
+  const { suggestions } = useFairTurn()
+  const navigate = useNavigate()
   const [showAdd, setShowAdd] = useState(false)
   const [filter, setFilter] = useState<Filter>('all')
   const [newName, setNewName] = useState('')
@@ -105,12 +108,20 @@ export function ChoresPage() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-brutal-white border-b-4 border-brutal-black px-4 py-3 flex items-center justify-between">
         <h1 className="font-mono font-bold text-lg tracking-tight">{group.name}</h1>
-        <button
-          onClick={() => setShowAdd(true)}
-          className="w-11 h-11 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
-        >
-          <Plus size={20} strokeWidth={3} />
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate('/roulette')}
+            className="w-11 h-11 bg-brutal-pink text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+          >
+            <Dices size={20} strokeWidth={2.5} />
+          </button>
+          <button
+            onClick={() => setShowAdd(true)}
+            className="w-11 h-11 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+          >
+            <Plus size={20} strokeWidth={3} />
+          </button>
+        </div>
       </div>
 
       {/* Filter pills */}
@@ -180,6 +191,19 @@ export function ChoresPage() {
                         {chore.is_persistent ? <><RotateCw size={10} /> RECURRING</> : <><Zap size={10} /> ONE-TIME</>}
                       </span>
                     </div>
+                    {suggestions.get(chore.id) && (
+                      <div className="mt-1.5 flex items-center gap-1.5">
+                        <div
+                          className="w-4 h-4 border border-brutal-black flex items-center justify-center font-mono text-[8px] font-bold text-white shrink-0"
+                          style={{ background: suggestions.get(chore.id)!.avatar_color }}
+                        >
+                          {suggestions.get(chore.id)!.display_name[0]}
+                        </div>
+                        <span className="font-mono text-[10px] text-brutal-black/50">
+                          {suggestions.get(chore.id)!.display_name}'s turn — {suggestions.get(chore.id)!.reason.toLowerCase()}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex gap-2">

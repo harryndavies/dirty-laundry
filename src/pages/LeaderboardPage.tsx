@@ -5,9 +5,9 @@ import { useNudges } from '@/lib/hooks/useNudges'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { toast } from '@/components/ui/Toast'
-import { Flame, Eye } from 'lucide-react'
+import { Flame, Eye, BarChart3 } from 'lucide-react'
 
 const rankColors = ['bg-brutal-yellow', 'bg-brutal-pink', 'bg-brutal-lime']
 
@@ -18,6 +18,7 @@ export function LeaderboardPage() {
   const { stats } = useStats()
   const { nudges, unseenCount, sendNudge, markSeen } = useNudges()
   const [nudgingId, setNudgingId] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   if (!group) return <Navigate to="/group" replace />
 
@@ -26,8 +27,19 @@ export function LeaderboardPage() {
   return (
     <div className="min-h-full">
       <div className="sticky top-0 z-10 bg-brutal-yellow border-b-4 border-brutal-black px-4 py-4">
-        <h1 className="font-mono font-bold text-2xl tracking-tight text-center">LEADERBOARD</h1>
-        <p className="font-mono text-xs text-center text-brutal-black/60 mt-0.5">{group.name}</p>
+        <div className="flex items-center justify-between">
+          <div className="w-9" />
+          <div className="text-center">
+            <h1 className="font-mono font-bold text-2xl tracking-tight">LEADERBOARD</h1>
+            <p className="font-mono text-xs text-brutal-black/60 mt-0.5">{group.name}</p>
+          </div>
+          <button
+            onClick={() => navigate('/report')}
+            className="w-9 h-9 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+          >
+            <BarChart3 size={16} strokeWidth={2.5} />
+          </button>
+        </div>
       </div>
 
       {/* Nudge notifications */}

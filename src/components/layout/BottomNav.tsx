@@ -1,19 +1,18 @@
 import { NavLink } from 'react-router-dom'
-import { CheckSquare, Trophy, ClipboardList, Dices, BarChart3, Users } from 'lucide-react'
+import { CheckSquare, Trophy, ClipboardList, Users, User } from 'lucide-react'
 
 const tabs = [
   { to: '/chores', icon: CheckSquare, label: 'CHORES' },
   { to: '/leaderboard', icon: Trophy, label: 'SCORES' },
   { to: '/activity', icon: ClipboardList, label: 'LOG' },
-  { to: '/roulette', icon: Dices, label: 'SPIN' },
-  { to: '/report', icon: BarChart3, label: 'REPORT' },
   { to: '/group', icon: Users, label: 'GROUP' },
+  { to: '/profile', icon: User, label: 'ME' },
 ]
 
 export function BottomNav() {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 h-16 bg-brutal-white border-t-4 border-brutal-black flex z-50 overflow-x-auto"
+      className="fixed bottom-0 left-0 right-0 h-16 bg-brutal-white border-t-4 border-brutal-black flex z-50"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       {tabs.map(({ to, icon: Icon, label }) => (

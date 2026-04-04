@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useGroup } from '@/context/GroupContext'
+import { useChampions } from '@/lib/hooks/useChampions'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
-import { Check, Pencil } from 'lucide-react'
+import { Check, Pencil, Crown } from 'lucide-react'
 
 const COLORS = ['#FF2D9B', '#0066FF', '#FFE500', '#BFFF00', '#FF6B00', '#8B5CF6', '#06B6D4', '#EF4444']
 
 export function ProfilePage() {
   const { user, profile, signOut, updateProfile } = useAuth()
-  const { userMember, leaveGroup } = useGroup()
+  const { userMember, leaveGroup, group } = useGroup()
+  const { champions, currentLeader } = useChampions()
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(profile?.display_name ?? '')
 
@@ -99,6 +101,69 @@ export function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* Monthly Champion */}
+        {group && (currentLeader || champions.length > 0) && (
+          <div className="border-4 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            <div className="bg-brutal-yellow border-b-3 border-brutal-black px-5 py-3 flex items-center gap-2">
+              <Crown size={16} strokeWidth={3} />
+              <h3 className="font-mono text-xs font-bold uppercase">MONTHLY CHAMPION</h3>
+            </div>
+
+            {/* Current month leader */}
+            {currentLeader && (
+              <div className="p-4 border-b-2 border-brutal-black/10">
+                <p className="font-mono text-[10px] text-brutal-black/40 font-bold tracking-widest mb-2">
+                  CURRENT LEADER — {currentLeader.month}
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Avatar
+                      name={currentLeader.display_name}
+                      color={currentLeader.avatar_color}
+                      size="sm"
+                    />
+                    <span className="absolute -top-1.5 -right-1.5 text-xs">👑</span>
+                  </div>
+                  <div className="flex-1">
+                    <span className="font-mono font-bold text-sm">
+                      {currentLeader.display_name}
+                      {currentLeader.user_id === user?.id && ' (YOU)'}
+                    </span>
+                    <span className="font-mono text-xs text-brutal-black/50 ml-2">
+                      {currentLeader.points} pts
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Hall of Fame */}
+            {champions.length > 0 && (
+              <div className="p-4">
+                <p className="font-mono text-[10px] text-brutal-black/40 font-bold tracking-widest mb-2">
+                  HALL OF FAME
+                </p>
+                <div className="space-y-2">
+                  {champions.map(c => (
+                    <div key={c.monthKey} className="flex items-center gap-3 py-1">
+                      <span className="font-mono text-[10px] text-brutal-black/40 font-bold w-16 shrink-0">
+                        {c.month}
+                      </span>
+                      <Avatar name={c.display_name} color={c.avatar_color} size="sm" />
+                      <span className="font-mono font-bold text-xs flex-1 truncate">
+                        {c.display_name}
+                      </span>
+                      <span className="font-mono text-xs text-brutal-black/40 font-bold">
+                        {c.points} pts
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Sign out */}
         <Button
