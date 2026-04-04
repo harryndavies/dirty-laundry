@@ -123,9 +123,10 @@
                 <div class="mock-chore-info">
                   <span class="mock-chore-name">Clean the bathroom</span>
                   <div class="mock-chore-tags">
-                    <span class="mock-tag tag-yellow">30 PTS</span>
+                    <span class="mock-tag tag-bounty">🔥 50 PTS</span>
                     <span class="mock-tag tag-blue">RECURRING</span>
                   </div>
+                  <div class="mock-turn">Tom's turn — done it least recently</div>
                 </div>
                 <span class="mock-check bg-lime">✓</span>
               </div>
@@ -334,9 +335,34 @@
             <p>Full history of who did what and when. Receipts.</p>
           </div>
           <div class="feature">
+            <div class="feature-icon bg-yellow">💰</div>
+            <h3>CHORE BOUNTIES</h3>
+            <p>Boost a chore's points to bribe someone into doing the gross one. Can't claim your own bounty.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-lime">⚖️</div>
+            <h3>FAIR ASSIGNMENT</h3>
+            <p>Auto-suggests whose turn it is based on who's done it least. No more guessing.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-pink">👑</div>
+            <h3>MONTHLY CHAMPION</h3>
+            <p>Crown the winner each month. Hall of fame on your profile.</p>
+          </div>
+          <div class="feature">
             <div class="feature-icon bg-blue">👥</div>
             <h3>GROUPS</h3>
             <p>Invite anyone with a code. Works for couples, flatshares, families.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-orange">🌙</div>
+            <h3>DARK MODE</h3>
+            <p>For late-night chore guilt. Easy on the eyes.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-lime">🔔</div>
+            <h3>SOUND EFFECTS</h3>
+            <p>Satisfying dings, fanfares, and buzzes. Every chore feels like a win.</p>
           </div>
         </div>
       </div>
@@ -746,8 +772,23 @@
   }
 
   .tag-yellow { background: #FFE500; }
+  .tag-bounty { background: #FF6B00; color: #FFF; border-color: #FF6B00; animation: pulse 2s infinite; }
   .tag-blue { background: rgba(0,102,255,0.1); color: #0066FF; border-color: #0066FF; }
   .tag-orange { background: rgba(255,107,0,0.1); color: #FF6B00; border-color: #FF6B00; }
+
+  .mock-turn {
+    font-size: 0.35rem;
+    color: rgba(0,0,0,0.4);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
 
   .mock-check {
     width: 28px;
