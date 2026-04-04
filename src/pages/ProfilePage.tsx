@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useGroup } from '@/context/GroupContext'
 import { useChampions } from '@/lib/hooks/useChampions'
@@ -7,7 +7,8 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
-import { Check, Pencil, Crown, Moon, Sun } from 'lucide-react'
+import { Check, Pencil, Crown, Moon, Sun, Bell, BellOff } from 'lucide-react'
+import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '@/lib/pushNotifications'
 
 const COLORS = ['#FF2D9B', '#0066FF', '#FFE500', '#BFFF00', '#FF6B00', '#8B5CF6', '#06B6D4', '#EF4444']
 
@@ -18,6 +19,13 @@ export function ProfilePage() {
   const { theme, toggle } = useTheme()
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(profile?.display_name ?? '')
+  const [pushEnabled, setPushEnabled] = useState(false)
+  const [pushLoading, setPushLoading] = useState(false)
+  const pushSupported = 'serviceWorker' in navigator && 'PushManager' in window
+
+  useEffect(() => {
+    isPushSubscribed().then(setPushEnabled)
+  }, [])
 
   async function handleSaveName() {
     if (!name.trim()) return
@@ -109,6 +117,43 @@ export function ProfilePage() {
             </div>
           </button>
         </div>
+
+        {/* Notifications */}
+        {pushSupported && (
+          <div>
+            <h3 className="font-mono text-xs font-bold uppercase mb-2">NOTIFICATIONS</h3>
+            <button
+              onClick={async () => {
+                if (pushLoading || !user) return
+                setPushLoading(true)
+                try {
+                  if (pushEnabled) {
+                    await unsubscribeFromPush(user.id)
+                    setPushEnabled(false)
+                    toast('Notifications off', 'bg-brutal-white')
+                  } else {
+                    const ok = await subscribeToPush(user.id)
+                    setPushEnabled(ok)
+                    if (ok) toast('Notifications on!', 'bg-brutal-lime')
+                    else toast('Permission denied', 'bg-red-500')
+                  }
+                } finally {
+                  setPushLoading(false)
+                }
+              }}
+              disabled={pushLoading}
+              className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-50"
+            >
+              <div className="flex items-center gap-3">
+                {pushEnabled ? <Bell size={20} /> : <BellOff size={20} />}
+                <span className="font-mono font-bold text-sm">{pushEnabled ? 'NOTIFICATIONS ON' : 'NOTIFICATIONS OFF'}</span>
+              </div>
+              <div className={`w-12 h-7 border-2 border-brutal-black flex items-center p-0.5 transition-colors ${pushEnabled ? 'bg-brutal-yellow justify-end' : 'bg-brutal-white justify-start'}`}>
+                <div className="w-5 h-5 bg-brutal-black" />
+              </div>
+            </button>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="border-4 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-5">

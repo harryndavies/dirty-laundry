@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { useGroup } from '@/context/GroupContext'
+import { sendPushToUser } from '@/lib/pushNotifications'
 
 interface NudgeWithSender {
   id: string
@@ -68,6 +69,18 @@ export function useNudges() {
       from_user_id: user.id,
       to_user_id: toUserId,
     })
+
+    // Send push notification to the nudged user
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('display_name')
+      .eq('id', user.id)
+      .single()
+    sendPushToUser(toUserId, {
+      title: 'You got nudged! 👀',
+      body: `${profile?.display_name ?? 'Someone'} is waiting on you...`,
+      url: '/leaderboard',
+    }).catch(() => {}) // fire and forget
   }
 
   async function markSeen() {

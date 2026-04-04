@@ -141,6 +141,28 @@ export interface Database {
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          endpoint: string
+          keys_p256dh: string
+          keys_auth: string
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          endpoint: string
+          keys_p256dh: string
+          keys_auth: string
+        }
+        Update: {
+          endpoint?: string
+          keys_p256dh?: string
+          keys_auth?: string
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { useGroup } from '@/context/GroupContext'
+import { sendPushToUser } from '@/lib/pushNotifications'
 
 export function useChores() {
   const { user } = useAuth()
@@ -76,6 +77,35 @@ export function useChores() {
           .from('chores')
           .update({ points: chore.base_points, boosted_by: null })
           .eq('id', choreId)
+      }
+
+      // Notify other group members
+      const { data: members } = await supabase
+        .from('group_members')
+        .select('user_id')
+        .eq('group_id', group.id)
+        .neq('user_id', user.id)
+
+      const { data: choreData } = await supabase
+        .from('chores')
+        .select('name')
+        .eq('id', choreId)
+        .single()
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single()
+
+      if (members) {
+        for (const m of members) {
+          sendPushToUser(m.user_id, {
+            title: 'Chore completed!',
+            body: `${profile?.display_name ?? 'Someone'} did "${choreData?.name ?? 'a chore'}" (+${earnedPoints} pts)`,
+            url: '/chores',
+          }).catch(() => {})
+        }
       }
 
       return { earnedPoints }
