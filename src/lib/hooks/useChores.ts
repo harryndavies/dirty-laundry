@@ -48,28 +48,37 @@ export function useChores() {
   const completeChore = useMutation({
     mutationFn: async ({ choreId, points }: { choreId: string; points: number }) => {
       if (!group || !user) throw new Error('No group or user')
+
+      // Check if this chore was boosted by the completer
+      const { data: chore } = await supabase
+        .from('chores')
+        .select('points, base_points, boosted_by')
+        .eq('id', choreId)
+        .single()
+
+      const earnedPoints = (chore?.boosted_by === user.id && chore.points > chore.base_points)
+        ? chore.base_points
+        : points
+
       const { error } = await supabase
         .from('completions')
         .insert({
           chore_id: choreId,
           user_id: user.id,
           group_id: group.id,
-          points_earned: points,
+          points_earned: earnedPoints,
         })
       if (error) throw error
 
       // Reset boosted points back to base
-      const { data: chore } = await supabase
-        .from('chores')
-        .select('points, base_points')
-        .eq('id', choreId)
-        .single()
       if (chore && chore.points !== chore.base_points) {
         await supabase
           .from('chores')
-          .update({ points: chore.base_points })
+          .update({ points: chore.base_points, boosted_by: null })
           .eq('id', choreId)
       }
+
+      return { earnedPoints }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['chores', group?.id] })
@@ -89,7 +98,7 @@ export function useChores() {
 
   const boostChore = useMutation({
     mutationFn: async ({ choreId, extraPoints }: { choreId: string; extraPoints: number }) => {
-      // Get current points first
+      if (!user) throw new Error('No user')
       const { data: chore } = await supabase
         .from('chores')
         .select('points')
@@ -98,7 +107,7 @@ export function useChores() {
       if (!chore) throw new Error('Chore not found')
       const { error } = await supabase
         .from('chores')
-        .update({ points: chore.points + extraPoints })
+        .update({ points: chore.points + extraPoints, boosted_by: user.id })
         .eq('id', choreId)
       if (error) throw error
     },

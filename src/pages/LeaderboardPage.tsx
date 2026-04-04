@@ -8,6 +8,7 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { toast } from '@/components/ui/Toast'
 import { Flame, Eye, BarChart3 } from 'lucide-react'
+import { playNudge } from '@/lib/sounds'
 
 const rankColors = ['bg-brutal-yellow', 'bg-brutal-pink', 'bg-brutal-lime']
 
@@ -139,6 +140,7 @@ export function LeaderboardPage() {
                         onClick={async () => {
                           setNudgingId(member.user_id)
                           await sendNudge(member.user_id)
+                          playNudge()
                           toast(`Nudged ${member.profiles.display_name} 👀`, 'bg-brutal-pink')
                           setNudgingId(null)
                         }}

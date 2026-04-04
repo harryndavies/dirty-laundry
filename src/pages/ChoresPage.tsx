@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { playComplete, playDelete, playBoost } from '@/lib/sounds'
 import { Plus, Minus, Trash2, RotateCw, Zap, Dices, TrendingUp } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
@@ -63,8 +64,13 @@ export function ChoresPage() {
 
   async function doComplete() {
     if (!confirmComplete) return
-    await completeChore.mutateAsync({ choreId: confirmComplete.id, points: confirmComplete.points })
-    toast(`Done! +${confirmComplete.points} pts for ${confirmComplete.name}`, 'bg-brutal-lime')
+    const result = await completeChore.mutateAsync({ choreId: confirmComplete.id, points: confirmComplete.points })
+    playComplete()
+    if (result.earnedPoints < confirmComplete.points) {
+      toast(`Done! +${result.earnedPoints} pts (you boosted this one, no bonus for you)`, 'bg-brutal-yellow')
+    } else {
+      toast(`Done! +${result.earnedPoints} pts for ${confirmComplete.name}`, 'bg-brutal-lime')
+    }
     setConfirmComplete(null)
   }
 
@@ -75,6 +81,7 @@ export function ChoresPage() {
   async function doDelete() {
     if (!confirmDelete) return
     await deleteChore.mutateAsync(confirmDelete)
+    playDelete()
     toast('Chore deleted', 'bg-brutal-orange')
     setConfirmDelete(null)
   }
@@ -195,6 +202,9 @@ export function ChoresPage() {
                         {chore.points > chore.base_points && '🔥 '}
                         {chore.points} PTS <TrendingUp size={10} />
                       </button>
+                      {chore.boosted_by === user?.id && chore.points > chore.base_points && (
+                        <span className="font-mono text-[9px] text-brutal-orange font-bold">YOUR BOUNTY</span>
+                      )}
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] font-bold border ${
                         chore.is_persistent
                           ? 'bg-brutal-blue/10 border-brutal-blue text-brutal-blue'
@@ -349,6 +359,7 @@ export function ChoresPage() {
             <Button
               onClick={async () => {
                 await boostChore.mutateAsync({ choreId: bountyChore.id, extraPoints: bountyAmount })
+                playBoost()
                 toast(`Boosted "${bountyChore.name}" by +${bountyAmount} pts!`, 'bg-brutal-orange')
                 setBountyChore(null)
               }}

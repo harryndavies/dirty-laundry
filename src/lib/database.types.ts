@@ -61,6 +61,7 @@ export interface Database {
           name: string
           points: number
           base_points: number
+          boosted_by: string | null
           is_persistent: boolean
           created_by: string
           created_at: string
@@ -70,6 +71,7 @@ export interface Database {
           name: string
           points?: number
           base_points?: number
+          boosted_by?: string | null
           is_persistent?: boolean
           created_by: string
         }
@@ -77,6 +79,7 @@ export interface Database {
           name?: string
           points?: number
           base_points?: number
+          boosted_by?: string | null
           is_persistent?: boolean
         }
         Relationships: []

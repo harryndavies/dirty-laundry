@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { playSpin, playResult } from '@/lib/sounds'
 import { useGroup } from '@/context/GroupContext'
 import { useChores } from '@/lib/hooks/useChores'
 import { Navigate } from 'react-router-dom'
@@ -24,6 +25,7 @@ export function RoulettePage() {
     if (spinning || items.length === 0) return
     setSpinning(true)
     setResult(null)
+    playSpin()
 
     const spins = 5 + Math.random() * 5
     const extraDeg = Math.random() * 360
@@ -42,6 +44,7 @@ export function RoulettePage() {
       const index = Math.floor(adjustedAngle / sliceSize)
       setResult(items[index % items.length])
       setSpinning(false)
+      playResult()
     }, 3500)
   }
 
