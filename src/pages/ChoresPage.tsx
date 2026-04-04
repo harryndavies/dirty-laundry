@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Plus, Minus, Trash2, RotateCw, Zap, Dices } from 'lucide-react'
+import { Plus, Minus, Trash2, RotateCw, Zap, Dices, TrendingUp } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'persistent' | 'one-time'
@@ -16,7 +16,7 @@ type Filter = 'all' | 'persistent' | 'one-time'
 export function ChoresPage() {
   const { group } = useGroup()
   const { user } = useAuth()
-  const { chores, loading, addChore, completeChore, deleteChore } = useChores()
+  const { chores, loading, addChore, completeChore, deleteChore, boostChore } = useChores()
   const { suggestions } = useFairTurn()
   const navigate = useNavigate()
   const [showAdd, setShowAdd] = useState(false)
@@ -28,6 +28,10 @@ export function ChoresPage() {
   // Confirm dialog state
   const [confirmComplete, setConfirmComplete] = useState<{ id: string; points: number; name: string } | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+
+  // Bounty state
+  const [bountyChore, setBountyChore] = useState<{ id: string; name: string; points: number } | null>(null)
+  const [bountyAmount, setBountyAmount] = useState(10)
 
   // Swipe state
   const touchStartX = useRef(0)
@@ -180,9 +184,12 @@ export function ChoresPage() {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-mono font-bold text-base truncate">{chore.name}</h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="inline-flex items-center gap-1 bg-brutal-yellow border border-brutal-black px-2 py-0.5 font-mono text-xs font-bold">
-                        {chore.points} PTS
-                      </span>
+                      <button
+                        onClick={() => { setBountyChore({ id: chore.id, name: chore.name, points: chore.points }); setBountyAmount(10) }}
+                        className="inline-flex items-center gap-1 bg-brutal-yellow border border-brutal-black px-2 py-0.5 font-mono text-xs font-bold active:bg-brutal-yellow/70 transition-colors"
+                      >
+                        {chore.points} PTS <TrendingUp size={10} />
+                      </button>
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] font-bold border ${
                         chore.is_persistent
                           ? 'bg-brutal-blue/10 border-brutal-blue text-brutal-blue'
@@ -300,6 +307,53 @@ export function ChoresPage() {
             {addChore.isPending ? 'ADDING...' : 'ADD CHORE'}
           </Button>
         </form>
+      </BottomSheet>
+
+      {/* Bounty sheet */}
+      <BottomSheet open={!!bountyChore} onClose={() => setBountyChore(null)}>
+        {bountyChore && (
+          <>
+            <h2 className="font-mono font-bold text-lg mb-1">BOOST BOUNTY</h2>
+            <p className="font-mono text-xs text-brutal-black/50 mb-4">
+              Make "{bountyChore.name}" worth more to get it done.
+              Currently <span className="font-bold">{bountyChore.points} pts</span>.
+            </p>
+            <div className="flex items-center gap-3 mb-4">
+              <button
+                type="button"
+                onClick={() => setBountyAmount(Math.max(5, bountyAmount - 5))}
+                className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+              >
+                <Minus size={18} />
+              </button>
+              <div className="flex-1 h-12 bg-brutal-orange border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-xl text-brutal-white">
+                +{bountyAmount}
+              </div>
+              <button
+                type="button"
+                onClick={() => setBountyAmount(bountyAmount + 5)}
+                className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+              >
+                <Plus size={18} />
+              </button>
+            </div>
+            <div className="bg-brutal-yellow/30 border-2 border-brutal-black p-3 mb-4 text-center">
+              <span className="font-mono text-xs text-brutal-black/50">NEW VALUE: </span>
+              <span className="font-mono font-bold text-lg">{bountyChore.points + bountyAmount} PTS</span>
+            </div>
+            <Button
+              onClick={async () => {
+                await boostChore.mutateAsync({ choreId: bountyChore.id, extraPoints: bountyAmount })
+                toast(`Boosted "${bountyChore.name}" by +${bountyAmount} pts!`, 'bg-brutal-orange')
+                setBountyChore(null)
+              }}
+              disabled={boostChore.isPending}
+              className="w-full h-12 bg-brutal-orange text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+            >
+              {boostChore.isPending ? 'BOOSTING...' : 'BOOST BOUNTY'}
+            </Button>
+          </>
+        )}
       </BottomSheet>
 
       <ConfirmDialog

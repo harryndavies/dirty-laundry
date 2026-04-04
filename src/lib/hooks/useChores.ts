@@ -73,5 +73,25 @@ export function useChores() {
     },
   })
 
-  return { chores: choresQuery.data ?? [], loading: choresQuery.isLoading, addChore, completeChore, deleteChore }
+  const boostChore = useMutation({
+    mutationFn: async ({ choreId, extraPoints }: { choreId: string; extraPoints: number }) => {
+      // Get current points first
+      const { data: chore } = await supabase
+        .from('chores')
+        .select('points')
+        .eq('id', choreId)
+        .single()
+      if (!chore) throw new Error('Chore not found')
+      const { error } = await supabase
+        .from('chores')
+        .update({ points: chore.points + extraPoints })
+        .eq('id', choreId)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chores', group?.id] })
+    },
+  })
+
+  return { chores: choresQuery.data ?? [], loading: choresQuery.isLoading, addChore, completeChore, deleteChore, boostChore }
 }
