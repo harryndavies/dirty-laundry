@@ -213,9 +213,6 @@ export function ChoresPage() {
                         {chore.points > chore.base_points && '🔥 '}
                         {chore.points} PTS <TrendingUp size={10} />
                       </button>
-                      {chore.boosted_by === user?.id && chore.points > chore.base_points && (
-                        <span className="font-mono text-[9px] text-brutal-orange font-bold">YOUR BOUNTY</span>
-                      )}
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] font-bold border ${
                         chore.is_persistent
                           ? 'bg-brutal-blue/10 border-brutal-blue text-brutal-blue'
