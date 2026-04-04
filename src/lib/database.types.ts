@@ -116,6 +116,25 @@ export interface Database {
         }
         Relationships: []
       }
+      nudges: {
+        Row: {
+          id: string
+          group_id: string
+          from_user_id: string
+          to_user_id: string
+          created_at: string
+          seen: boolean
+        }
+        Insert: {
+          group_id: string
+          from_user_id: string
+          to_user_id: string
+        }
+        Update: {
+          seen?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>
@@ -130,3 +149,4 @@ export type GroupMember = Database['public']['Tables']['group_members']['Row']
 export type Chore = Database['public']['Tables']['chores']['Row']
 export type Completion = Database['public']['Tables']['completions']['Row']
 export type Invitation = Database['public']['Tables']['invitations']['Row']
+export type Nudge = Database['public']['Tables']['nudges']['Row']
