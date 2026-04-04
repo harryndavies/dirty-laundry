@@ -60,6 +60,26 @@ input, textarea, select {
   --radius-4xl: 0px;
 }
 
+.dark {
+  --color-brutal-white: #1A1A1A;
+  --color-brutal-black: #F5F5F0;
+  --color-background: #1A1A1A;
+  --color-foreground: #F5F5F0;
+  --color-card: #1A1A1A;
+  --color-card-foreground: #F5F5F0;
+  --color-popover: #222222;
+  --color-popover-foreground: #F5F5F0;
+  --color-primary: #F5F5F0;
+  --color-primary-foreground: #1A1A1A;
+  --color-secondary: #FFE500;
+  --color-secondary-foreground: #1A1A1A;
+  --color-muted: #2A2A2A;
+  --color-muted-foreground: #999999;
+  --color-border: #F5F5F0;
+  --color-input: #F5F5F0;
+  --color-ring: #F5F5F0;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

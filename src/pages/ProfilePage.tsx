@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useGroup } from '@/context/GroupContext'
 import { useChampions } from '@/lib/hooks/useChampions'
+import { useTheme } from '@/context/ThemeContext'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
-import { Check, Pencil, Crown } from 'lucide-react'
+import { Check, Pencil, Crown, Moon, Sun } from 'lucide-react'
 
 const COLORS = ['#FF2D9B', '#0066FF', '#FFE500', '#BFFF00', '#FF6B00', '#8B5CF6', '#06B6D4', '#EF4444']
 
@@ -14,6 +15,7 @@ export function ProfilePage() {
   const { user, profile, signOut, updateProfile } = useAuth()
   const { userMember, leaveGroup, group } = useGroup()
   const { champions, currentLeader } = useChampions()
+  const { theme, toggle } = useTheme()
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(profile?.display_name ?? '')
 
@@ -89,6 +91,23 @@ export function ProfilePage() {
               />
             ))}
           </div>
+        </div>
+
+        {/* Dark mode toggle */}
+        <div>
+          <h3 className="font-mono text-xs font-bold uppercase mb-2">THEME</h3>
+          <button
+            onClick={toggle}
+            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+          >
+            <div className="flex items-center gap-3">
+              {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
+              <span className="font-mono font-bold text-sm">{theme === 'dark' ? 'DARK MODE' : 'LIGHT MODE'}</span>
+            </div>
+            <div className={`w-12 h-7 border-2 border-brutal-black flex items-center p-0.5 transition-colors ${theme === 'dark' ? 'bg-brutal-yellow justify-end' : 'bg-brutal-white justify-start'}`}>
+              <div className="w-5 h-5 bg-brutal-black" />
+            </div>
+          </button>
         </div>
 
         {/* Stats */}
