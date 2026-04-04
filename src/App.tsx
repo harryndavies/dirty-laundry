@@ -8,6 +8,7 @@ import { AppShell } from '@/components/layout/AppShell'
 import { ToastContainer } from '@/components/ui/Toast'
 import { InstallPrompt } from '@/components/ui/InstallPrompt'
 import { AuthPage } from '@/pages/AuthPage'
+import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { ChoresPage } from '@/pages/ChoresPage'
 import { LeaderboardPage } from '@/pages/LeaderboardPage'
 import { GroupPage } from '@/pages/GroupPage'
@@ -36,6 +37,7 @@ function App() {
             <InstallPrompt />
             <Routes>
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route
                 element={
                   <ProtectedRoute>

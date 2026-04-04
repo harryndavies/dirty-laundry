@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function AuthPage() {
-  const { session, signIn, signUp } = useAuth()
+  const { session, signIn, signUp, resetPassword } = useAuth()
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
   const [signupEmail, setSignupEmail] = useState('')
@@ -16,6 +16,22 @@ export function AuthPage() {
   const [loading, setLoading] = useState(false)
   const [signedUp, setSignedUp] = useState(false)
   const [showAbout, setShowAbout] = useState(true)
+  const [showForgot, setShowForgot] = useState(false)
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [resetSent, setResetSent] = useState(false)
+
+  async function handleForgot(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    const { error } = await resetPassword(forgotEmail)
+    if (error) {
+      setError(error)
+    } else {
+      setResetSent(true)
+    }
+    setLoading(false)
+  }
 
   if (session) return <Navigate to="/chores" replace />
 
@@ -119,35 +135,91 @@ export function AuthPage() {
             )}
 
             <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4 mt-4">
-                <div>
-                  <label className="font-mono text-xs font-bold uppercase block mb-1">EMAIL</label>
-                  <Input
-                    type="email"
-                    value={loginEmail}
-                    onChange={e => setLoginEmail(e.target.value)}
-                    className="border-2 border-brutal-black font-mono h-12"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="font-mono text-xs font-bold uppercase block mb-1">PASSWORD</label>
-                  <Input
-                    type="password"
-                    value={loginPassword}
-                    onChange={e => setLoginPassword(e.target.value)}
-                    className="border-2 border-brutal-black font-mono h-12"
-                    required
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
-                >
-                  {loading ? 'LOADING...' : 'LOG IN'}
-                </Button>
-              </form>
+              {showForgot ? (
+                resetSent ? (
+                  <div className="text-center py-8">
+                    <div className="text-4xl mb-4">📬</div>
+                    <h2 className="font-mono font-bold text-lg mb-2">CHECK YOUR EMAIL</h2>
+                    <p className="font-mono text-sm text-brutal-black/60">
+                      We sent a password reset link to {forgotEmail}
+                    </p>
+                    <button
+                      onClick={() => { setShowForgot(false); setResetSent(false); setError('') }}
+                      className="font-mono text-xs font-bold text-brutal-blue mt-4 active:opacity-60"
+                    >
+                      BACK TO LOGIN
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleForgot} className="space-y-4 mt-4">
+                    <p className="font-mono text-xs text-brutal-black/60">
+                      Enter your email and we'll send you a reset link.
+                    </p>
+                    <div>
+                      <label className="font-mono text-xs font-bold uppercase block mb-1">EMAIL</label>
+                      <Input
+                        type="email"
+                        value={forgotEmail}
+                        onChange={e => setForgotEmail(e.target.value)}
+                        className="border-2 border-brutal-black font-mono h-12"
+                        required
+                        autoFocus
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+                    >
+                      {loading ? 'SENDING...' : 'SEND RESET LINK'}
+                    </Button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowForgot(false); setError('') }}
+                      className="w-full font-mono text-xs font-bold text-brutal-black/50 active:opacity-60"
+                    >
+                      BACK TO LOGIN
+                    </button>
+                  </form>
+                )
+              ) : (
+                <form onSubmit={handleLogin} className="space-y-4 mt-4">
+                  <div>
+                    <label className="font-mono text-xs font-bold uppercase block mb-1">EMAIL</label>
+                    <Input
+                      type="email"
+                      value={loginEmail}
+                      onChange={e => setLoginEmail(e.target.value)}
+                      className="border-2 border-brutal-black font-mono h-12"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="font-mono text-xs font-bold uppercase block mb-1">PASSWORD</label>
+                    <Input
+                      type="password"
+                      value={loginPassword}
+                      onChange={e => setLoginPassword(e.target.value)}
+                      className="border-2 border-brutal-black font-mono h-12"
+                      required
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+                  >
+                    {loading ? 'LOADING...' : 'LOG IN'}
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowForgot(true); setForgotEmail(loginEmail); setError('') }}
+                    className="w-full font-mono text-xs font-bold text-brutal-black/50 active:opacity-60"
+                  >
+                    FORGOT PASSWORD?
+                  </button>
+                </form>
+              )}
             </TabsContent>
 
             <TabsContent value="signup">
