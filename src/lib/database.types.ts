@@ -65,6 +65,8 @@ export interface Database {
           is_persistent: boolean
           created_by: string
           created_at: string
+          reminder_day: number | null
+          reminder_time: string | null
         }
         Insert: {
           group_id: string
@@ -74,6 +76,8 @@ export interface Database {
           boosted_by?: string | null
           is_persistent?: boolean
           created_by: string
+          reminder_day?: number | null
+          reminder_time?: string | null
         }
         Update: {
           name?: string
@@ -81,6 +85,8 @@ export interface Database {
           base_points?: number
           boosted_by?: string | null
           is_persistent?: boolean
+          reminder_day?: number | null
+          reminder_time?: string | null
         }
         Relationships: []
       }

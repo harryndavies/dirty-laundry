@@ -24,7 +24,7 @@ export function useChores() {
   })
 
   const addChore = useMutation({
-    mutationFn: async ({ name, points, isPersistent }: { name: string; points: number; isPersistent: boolean }) => {
+    mutationFn: async ({ name, points, isPersistent, reminderDay, reminderTime }: { name: string; points: number; isPersistent: boolean; reminderDay?: number | null; reminderTime?: string | null }) => {
       if (!group || !user) throw new Error('No group or user')
       const { data, error } = await supabase
         .from('chores')
@@ -35,6 +35,8 @@ export function useChores() {
           base_points: points,
           is_persistent: isPersistent,
           created_by: user.id,
+          reminder_day: reminderDay ?? null,
+          reminder_time: reminderTime ?? null,
         })
         .select()
         .single()

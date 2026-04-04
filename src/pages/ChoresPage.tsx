@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
-import { Plus, Minus, Trash2, RotateCw, Zap, Dices, TrendingUp } from 'lucide-react'
+import { Plus, Minus, Trash2, RotateCw, Zap, Dices, TrendingUp, Bell } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'persistent' | 'one-time'
@@ -25,6 +25,8 @@ export function ChoresPage() {
   const [newName, setNewName] = useState('')
   const [newPoints, setNewPoints] = useState(10)
   const [newPersistent, setNewPersistent] = useState(true)
+  const [newReminderDay, setNewReminderDay] = useState<number | null>(null)
+  const [newReminderTime, setNewReminderTime] = useState('09:00')
 
   // Confirm dialog state
   const [confirmComplete, setConfirmComplete] = useState<{ id: string; points: number; name: string } | null>(null)
@@ -50,12 +52,21 @@ export function ChoresPage() {
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
     if (!newName.trim()) return
-    await addChore.mutateAsync({ name: newName.trim(), points: newPoints, isPersistent: newPersistent })
+    await addChore.mutateAsync({
+      name: newName.trim(),
+      points: newPoints,
+      isPersistent: newPersistent,
+      reminderDay: newReminderDay,
+      reminderTime: newReminderDay !== null ? newReminderTime : null,
+    })
+    const addedName = newName.trim()
     setNewName('')
     setNewPoints(10)
     setNewPersistent(true)
+    setNewReminderDay(null)
+    setNewReminderTime('09:00')
     setShowAdd(false)
-    toast(`${newName.trim()} added!`, 'bg-brutal-lime')
+    toast(`${addedName} added!`, 'bg-brutal-lime')
   }
 
   function handleComplete(choreId: string, points: number, name: string) {
@@ -212,6 +223,11 @@ export function ChoresPage() {
                       }`}>
                         {chore.is_persistent ? <><RotateCw size={10} /> RECURRING</> : <><Zap size={10} /> ONE-TIME</>}
                       </span>
+                      {chore.reminder_day !== null && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] font-bold border bg-brutal-yellow/20 border-brutal-yellow text-brutal-black/60">
+                          <Bell size={10} /> {['SUN','MON','TUE','WED','THU','FRI','SAT'][chore.reminder_day]} {chore.reminder_time?.slice(0, 5)}
+                        </span>
+                      )}
                     </div>
                     {suggestions.get(chore.id) && (
                       <div className="mt-1.5 flex items-center gap-1.5">
@@ -312,6 +328,46 @@ export function ChoresPage() {
                 ONE-TIME
               </button>
             </div>
+          </div>
+
+          <div>
+            <label className="font-mono text-xs font-bold uppercase block mb-1">REMINDER</label>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { label: 'NONE', value: null },
+                { label: 'MON', value: 1 },
+                { label: 'TUE', value: 2 },
+                { label: 'WED', value: 3 },
+                { label: 'THU', value: 4 },
+                { label: 'FRI', value: 5 },
+                { label: 'SAT', value: 6 },
+                { label: 'SUN', value: 0 },
+              ].map(d => (
+                <button
+                  key={d.label}
+                  type="button"
+                  onClick={() => setNewReminderDay(d.value)}
+                  className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${
+                    newReminderDay === d.value
+                      ? 'bg-brutal-black text-brutal-white'
+                      : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
+                  }`}
+                >
+                  {d.label}
+                </button>
+              ))}
+            </div>
+            {newReminderDay !== null && (
+              <div className="flex items-center gap-2 mt-2">
+                <Bell size={14} className="text-brutal-black/50" />
+                <input
+                  type="time"
+                  value={newReminderTime}
+                  onChange={e => setNewReminderTime(e.target.value)}
+                  className="flex-1 h-10 border-2 border-brutal-black px-3 font-mono text-sm bg-brutal-white"
+                />
+              </div>
+            )}
           </div>
 
           <Button
