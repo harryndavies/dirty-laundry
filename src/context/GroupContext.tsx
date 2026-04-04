@@ -46,7 +46,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       .select('*')
       .eq('user_id', user.id)
       .limit(1)
-      .single()
+      .maybeSingle()
 
     if (!membership) {
       localStorage.removeItem('dirtylaundry_group_id')
@@ -68,7 +68,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       .from('groups')
       .select('*')
       .eq('id', groupId)
-      .single()
+      .maybeSingle()
 
     setGroup(groupData)
 
