@@ -77,9 +77,18 @@ Deno.serve(async () => {
 
       if (!members?.length) continue
 
+      const name = champion?.display_name ?? 'Someone'
+      const sassy = [
+        { title: "Bow down 👑", body: `${name} wiped the floor with everyone. ${maxPoints} pts.` },
+        { title: "It's not even close", body: `${name} carried the whole house. ${maxPoints} pts. You're welcome.` },
+        { title: "While you were sleeping 💅", body: `${name} racked up ${maxPoints} pts. What's your excuse?` },
+        { title: "Someone did the work", body: `Spoiler: it was ${name}. Again. ${maxPoints} pts.` },
+        { title: "The receipts are in 🧾", body: `${name} on top with ${maxPoints} pts. No debate.` },
+      ]
+      const pick = sassy[Math.floor(Math.random() * sassy.length)]
       const payload = {
-        title: "This week's champion! 🏆",
-        body: `${champion?.display_name ?? 'Someone'} topped ${group?.name ?? 'the group'} with ${maxPoints} pts`,
+        title: pick.title,
+        body: pick.body,
         url: '/report',
       }
 
