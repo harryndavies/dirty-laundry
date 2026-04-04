@@ -154,7 +154,8 @@
               <span class="nav-item nav-active">CHORES</span>
               <span class="nav-item">SCORES</span>
               <span class="nav-item">LOG</span>
-              <span class="nav-item">GROUP</span>
+              <span class="nav-item">SPIN</span>
+              <span class="nav-item">REPORT</span>
             </div>
             <p class="phone-label">CHORES LIST</p>
           </div>
@@ -166,39 +167,67 @@
               <span class="phone-title-center">LEADERBOARD</span>
             </div>
             <div class="phone-body">
-              <div class="mock-leader">
-                <span class="mock-rank bg-yellow">1</span>
-                <div class="mock-avatar" style="background:#FF2D9B;">S</div>
-                <div class="mock-leader-info">
-                  <span class="mock-leader-name">Sarah</span>
-                  <div class="mock-bar"><div class="mock-bar-fill bg-yellow" style="width:100%;"></div></div>
+              <div class="mock-leader-card">
+                <div class="mock-leader">
+                  <span class="mock-rank bg-yellow">1</span>
+                  <div class="mock-avatar" style="background:#FF2D9B;">S</div>
+                  <div class="mock-leader-info">
+                    <div class="mock-leader-name-row">
+                      <span class="mock-leader-name">Sarah</span>
+                      <span class="mock-streak">🔥 7</span>
+                    </div>
+                    <div class="mock-bar"><div class="mock-bar-fill bg-yellow" style="width:100%;"></div></div>
+                  </div>
+                  <div class="mock-points">285<span class="mock-pts">PTS</span></div>
                 </div>
-                <div class="mock-points">285<span class="mock-pts">PTS</span></div>
+                <div class="mock-shame">
+                  <span class="mock-shame-label">LAST ACTIVE</span>
+                  <span class="mock-shame-value">2H AGO</span>
+                </div>
               </div>
-              <div class="mock-leader">
-                <span class="mock-rank bg-pink">2</span>
-                <div class="mock-avatar" style="background:#0066FF;">T</div>
-                <div class="mock-leader-info">
-                  <span class="mock-leader-name">Tom</span>
-                  <div class="mock-bar"><div class="mock-bar-fill bg-pink" style="width:68%;"></div></div>
+              <div class="mock-leader-card">
+                <div class="mock-leader">
+                  <span class="mock-rank bg-pink">2</span>
+                  <div class="mock-avatar" style="background:#0066FF;">T</div>
+                  <div class="mock-leader-info">
+                    <span class="mock-leader-name">Tom</span>
+                    <div class="mock-bar"><div class="mock-bar-fill bg-pink" style="width:68%;"></div></div>
+                  </div>
+                  <div class="mock-points">195<span class="mock-pts">PTS</span></div>
                 </div>
-                <div class="mock-points">195<span class="mock-pts">PTS</span></div>
+                <div class="mock-shame">
+                  <span class="mock-shame-label">LAST ACTIVE</span>
+                  <div class="mock-shame-row">
+                    <span class="mock-shame-warn">4 DAYS AGO</span>
+                    <span class="mock-nudge-btn">👀</span>
+                  </div>
+                </div>
               </div>
-              <div class="mock-leader">
-                <span class="mock-rank bg-lime">3</span>
-                <div class="mock-avatar" style="background:#FF6B00;">J</div>
-                <div class="mock-leader-info">
-                  <span class="mock-leader-name">Jake</span>
-                  <div class="mock-bar"><div class="mock-bar-fill bg-lime" style="width:39%;"></div></div>
+              <div class="mock-leader-card">
+                <div class="mock-leader">
+                  <span class="mock-rank bg-lime">3</span>
+                  <div class="mock-avatar" style="background:#FF6B00;">J</div>
+                  <div class="mock-leader-info">
+                    <span class="mock-leader-name">Jake</span>
+                    <div class="mock-bar"><div class="mock-bar-fill bg-lime" style="width:39%;"></div></div>
+                  </div>
+                  <div class="mock-points">110<span class="mock-pts">PTS</span></div>
                 </div>
-                <div class="mock-points">110<span class="mock-pts">PTS</span></div>
+                <div class="mock-shame">
+                  <span class="mock-shame-label">LAST ACTIVE</span>
+                  <div class="mock-shame-row">
+                    <span class="mock-shame-value">1D AGO</span>
+                    <span class="mock-nudge-btn">👀</span>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="phone-nav">
               <span class="nav-item">CHORES</span>
               <span class="nav-item nav-active">SCORES</span>
               <span class="nav-item">LOG</span>
-              <span class="nav-item">GROUP</span>
+              <span class="nav-item">SPIN</span>
+              <span class="nav-item">REPORT</span>
             </div>
             <p class="phone-label">LEADERBOARD</p>
           </div>
@@ -249,7 +278,8 @@
               <span class="nav-item">CHORES</span>
               <span class="nav-item">SCORES</span>
               <span class="nav-item nav-active">LOG</span>
-              <span class="nav-item">GROUP</span>
+              <span class="nav-item">SPIN</span>
+              <span class="nav-item">REPORT</span>
             </div>
             <p class="phone-label">ACTIVITY LOG</p>
           </div>
@@ -269,9 +299,29 @@
             <p>Points update instantly. No refresh needed.</p>
           </div>
           <div class="feature">
-            <div class="feature-icon bg-yellow">📋</div>
-            <h3>ACTIVITY LOG</h3>
-            <p>Full history of who did what and when. Receipts.</p>
+            <div class="feature-icon bg-pink">⏱️</div>
+            <h3>SHAME TIMER</h3>
+            <p>Shows how long since someone last did a chore. Nowhere to hide.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-orange">🔥</div>
+            <h3>STREAKS</h3>
+            <p>Consecutive days of doing chores. Lose it and everyone knows.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-blue">👀</div>
+            <h3>NUDGE</h3>
+            <p>One tap to send someone a passive-aggressive reminder.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-yellow">🎰</div>
+            <h3>CHORE ROULETTE</h3>
+            <p>Can't decide? Spin the wheel. Fate picks who does it.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-lime">📊</div>
+            <h3>WEEKLY REPORT</h3>
+            <p>Who did 62% of the work? The numbers don't lie.</p>
           </div>
           <div class="feature">
             <div class="feature-icon bg-pink">🏆</div>
@@ -279,19 +329,14 @@
             <p>See who's on top. Friendly competition encouraged.</p>
           </div>
           <div class="feature">
-            <div class="feature-icon bg-blue">🔄</div>
-            <h3>RECURRING & ONE-TIME</h3>
-            <p>Set chores as recurring or one-off. They disappear when done.</p>
+            <div class="feature-icon bg-orange">📋</div>
+            <h3>ACTIVITY LOG</h3>
+            <p>Full history of who did what and when. Receipts.</p>
           </div>
           <div class="feature">
-            <div class="feature-icon bg-orange">👥</div>
+            <div class="feature-icon bg-blue">👥</div>
             <h3>GROUPS</h3>
             <p>Invite anyone with a code. Works for couples, flatshares, families.</p>
-          </div>
-          <div class="feature">
-            <div class="feature-icon bg-lime">📱</div>
-            <h3>MOBILE FIRST</h3>
-            <p>Designed for your phone. Add to home screen for the full experience.</p>
           </div>
         </div>
       </div>
@@ -718,14 +763,76 @@
   }
 
   /* Mock leaderboard */
+  .mock-leader-card {
+    border: 2px solid #000;
+    box-shadow: 2px 2px 0 0 #000;
+    background: #FFF;
+  }
+
+  .mock-leader-name-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .mock-streak {
+    font-size: 0.4rem;
+    font-weight: 700;
+    background: rgba(255,107,0,0.15);
+    border: 1px solid #FF6B00;
+    color: #FF6B00;
+    padding: 0 3px;
+  }
+
+  .mock-shame {
+    border-top: 1px solid rgba(0,0,0,0.1);
+    padding: 3px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mock-shame-label {
+    font-size: 0.35rem;
+    font-weight: 700;
+    opacity: 0.35;
+  }
+
+  .mock-shame-value {
+    font-size: 0.35rem;
+    font-weight: 700;
+    opacity: 0.5;
+  }
+
+  .mock-shame-warn {
+    font-size: 0.35rem;
+    font-weight: 700;
+    color: #FF6B00;
+  }
+
+  .mock-shame-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .mock-nudge-btn {
+    font-size: 0.4rem;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #FF2D9B;
+    background: rgba(255,45,155,0.1);
+  }
+
   .mock-leader {
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 8px;
-    border: 2px solid #000;
-    box-shadow: 2px 2px 0 0 #000;
-    background: #FFF;
   }
 
   .mock-rank {
