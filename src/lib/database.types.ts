@@ -60,6 +60,7 @@ export interface Database {
           group_id: string
           name: string
           points: number
+          base_points: number
           is_persistent: boolean
           created_by: string
           created_at: string
@@ -68,12 +69,14 @@ export interface Database {
           group_id: string
           name: string
           points?: number
+          base_points?: number
           is_persistent?: boolean
           created_by: string
         }
         Update: {
           name?: string
           points?: number
+          base_points?: number
           is_persistent?: boolean
         }
         Relationships: []

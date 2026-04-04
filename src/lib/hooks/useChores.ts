@@ -31,6 +31,7 @@ export function useChores() {
           group_id: group.id,
           name,
           points,
+          base_points: points,
           is_persistent: isPersistent,
           created_by: user.id,
         })
@@ -56,6 +57,19 @@ export function useChores() {
           points_earned: points,
         })
       if (error) throw error
+
+      // Reset boosted points back to base
+      const { data: chore } = await supabase
+        .from('chores')
+        .select('points, base_points')
+        .eq('id', choreId)
+        .single()
+      if (chore && chore.points !== chore.base_points) {
+        await supabase
+          .from('chores')
+          .update({ points: chore.base_points })
+          .eq('id', choreId)
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['chores', group?.id] })

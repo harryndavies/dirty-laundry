@@ -186,8 +186,13 @@ export function ChoresPage() {
                     <div className="flex items-center gap-2 mt-1">
                       <button
                         onClick={() => { setBountyChore({ id: chore.id, name: chore.name, points: chore.points }); setBountyAmount(10) }}
-                        className="inline-flex items-center gap-1 bg-brutal-yellow border border-brutal-black px-2 py-0.5 font-mono text-xs font-bold active:bg-brutal-yellow/70 transition-colors"
+                        className={`inline-flex items-center gap-1 border border-brutal-black px-2 py-0.5 font-mono text-xs font-bold active:opacity-70 transition-colors ${
+                          chore.points > chore.base_points
+                            ? 'bg-brutal-orange text-brutal-white animate-pulse'
+                            : 'bg-brutal-yellow'
+                        }`}
                       >
+                        {chore.points > chore.base_points && '🔥 '}
                         {chore.points} PTS <TrendingUp size={10} />
                       </button>
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] font-bold border ${
