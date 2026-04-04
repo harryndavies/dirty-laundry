@@ -17,6 +17,7 @@ export interface Database {
           display_name?: string
           avatar_color?: string
         }
+        Relationships: []
       }
       groups: {
         Row: {
@@ -33,6 +34,7 @@ export interface Database {
         Update: {
           name?: string
         }
+        Relationships: []
       }
       group_members: {
         Row: {
@@ -50,6 +52,7 @@ export interface Database {
         Update: {
           total_points?: number
         }
+        Relationships: []
       }
       chores: {
         Row: {
@@ -73,6 +76,7 @@ export interface Database {
           points?: number
           is_persistent?: boolean
         }
+        Relationships: []
       }
       completions: {
         Row: {
@@ -90,6 +94,7 @@ export interface Database {
           points_earned: number
         }
         Update: Record<string, never>
+        Relationships: []
       }
       invitations: {
         Row: {
@@ -109,8 +114,13 @@ export interface Database {
         Update: {
           status?: 'pending' | 'accepted'
         }
+        Relationships: []
       }
     }
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
   }
 }
 
