@@ -6,6 +6,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Plus, Minus, Trash2, RotateCw, Zap } from 'lucide-react'
 import { Navigate } from 'react-router-dom'
 
@@ -20,6 +21,10 @@ export function ChoresPage() {
   const [newName, setNewName] = useState('')
   const [newPoints, setNewPoints] = useState(10)
   const [newPersistent, setNewPersistent] = useState(true)
+
+  // Confirm dialog state
+  const [confirmComplete, setConfirmComplete] = useState<{ id: string; points: number; name: string } | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
 
   // Swipe state
   const touchStartX = useRef(0)
@@ -45,14 +50,26 @@ export function ChoresPage() {
     toast(`${newName.trim()} added!`, 'bg-brutal-lime')
   }
 
-  async function handleComplete(choreId: string, points: number, name: string) {
-    await completeChore.mutateAsync({ choreId, points })
-    toast(`Done! +${points} pts for ${name}`, 'bg-brutal-lime')
+  function handleComplete(choreId: string, points: number, name: string) {
+    setConfirmComplete({ id: choreId, points, name })
   }
 
-  async function handleDelete(choreId: string) {
-    await deleteChore.mutateAsync(choreId)
+  async function doComplete() {
+    if (!confirmComplete) return
+    await completeChore.mutateAsync({ choreId: confirmComplete.id, points: confirmComplete.points })
+    toast(`Done! +${confirmComplete.points} pts for ${confirmComplete.name}`, 'bg-brutal-lime')
+    setConfirmComplete(null)
+  }
+
+  function handleDelete(choreId: string) {
+    setConfirmDelete(choreId)
+  }
+
+  async function doDelete() {
+    if (!confirmDelete) return
+    await deleteChore.mutateAsync(confirmDelete)
     toast('Chore deleted', 'bg-brutal-orange')
+    setConfirmDelete(null)
   }
 
   function onTouchStart(e: React.TouchEvent, id: string) {
@@ -260,6 +277,26 @@ export function ChoresPage() {
           </Button>
         </form>
       </BottomSheet>
+
+      <ConfirmDialog
+        open={!!confirmComplete}
+        title="COMPLETE CHORE"
+        message={confirmComplete ? `Mark "${confirmComplete.name}" as done for +${confirmComplete.points} pts?` : ''}
+        confirmLabel="DONE ✓"
+        confirmColor="bg-brutal-lime"
+        onConfirm={doComplete}
+        onCancel={() => setConfirmComplete(null)}
+      />
+
+      <ConfirmDialog
+        open={!!confirmDelete}
+        title="DELETE CHORE"
+        message="Are you sure? This can't be undone."
+        confirmLabel="DELETE"
+        confirmColor="bg-brutal-pink"
+        onConfirm={doDelete}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   )
 }
