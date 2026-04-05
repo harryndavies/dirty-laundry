@@ -100,13 +100,33 @@ export function useChores() {
         .eq('id', user.id)
         .single()
 
+      // Check for leaderboard overtakes
+      const { data: allMembers } = await supabase
+        .from('group_members')
+        .select('user_id, total_points')
+        .eq('group_id', group.id)
+
+      const myPoints = allMembers?.find(m => m.user_id === user.id)?.total_points ?? 0
+      const previousPoints = myPoints - earnedPoints
+
       if (members) {
         for (const m of members) {
-          sendPushToUser(m.user_id, {
-            title: 'Chore completed!',
-            body: `${profile?.display_name ?? 'Someone'} did "${choreData?.name ?? 'a chore'}" (+${earnedPoints} pts)`,
-            url: '/chores',
-          }).catch(() => {})
+          const theirPoints = allMembers?.find(am => am.user_id === m.user_id)?.total_points ?? 0
+
+          // Notify if we just overtook them (they were above us, now we're above them)
+          if (theirPoints > 0 && previousPoints <= theirPoints && myPoints > theirPoints) {
+            sendPushToUser(m.user_id, {
+              title: 'You got overtaken! 😤',
+              body: `${profile?.display_name ?? 'Someone'} just passed you on the leaderboard`,
+              url: '/leaderboard',
+            }).catch(() => {})
+          } else {
+            sendPushToUser(m.user_id, {
+              title: 'Chore completed!',
+              body: `${profile?.display_name ?? 'Someone'} did "${choreData?.name ?? 'a chore'}" (+${earnedPoints} pts)`,
+              url: '/chores',
+            }).catch(() => {})
+          }
         }
       }
 

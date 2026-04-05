@@ -174,6 +174,25 @@ export function GroupProvider({ children }: { children: ReactNode }) {
         .eq('id', memberId)
     }
     if (group) await refreshMembersForGroup(group.id)
+
+    // Notify other members that the split changed
+    if (user && group) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single()
+
+      const otherMembers = members.filter(m => m.user_id !== user.id)
+      for (const m of otherMembers) {
+        const memberShare = shares.find(s => s.memberId === m.id)
+        sendPushToUser(m.user_id, {
+          title: 'Chore split updated! ⚖️',
+          body: `${profile?.display_name ?? 'The owner'} changed the split — your share is now ${memberShare?.share ?? 0}%`,
+          url: '/group',
+        }).catch(() => {})
+      }
+    }
   }
 
   function leaveGroup() {
