@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { Spinner } from '@/components/ui/Spinner'
 import { supabase } from '@/lib/supabase'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
@@ -119,7 +120,7 @@ export function WeeklyReportPage() {
 
       <div className="px-4 py-4">
         {loading ? (
-          <div className="py-12 text-center font-mono text-brutal-black/40 text-sm">LOADING...</div>
+          <div className="py-12"><Spinner /></div>
         ) : !hasActivity ? (
           <div className="py-12 text-center">
             <div className="text-4xl mb-3">📊</div>

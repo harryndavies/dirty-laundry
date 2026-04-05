@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
@@ -22,7 +23,7 @@ export function GroupPage() {
   if (groupLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <p className="font-mono font-bold text-brutal-black/40 animate-pulse">LOADING...</p>
+        <Spinner />
       </div>
     )
   }

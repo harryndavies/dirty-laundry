@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
 import { useChores } from '@/lib/hooks/useChores'
 import { useFairTurn } from '@/lib/hooks/useFairTurn'
@@ -175,7 +176,7 @@ export function ChoresPage() {
       {/* Chore list */}
       <div className="px-4 pb-4 space-y-3">
         {loading ? (
-          <div className="py-12 text-center font-mono text-brutal-black/40">LOADING...</div>
+          <div className="py-12"><Spinner /></div>
         ) : filtered.length === 0 ? (
           <div className="py-12 text-center">
             <div className="text-4xl mb-3">🧹</div>

@@ -1,4 +1,5 @@
 import { useActivity } from '@/lib/hooks/useActivity'
+import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
 import { Avatar } from '@/components/ui/Avatar'
 import { Navigate } from 'react-router-dom'
@@ -54,9 +55,7 @@ export function ActivityPage() {
 
       <div className="px-4 py-4">
         {loading ? (
-          <div className="py-12 text-center">
-            <p className="font-mono font-bold text-brutal-black/40 text-sm">LOADING...</p>
-          </div>
+          <div className="py-12"><Spinner /></div>
         ) : activity.length === 0 ? (
           <div className="py-12 text-center">
             <div className="text-4xl mb-3">📋</div>
