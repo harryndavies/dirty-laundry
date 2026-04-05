@@ -224,7 +224,22 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  function leaveGroup() {
+  async function leaveGroup() {
+    if (!user || !group) {
+      localStorage.removeItem('dirtylaundry_group_id')
+      setGroup(null)
+      setMembers([])
+      setUserMember(null)
+      return
+    }
+
+    // Delete membership from database
+    await supabase
+      .from('group_members')
+      .delete()
+      .eq('group_id', group.id)
+      .eq('user_id', user.id)
+
     localStorage.removeItem('dirtylaundry_group_id')
     setGroup(null)
     setMembers([])

@@ -7,11 +7,12 @@ import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
-import { Copy, Mail, Percent, Trophy } from 'lucide-react'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { Copy, Mail, Percent, Trophy, LogOut } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 export function GroupPage() {
-  const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, loading: groupLoading } = useGroup()
+  const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, leaveGroup, loading: groupLoading } = useGroup()
   const { user } = useAuth()
   const [groupName, setGroupName] = useState('')
   const [inviteCode, setInviteCode] = useState('')
@@ -25,6 +26,7 @@ export function GroupPage() {
   const [showPrize, setShowPrize] = useState(false)
   const [prizeText, setPrizeText] = useState('')
   const [savingPrize, setSavingPrize] = useState(false)
+  const [confirmLeave, setConfirmLeave] = useState(false)
 
   const isOwner = members.find(m => m.user_id === user?.id)?.role === 'owner'
   const shareTotal = Object.values(shares).reduce((sum, v) => sum + v, 0)
@@ -358,6 +360,29 @@ export function GroupPage() {
           {savingPrize ? 'SAVING...' : 'SAVE PRIZE'}
         </Button>
       </BottomSheet>
+
+      {/* Leave group */}
+      <div className="px-4 mt-6 mb-6">
+        <button
+          onClick={() => setConfirmLeave(true)}
+          className="w-full flex items-center justify-center gap-2 p-4 border-2 border-brutal-pink/30 font-mono text-xs font-bold text-brutal-pink active:bg-brutal-pink/10 transition-colors"
+        >
+          <LogOut size={14} /> LEAVE GROUP
+        </button>
+      </div>
+
+      <ConfirmDialog
+        open={confirmLeave}
+        title="LEAVE GROUP"
+        message={`Leave ${group.name}? Your points and history will stay but you won't be a member anymore.`}
+        confirmLabel="LEAVE"
+        confirmColor="bg-brutal-pink"
+        onConfirm={async () => {
+          await leaveGroup()
+          setConfirmLeave(false)
+        }}
+        onCancel={() => setConfirmLeave(false)}
+      />
 
       {/* Invite sheet */}
       <BottomSheet open={showInvite} onClose={() => setShowInvite(false)}>
