@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
-import { Plus, Minus, Trash2, RotateCw, Zap, Dices, TrendingUp, Bell } from 'lucide-react'
+import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'persistent' | 'one-time'
@@ -249,22 +249,12 @@ export function ChoresPage() {
                     )}
                   </div>
 
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleComplete(chore.id, chore.points, chore.name)}
-                      className="w-12 h-12 bg-brutal-lime border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono font-bold text-sm active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
-                    >
-                      ✓
-                    </button>
-                    {chore.created_by === user?.id && (
-                      <button
-                        onClick={() => handleDelete(chore.id)}
-                        className="w-12 h-12 bg-brutal-pink/20 border-2 border-brutal-black flex items-center justify-center active:bg-brutal-pink/40 transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
-                  </div>
+                  <button
+                    onClick={() => handleComplete(chore.id, chore.points, chore.name)}
+                    className="w-12 h-12 bg-brutal-lime border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono font-bold text-sm active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+                  >
+                    ✓
+                  </button>
                 </div>
               </div>
             )
