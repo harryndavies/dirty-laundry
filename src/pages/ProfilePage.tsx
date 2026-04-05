@@ -78,6 +78,9 @@ export function ProfilePage() {
           )}
 
           <p className="font-mono text-xs text-brutal-black/40 mt-1">{user?.email}</p>
+          <div className="mt-2 px-3 py-1 bg-brutal-yellow border-2 border-brutal-black font-mono font-bold text-sm">
+            {userMember?.total_points ?? 0} PTS
+          </div>
         </div>
 
         {/* Color picker */}
@@ -152,17 +155,6 @@ export function ProfilePage() {
             </button>
           </div>
         )}
-
-        {/* Stats */}
-        <div className="border-4 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-5">
-          <h3 className="font-mono text-xs font-bold uppercase mb-3">YOUR STATS</h3>
-          <div className="flex gap-4">
-            <div className="flex-1 bg-brutal-yellow border-2 border-brutal-black p-3 text-center">
-              <div className="font-mono font-bold text-2xl">{userMember?.total_points ?? 0}</div>
-              <div className="font-mono text-[10px] font-bold text-brutal-black/60">TOTAL PTS</div>
-            </div>
-          </div>
-        </div>
 
         {/* Sign out */}
         <Button
