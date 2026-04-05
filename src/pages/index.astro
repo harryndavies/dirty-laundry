@@ -29,6 +29,42 @@
       </div>
     </section>
 
+    <!-- LIVE STATS -->
+    <section class="section bg-black stats-section">
+      <div class="container">
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat">
+            <div class="stat-number" id="stat-chores">—</div>
+            <div class="stat-label">CHORES COMPLETED</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number" id="stat-points">—</div>
+            <div class="stat-label">POINTS EARNED</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number" id="stat-households">—</div>
+            <div class="stat-label">HOUSEHOLDS</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      async function loadStats() {
+        try {
+          const res = await fetch('https://ldluxsoyevjrzualmfvo.supabase.co/functions/v1/public-stats')
+          const data = await res.json()
+          const fmt = (n) => n.toLocaleString('en-GB')
+          document.getElementById('stat-chores').textContent = fmt(data.chores_completed)
+          document.getElementById('stat-points').textContent = fmt(data.points_earned)
+          document.getElementById('stat-households').textContent = fmt(data.households)
+        } catch {
+          // Leave as dashes
+        }
+      }
+      loadStats()
+    </script>
+
     <!-- PROBLEM -->
     <section class="section bg-white">
       <div class="container">
@@ -1114,6 +1150,36 @@
      FOOTER
      ================================ */
   /* ================================
+     LIVE STATS
+     ================================ */
+
+  .stats-section {
+    padding: 2.5rem 0;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #FFE500;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.15em;
+    margin-top: 0.5rem;
+  }
+
+  /* ================================
      CHORE SPLIT SECTION
      ================================ */
 
@@ -1277,6 +1343,10 @@
 
     .card-grid, .card-grid.four {
       grid-template-columns: 1fr;
+    }
+
+    .stat-number {
+      font-size: 1.75rem;
     }
 
     .split-grid {
