@@ -90,12 +90,6 @@ export function useChores() {
         .eq('group_id', group.id)
         .neq('user_id', user.id)
 
-      const { data: choreData } = await supabase
-        .from('chores')
-        .select('name')
-        .eq('id', choreId)
-        .single()
-
       const { data: profile } = await supabase
         .from('profiles')
         .select('display_name')
@@ -125,7 +119,7 @@ export function useChores() {
           } else {
             sendPushToUser(m.user_id, {
               title: 'Chore completed!',
-              body: `${profile?.display_name ?? 'Someone'} did "${choreData?.name ?? 'a chore'}" (+${earnedPoints} pts)`,
+              body: `${profile?.display_name ?? 'Someone'} did "${chore?.name ?? 'a chore'}" (+${earnedPoints} pts)`,
               url: '/chores',
             }).catch(() => {})
           }
