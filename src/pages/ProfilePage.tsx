@@ -9,7 +9,7 @@ import { toast } from '@/components/ui/Toast'
 import { Check, Pencil, Moon, Sun, Bell, BellOff } from 'lucide-react'
 import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '@/lib/pushNotifications'
 
-const COLORS = ['#FF2D9B', '#0066FF', '#FFE500', '#BFFF00', '#FF6B00', '#8B5CF6', '#06B6D4', '#EF4444']
+const COLORS = ['#FF2D9B', '#0066FF', '#FFE500', '#BFFF00', '#FF6B00', '#8B5CF6', '#06B6D4']
 
 export function ProfilePage() {
   const { user, profile, signOut, updateProfile } = useAuth()
