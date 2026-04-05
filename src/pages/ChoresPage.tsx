@@ -36,8 +36,10 @@ export function ChoresPage() {
   const [bountyChore, setBountyChore] = useState<{ id: string; name: string; points: number } | null>(null)
   const [bountyAmount, setBountyAmount] = useState(10)
 
-  // Swipe state
+  // Swipe state — use refs for tracking to avoid async state issues, state only for rendering
   const touchStartX = useRef(0)
+  const swipingIdRef = useRef<string | null>(null)
+  const swipeOffsetRef = useRef(0)
   const [swipingId, setSwipingId] = useState<string | null>(null)
   const [swipeOffset, setSwipeOffset] = useState(0)
 
@@ -99,22 +101,28 @@ export function ChoresPage() {
 
   function onTouchStart(e: React.TouchEvent, id: string) {
     touchStartX.current = e.touches[0].clientX
+    swipingIdRef.current = id
+    swipeOffsetRef.current = 0
     setSwipingId(id)
     setSwipeOffset(0)
   }
 
   function onTouchMove(e: React.TouchEvent) {
-    if (!swipingId) return
+    if (!swipingIdRef.current) return
     const diff = e.touches[0].clientX - touchStartX.current
+    swipeOffsetRef.current = diff
     setSwipeOffset(diff)
   }
 
   function onTouchEnd(choreId: string, points: number, name: string, createdBy: string) {
-    if (swipeOffset > 80) {
+    const offset = swipeOffsetRef.current
+    if (offset > 80) {
       handleComplete(choreId, points, name)
-    } else if (swipeOffset < -80 && createdBy === user?.id) {
+    } else if (offset < -80 && createdBy === user?.id) {
       handleDelete(choreId)
     }
+    swipingIdRef.current = null
+    swipeOffsetRef.current = 0
     setSwipingId(null)
     setSwipeOffset(0)
   }
