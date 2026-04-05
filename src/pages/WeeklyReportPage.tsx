@@ -17,6 +17,12 @@ interface WeeklyMemberStats {
   topChore: string | null
 }
 
+interface ChoreBreakdown {
+  name: string
+  doers: { user_id: string; display_name: string; avatar_color: string; count: number }[]
+  total: number
+}
+
 function getWeekRange(offset: number): { start: Date; end: Date; label: string } {
   const now = new Date()
   const dayOfWeek = now.getDay()
@@ -40,6 +46,7 @@ export function WeeklyReportPage() {
   const { champions, currentLeader } = useChampions()
   const [weekOffset, setWeekOffset] = useState(0)
   const [stats, setStats] = useState<WeeklyMemberStats[]>([])
+  const [choreBreakdown, setChoreBreakdown] = useState<ChoreBreakdown[]>([])
   const [loading, setLoading] = useState(true)
 
   const { start, end, label } = getWeekRange(weekOffset)
@@ -89,6 +96,33 @@ export function WeeklyReportPage() {
       }
     }).sort((a, b) => b.points - a.points)
 
+    // Build chore breakdown — who does each chore
+    const choreMap = new Map<string, Map<string, number>>()
+    for (const c of (completions ?? []) as unknown as { user_id: string; points_earned: number; chores: { name: string } | null }[]) {
+      const choreName = c.chores?.name ?? 'Unknown'
+      if (!choreMap.has(choreName)) choreMap.set(choreName, new Map())
+      const doerMap = choreMap.get(choreName)!
+      doerMap.set(c.user_id, (doerMap.get(c.user_id) ?? 0) + 1)
+    }
+
+    const breakdown: ChoreBreakdown[] = Array.from(choreMap.entries())
+      .map(([name, doerMap]) => {
+        const doers = Array.from(doerMap.entries())
+          .map(([userId, count]) => {
+            const m = members.find(m => m.user_id === userId)
+            return {
+              user_id: userId,
+              display_name: m?.profiles.display_name ?? '?',
+              avatar_color: m?.profiles.avatar_color ?? '#ccc',
+              count,
+            }
+          })
+          .sort((a, b) => b.count - a.count)
+        return { name, doers, total: doers.reduce((s, d) => s + d.count, 0) }
+      })
+      .sort((a, b) => b.total - a.total)
+
+    setChoreBreakdown(breakdown)
     setStats(result)
     setLoading(false)
   }, [group, members, start.getTime(), end.getTime()])
@@ -211,6 +245,46 @@ export function WeeklyReportPage() {
                 )
               })}
             </div>
+
+            {/* Who does what */}
+            {choreBreakdown.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="font-mono font-bold text-xs text-brutal-black/40 tracking-widest px-1">WHO DOES WHAT</h3>
+                {choreBreakdown.map(chore => (
+                  <div key={chore.name} className="border-2 border-brutal-black p-3 bg-brutal-white">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-mono font-bold text-sm">{chore.name}</span>
+                      <span className="font-mono text-[10px] text-brutal-black/40">{chore.total}x</span>
+                    </div>
+                    <div className="flex gap-1 h-4 mb-2">
+                      {chore.doers.map(d => (
+                        <div
+                          key={d.user_id}
+                          className="h-full border border-brutal-black/20"
+                          style={{
+                            width: `${(d.count / chore.total) * 100}%`,
+                            backgroundColor: d.avatar_color,
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1">
+                      {chore.doers.map(d => (
+                        <div key={d.user_id} className="flex items-center gap-1">
+                          <div
+                            className="w-2.5 h-2.5 border border-brutal-black/30"
+                            style={{ backgroundColor: d.avatar_color }}
+                          />
+                          <span className="font-mono text-[10px] text-brutal-black/60">
+                            {d.display_name} {d.count}x
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Sass */}
             {stats.length >= 2 && stats[stats.length - 1].points === 0 && (
