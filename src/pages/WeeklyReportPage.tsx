@@ -3,9 +3,10 @@ import { Spinner } from '@/components/ui/Spinner'
 import { supabase } from '@/lib/supabase'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
+import { useChampions } from '@/lib/hooks/useChampions'
 import { Avatar } from '@/components/ui/Avatar'
 import { Navigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Crown } from 'lucide-react'
 
 interface WeeklyMemberStats {
   user_id: string
@@ -36,6 +37,7 @@ function getWeekRange(offset: number): { start: Date; end: Date; label: string }
 export function WeeklyReportPage() {
   const { group, members } = useGroup()
   const { user } = useAuth()
+  const { champions, currentLeader } = useChampions()
   const [weekOffset, setWeekOffset] = useState(0)
   const [stats, setStats] = useState<WeeklyMemberStats[]>([])
   const [loading, setLoading] = useState(true)
@@ -202,6 +204,67 @@ export function WeeklyReportPage() {
                 <p className="font-mono text-xs font-bold text-brutal-pink">
                   {stats[stats.length - 1].display_name} did literally nothing this week. Just saying.
                 </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Monthly Champion */}
+        {(currentLeader || champions.length > 0) && (
+          <div className="mt-6 border-4 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            <div className="bg-brutal-yellow border-b-3 border-brutal-black px-5 py-3 flex items-center gap-2">
+              <Crown size={16} strokeWidth={3} />
+              <h3 className="font-mono text-xs font-bold uppercase">MONTHLY CHAMPION</h3>
+            </div>
+
+            {currentLeader && (
+              <div className="p-4 border-b-2 border-brutal-black/10">
+                <p className="font-mono text-[10px] text-brutal-black/40 font-bold tracking-widest mb-2">
+                  CURRENT LEADER — {currentLeader.month}
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Avatar
+                      name={currentLeader.display_name}
+                      color={currentLeader.avatar_color}
+                      size="sm"
+                    />
+                    <span className="absolute -top-1.5 -right-1.5 text-xs">👑</span>
+                  </div>
+                  <div className="flex-1">
+                    <span className="font-mono font-bold text-sm">
+                      {currentLeader.display_name}
+                      {currentLeader.user_id === user?.id && ' (YOU)'}
+                    </span>
+                    <span className="font-mono text-xs text-brutal-black/50 ml-2">
+                      {currentLeader.points} pts
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {champions.length > 0 && (
+              <div className="p-4">
+                <p className="font-mono text-[10px] text-brutal-black/40 font-bold tracking-widest mb-2">
+                  HALL OF FAME
+                </p>
+                <div className="space-y-2">
+                  {champions.map(c => (
+                    <div key={c.monthKey} className="flex items-center gap-3 py-1">
+                      <span className="font-mono text-[10px] text-brutal-black/40 font-bold w-16 shrink-0">
+                        {c.month}
+                      </span>
+                      <Avatar name={c.display_name} color={c.avatar_color} size="sm" />
+                      <span className="font-mono font-bold text-xs flex-1 truncate">
+                        {c.display_name}
+                      </span>
+                      <span className="font-mono text-xs text-brutal-black/40 font-bold">
+                        {c.points} pts
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
