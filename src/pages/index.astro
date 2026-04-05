@@ -133,6 +133,14 @@
       </div>
     </section>
 
+    <!-- MID CTA -->
+    <section class="section bg-black mid-cta">
+      <div class="container cta">
+        <p class="cta-free">100% free. No ads. No catch. No premium tier.</p>
+        <a href="https://app.dirtylaundry.club/auth" class="btn btn-yellow">START TRACKING — IT'S FREE</a>
+      </div>
+    </section>
+
     <!-- APP PREVIEW -->
     <section class="section bg-white">
       <div class="container">
@@ -328,6 +336,45 @@
             <p class="phone-label">ACTIVITY LOG</p>
           </div>
 
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="section bg-white">
+      <div class="container">
+        <h2>WHAT PEOPLE ARE SAYING</h2>
+        <div class="testimonial-grid">
+          <div class="testimonial">
+            <p class="testimonial-quote">"We stopped arguing about dishes within a week. Now we just passive-aggressively nudge each other instead."</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar bg-pink">L</div>
+              <div>
+                <span class="testimonial-name">Laura</span>
+                <span class="testimonial-detail">Lives with partner</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial">
+            <p class="testimonial-quote">"My flatmate claimed he did 'most of the cleaning.' Showed him the yearly report. He does 19%. We don't argue about it anymore."</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar bg-blue">M</div>
+              <div>
+                <span class="testimonial-name">Marcus</span>
+                <span class="testimonial-detail">3-person flatshare</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial">
+            <p class="testimonial-quote">"I have ADHD and the chore roulette is genuinely the only reason my flat isn't a disaster. Spin, do, done."</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar bg-orange">R</div>
+              <div>
+                <span class="testimonial-name">Ria</span>
+                <span class="testimonial-detail">Lives alone (still needs accountability)</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -528,8 +575,8 @@
     <section class="section bg-black">
       <div class="container cta">
         <h2 class="text-white">READY TO SETTLE IT?</h2>
-        <p class="text-white-muted">Free. No ads. Just accountability.</p>
-        <a href="https://app.dirtylaundry.club/auth" class="btn btn-yellow">START TRACKING</a>
+        <p class="text-white-muted">100% free. No ads. No catch. No premium tier. Just accountability.</p>
+        <a href="https://app.dirtylaundry.club/auth" class="btn btn-yellow">START TRACKING — IT'S FREE</a>
       </div>
     </section>
 
@@ -1231,6 +1278,77 @@
   }
 
   /* ================================
+     MID CTA
+     ================================ */
+
+  .mid-cta {
+    padding: 2.5rem 0;
+  }
+
+  .cta-free {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 1.25rem;
+  }
+
+  /* ================================
+     TESTIMONIALS
+     ================================ */
+
+  .testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .testimonial {
+    border: 3px solid #000;
+    padding: 1.5rem;
+    background: #fff;
+    box-shadow: 6px 6px 0 #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .testimonial-quote {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: rgba(0,0,0,0.7);
+    margin-bottom: 1.25rem;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .testimonial-avatar {
+    width: 36px;
+    height: 36px;
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .testimonial-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: block;
+  }
+
+  .testimonial-detail {
+    font-size: 0.625rem;
+    color: rgba(0,0,0,0.4);
+  }
+
+  /* ================================
      CHORE SPLIT SECTION
      ================================ */
 
@@ -1443,7 +1561,7 @@
       font-size: 1.75rem;
     }
 
-    .split-grid, .adhd-grid {
+    .split-grid, .adhd-grid, .testimonial-grid {
       grid-template-columns: 1fr;
     }
   }
