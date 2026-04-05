@@ -56,7 +56,7 @@ export function useChores() {
       // Check if this chore was boosted by the completer
       const { data: chore } = await supabase
         .from('chores')
-        .select('points, base_points, boosted_by')
+        .select('name, points, base_points, boosted_by')
         .eq('id', choreId)
         .single()
 
@@ -71,6 +71,7 @@ export function useChores() {
           user_id: user.id,
           group_id: group.id,
           points_earned: earnedPoints,
+          chore_name: chore?.name ?? null,
         })
       if (error) throw error
 

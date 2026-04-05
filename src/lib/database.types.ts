@@ -104,12 +104,14 @@ export interface Database {
           group_id: string
           points_earned: number
           completed_at: string
+          chore_name: string | null
         }
         Insert: {
           chore_id: string
           user_id: string
           group_id: string
           points_earned: number
+          chore_name?: string | null
         }
         Update: Record<string, never>
         Relationships: []

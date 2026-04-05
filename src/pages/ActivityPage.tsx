@@ -78,7 +78,7 @@ export function ActivityPage() {
   function onTouchEnd(entry: ActivityEntry) {
     const offset = swipeOffsetRef.current
     if (offset < -80 && entry.user_id === user?.id) {
-      setConfirmUndo({ id: entry.id, name: entry.chores?.name ?? 'a chore' })
+      setConfirmUndo({ id: entry.id, name: entry.chore_name ?? 'a chore' })
     }
     swipingIdRef.current = null
     swipeOffsetRef.current = 0
@@ -156,7 +156,7 @@ export function ActivityPage() {
                           <p className="font-mono text-sm">
                             <span className="font-bold">{entry.profiles.display_name}</span>
                             {' completed '}
-                            <span className="font-bold">{entry.chores?.name ?? 'a chore'}</span>
+                            <span className="font-bold">{entry.chore_name ?? 'a chore'}</span>
                           </p>
                           <p className="font-mono text-[10px] text-brutal-black/40 mt-0.5">
                             {timeAgo(entry.completed_at)}

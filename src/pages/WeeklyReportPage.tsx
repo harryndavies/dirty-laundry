@@ -79,21 +79,21 @@ export function WeeklyReportPage() {
 
     const { data: completions } = await supabase
       .from('completions')
-      .select('user_id, points_earned, chores!left(name)')
+      .select('user_id, points_earned, chore_name')
       .eq('group_id', group.id)
       .gte('completed_at', start.toISOString())
       .lte('completed_at', end.toISOString())
 
     const memberMap = new Map<string, { points: number; completions: number; choreCounts: Map<string, number> }>()
 
-    for (const c of (completions ?? []) as unknown as { user_id: string; points_earned: number; chores: { name: string } | null }[]) {
+    for (const c of (completions ?? []) as unknown as { user_id: string; points_earned: number; chore_name: string | null }[]) {
       if (!memberMap.has(c.user_id)) {
         memberMap.set(c.user_id, { points: 0, completions: 0, choreCounts: new Map() })
       }
       const entry = memberMap.get(c.user_id)!
       entry.points += c.points_earned
       entry.completions += 1
-      const choreName = c.chores?.name ?? 'Unknown'
+      const choreName = c.chore_name ?? 'Unknown'
       entry.choreCounts.set(choreName, (entry.choreCounts.get(choreName) ?? 0) + 1)
     }
 
@@ -118,8 +118,8 @@ export function WeeklyReportPage() {
 
     // Build chore breakdown
     const choreMap = new Map<string, Map<string, number>>()
-    for (const c of (completions ?? []) as unknown as { user_id: string; points_earned: number; chores: { name: string } | null }[]) {
-      const choreName = c.chores?.name ?? 'Unknown'
+    for (const c of (completions ?? []) as unknown as { user_id: string; points_earned: number; chore_name: string | null }[]) {
+      const choreName = c.chore_name ?? 'Unknown'
       if (!choreMap.has(choreName)) choreMap.set(choreName, new Map())
       const doerMap = choreMap.get(choreName)!
       doerMap.set(c.user_id, (doerMap.get(c.user_id) ?? 0) + 1)
