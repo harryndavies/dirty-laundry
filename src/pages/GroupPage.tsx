@@ -146,33 +146,24 @@ export function GroupPage() {
         <h1 className="font-mono font-bold text-lg tracking-tight">{group.name}</h1>
       </div>
 
-      {/* Invite code card */}
-      <div className="p-4">
-        <div className="bg-brutal-yellow border-4 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-5 text-center">
-          <p className="font-mono text-xs font-bold text-brutal-black/60 mb-2">INVITE CODE</p>
-          <div className="flex items-center justify-center gap-3">
-            <span className="font-mono font-bold text-3xl tracking-[0.3em]">{group.invite_code}</span>
-            <button
-              onClick={copyCode}
-              className="w-10 h-10 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
-            >
-              <Copy size={16} />
-            </button>
-          </div>
-          <p className="font-mono text-[10px] text-brutal-black/40 mt-2">Share this code to invite people</p>
-        </div>
-      </div>
-
       {/* Members */}
-      <div className="px-4">
+      <div className="px-4 pt-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-mono font-bold text-sm">MEMBERS ({members.length})</h2>
-          <button
-            onClick={() => setShowInvite(true)}
-            className="flex items-center gap-1.5 font-mono text-xs font-bold px-3 py-2 bg-brutal-pink text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
-          >
-            <Mail size={14} /> INVITE
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={copyCode}
+              className="flex items-center gap-1.5 font-mono text-xs font-bold px-3 py-2 bg-brutal-yellow border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+            >
+              <Copy size={14} /> {group.invite_code}
+            </button>
+            <button
+              onClick={() => setShowInvite(true)}
+              className="flex items-center gap-1.5 font-mono text-xs font-bold px-3 py-2 bg-brutal-pink text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+            >
+              <Mail size={14} /> INVITE
+            </button>
+          </div>
         </div>
 
         <div className="space-y-2">
