@@ -1,17 +1,28 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useGroup } from '@/context/GroupContext'
+import { useAuth } from '@/context/AuthContext'
+import { sendPushToUser } from '@/lib/pushNotifications'
 
-interface ActivityEntry {
+interface Reaction {
   id: string
+  emoji: string
+  user_id: string
+}
+
+export interface ActivityEntry {
+  id: string
+  user_id: string
   points_earned: number
   completed_at: string
   profiles: { display_name: string; avatar_color: string }
   chores: { name: string } | null
+  reactions: Reaction[]
 }
 
 export function useActivity() {
   const { group } = useGroup()
+  const { user } = useAuth()
   const [activity, setActivity] = useState<ActivityEntry[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -19,7 +30,7 @@ export function useActivity() {
     if (!group) return
     const { data } = await supabase
       .from('completions')
-      .select('id, points_earned, completed_at, profiles(display_name, avatar_color), chores(name)')
+      .select('id, user_id, points_earned, completed_at, profiles(display_name, avatar_color), chores(name), reactions(id, emoji, user_id)')
       .eq('group_id', group.id)
       .order('completed_at', { ascending: false })
       .limit(50)
@@ -47,6 +58,15 @@ export function useActivity() {
         },
         () => fetchActivity()
       )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'reactions',
+        },
+        () => fetchActivity()
+      )
       .subscribe()
 
     return () => {
@@ -54,5 +74,40 @@ export function useActivity() {
     }
   }, [group, fetchActivity])
 
-  return { activity, loading }
+  async function toggleReaction(completionId: string, emoji: string) {
+    if (!user) return
+
+    // Find existing reaction by this user with this emoji
+    const entry = activity.find(a => a.id === completionId)
+    const existing = entry?.reactions.find(r => r.user_id === user.id && r.emoji === emoji)
+
+    if (existing) {
+      await supabase.from('reactions').delete().eq('id', existing.id)
+    } else {
+      await supabase.from('reactions').insert({
+        completion_id: completionId,
+        user_id: user.id,
+        emoji,
+      })
+
+      // Notify the person who completed the chore
+      if (entry && entry.user_id !== user.id) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single()
+
+        sendPushToUser(entry.user_id, {
+          title: `${emoji} Reaction!`,
+          body: `${profile?.display_name ?? 'Someone'} reacted ${emoji} to your "${entry.chores?.name ?? 'chore'}" completion`,
+          url: '/activity',
+        }).catch(() => {})
+      }
+    }
+
+    await fetchActivity()
+  }
+
+  return { activity, loading, toggleReaction }
 }

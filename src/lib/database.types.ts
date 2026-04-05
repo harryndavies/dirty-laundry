@@ -173,6 +173,23 @@ export interface Database {
         Relationships: []
       }
     }
+      reactions: {
+        Row: {
+          id: string
+          completion_id: string
+          user_id: string
+          emoji: string
+          created_at: string
+        }
+        Insert: {
+          completion_id: string
+          user_id: string
+          emoji: string
+        }
+        Update: Record<string, never>
+        Relationships: []
+      }
+    }
     Views: Record<string, never>
     Functions: Record<string, never>
     Enums: Record<string, never>

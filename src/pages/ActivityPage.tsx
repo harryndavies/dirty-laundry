@@ -1,8 +1,13 @@
+import { useState } from 'react'
 import { useActivity } from '@/lib/hooks/useActivity'
+import type { ActivityEntry } from '@/lib/hooks/useActivity'
 import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
+import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
 import { Navigate } from 'react-router-dom'
+
+const REACTION_EMOJIS = ['👏', '🔥', '😂', '🫡', '💀']
 
 function timeAgo(dateStr: string): string {
   const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000)
@@ -15,8 +20,8 @@ function timeAgo(dateStr: string): string {
   return `${days}d ago`
 }
 
-function groupByDate<T extends { completed_at: string }>(activity: T[]): Map<string, T[]> {
-  const groups = new Map<string, T[]>()
+function groupByDate(activity: ActivityEntry[]): Map<string, ActivityEntry[]> {
+  const groups = new Map<string, ActivityEntry[]>()
   for (const entry of activity) {
     const date = new Date(entry.completed_at)
     const today = new Date()
@@ -40,11 +45,23 @@ function groupByDate<T extends { completed_at: string }>(activity: T[]): Map<str
 
 export function ActivityPage() {
   const { group } = useGroup()
-  const { activity, loading } = useActivity()
+  const { user } = useAuth()
+  const { activity, loading, toggleReaction } = useActivity()
+  const [pickerOpen, setPickerOpen] = useState<string | null>(null)
 
   if (!group) return <Navigate to="/group" replace />
 
   const grouped = groupByDate(activity)
+
+  // Group reactions by emoji for display
+  function groupReactions(reactions: { id: string; emoji: string; user_id: string }[]) {
+    const map = new Map<string, string[]>()
+    for (const r of reactions) {
+      if (!map.has(r.emoji)) map.set(r.emoji, [])
+      map.get(r.emoji)!.push(r.user_id)
+    }
+    return map
+  }
 
   return (
     <div className="min-h-full">
@@ -69,31 +86,83 @@ export function ActivityPage() {
                 {dateLabel}
               </div>
               <div className="space-y-2">
-                {entries.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="bg-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 flex items-center gap-3"
-                  >
-                    <Avatar
-                      name={entry.profiles.display_name}
-                      color={entry.profiles.avatar_color}
-                      size="sm"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-mono text-sm">
-                        <span className="font-bold">{entry.profiles.display_name}</span>
-                        {' completed '}
-                        <span className="font-bold">{entry.chores?.name ?? 'a chore'}</span>
-                      </p>
-                      <p className="font-mono text-[10px] text-brutal-black/40 mt-0.5">
-                        {timeAgo(entry.completed_at)}
-                      </p>
+                {entries.map((entry) => {
+                  const reactionGroups = groupReactions(entry.reactions)
+                  const isPickerOpen = pickerOpen === entry.id
+
+                  return (
+                    <div
+                      key={entry.id}
+                      className="bg-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar
+                          name={entry.profiles.display_name}
+                          color={entry.profiles.avatar_color}
+                          size="sm"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-mono text-sm">
+                            <span className="font-bold">{entry.profiles.display_name}</span>
+                            {' completed '}
+                            <span className="font-bold">{entry.chores?.name ?? 'a chore'}</span>
+                          </p>
+                          <p className="font-mono text-[10px] text-brutal-black/40 mt-0.5">
+                            {timeAgo(entry.completed_at)}
+                          </p>
+                        </div>
+                        <div className="font-mono font-bold text-sm bg-brutal-yellow border border-brutal-black px-2 py-0.5">
+                          +{entry.points_earned}
+                        </div>
+                      </div>
+
+                      {/* Reactions row */}
+                      <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                        {Array.from(reactionGroups.entries()).map(([emoji, userIds]) => {
+                          const iMine = userIds.includes(user?.id ?? '')
+                          return (
+                            <button
+                              key={emoji}
+                              onClick={() => toggleReaction(entry.id, emoji)}
+                              className={`flex items-center gap-1 px-2 py-0.5 border font-mono text-xs transition-all active:scale-95 ${
+                                iMine
+                                  ? 'border-brutal-black bg-brutal-yellow/40'
+                                  : 'border-brutal-black/20 bg-brutal-white'
+                              }`}
+                            >
+                              <span>{emoji}</span>
+                              <span className="font-bold text-[10px]">{userIds.length}</span>
+                            </button>
+                          )
+                        })}
+                        <button
+                          onClick={() => setPickerOpen(isPickerOpen ? null : entry.id)}
+                          className="w-7 h-7 border border-brutal-black/20 bg-brutal-white flex items-center justify-center font-mono text-xs active:bg-brutal-black/5 transition-colors"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      {/* Emoji picker */}
+                      {isPickerOpen && (
+                        <div className="flex gap-1 mt-2 p-2 border-2 border-brutal-black bg-brutal-yellow/10">
+                          {REACTION_EMOJIS.map(emoji => (
+                            <button
+                              key={emoji}
+                              onClick={() => {
+                                toggleReaction(entry.id, emoji)
+                                setPickerOpen(null)
+                              }}
+                              className="w-10 h-10 text-lg border border-brutal-black/20 bg-brutal-white flex items-center justify-center active:scale-90 active:bg-brutal-yellow/30 transition-all"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <div className="font-mono font-bold text-sm bg-brutal-yellow border border-brutal-black px-2 py-0.5">
-                      +{entry.points_earned}
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           ))
