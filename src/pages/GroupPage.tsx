@@ -10,7 +10,7 @@ import { Copy, Mail } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 export function GroupPage() {
-  const { group, members, createGroup, joinGroup } = useGroup()
+  const { group, members, createGroup, joinGroup, loading: groupLoading } = useGroup()
   const { user } = useAuth()
   const [groupName, setGroupName] = useState('')
   const [inviteCode, setInviteCode] = useState('')
@@ -18,6 +18,14 @@ export function GroupPage() {
   const [inviteEmail, setInviteEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  if (groupLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <p className="font-mono font-bold text-brutal-black/40 animate-pulse">LOADING...</p>
+      </div>
+    )
+  }
 
   // No group — show create/join
   if (!group) {

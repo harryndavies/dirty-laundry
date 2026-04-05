@@ -15,7 +15,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 type Filter = 'all' | 'persistent' | 'one-time'
 
 export function ChoresPage() {
-  const { group } = useGroup()
+  const { group, loading: groupLoading } = useGroup()
   const { user } = useAuth()
   const { chores, loading, addChore, completeChore, deleteChore, boostChore } = useChores()
   const { suggestions } = useFairTurn()
@@ -43,6 +43,7 @@ export function ChoresPage() {
   const [swipingId, setSwipingId] = useState<string | null>(null)
   const [swipeOffset, setSwipeOffset] = useState(0)
 
+  if (groupLoading) return null
   if (!group) return <Navigate to="/group" replace />
 
   const filtered = chores.filter(c => {
