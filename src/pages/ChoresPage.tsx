@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
-import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell } from 'lucide-react'
+import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Search } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'persistent' | 'one-time'
@@ -23,6 +23,7 @@ export function ChoresPage() {
   const navigate = useNavigate()
   const [showAdd, setShowAdd] = useState(false)
   const [filter, setFilter] = useState<Filter>('all')
+  const [search, setSearch] = useState('')
   const [newName, setNewName] = useState('')
   const [newPoints, setNewPoints] = useState(10)
   const [newPersistent, setNewPersistent] = useState(true)
@@ -48,6 +49,7 @@ export function ChoresPage() {
   if (!group) return <Navigate to="/group" replace />
 
   const filtered = chores.filter(c => {
+    if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false
     if (filter === 'persistent') return c.is_persistent
     if (filter === 'one-time') return !c.is_persistent
     return true
@@ -171,6 +173,24 @@ export function ChoresPage() {
             {f.label}
           </button>
         ))}
+      </div>
+
+      {/* Search */}
+      <div className="px-4 pb-3">
+        <div className="flex items-center border-2 border-brutal-black bg-brutal-white h-10">
+          <Search size={14} className="ml-3 text-brutal-black/30" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search chores..."
+            className="flex-1 h-full px-2 font-mono text-xs bg-transparent outline-none"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="px-3 font-mono text-xs text-brutal-black/40 font-bold">
+              ✕
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Chore list */}
