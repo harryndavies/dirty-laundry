@@ -44,6 +44,7 @@ export function WeeklyReportPage() {
 
   const { start, end, label } = getWeekRange(weekOffset)
   const totalPoints = stats.reduce((sum, s) => sum + s.points, 0)
+  const hasShares = members.some(m => m.chore_share > 0)
 
   const fetchWeeklyStats = useCallback(async () => {
     if (!group) return
@@ -153,6 +154,10 @@ export function WeeklyReportPage() {
               {stats.map(member => {
                 const pct = totalPoints > 0 ? (member.points / totalPoints) * 100 : 0
                 const isMe = member.user_id === user?.id
+                const memberData = members.find(m => m.user_id === member.user_id)
+                const expectedShare = hasShares && memberData ? memberData.chore_share : Math.round(100 / members.length)
+                const expectedPoints = totalPoints * (expectedShare / 100)
+                const fairPct = expectedPoints > 0 ? Math.round((member.points / expectedPoints) * 100) : 0
 
                 return (
                   <div
@@ -166,7 +171,16 @@ export function WeeklyReportPage() {
                         <Avatar name={member.display_name} color={member.avatar_color} size="sm" />
                         <span className="font-mono font-bold text-sm">{member.display_name}</span>
                       </div>
-                      <span className="font-mono font-bold text-sm">{member.points} PTS</span>
+                      <div className="text-right">
+                        <span className="font-mono font-bold text-sm">{member.points} PTS</span>
+                        {hasShares && totalPoints > 0 && (
+                          <span className={`ml-2 font-mono font-bold text-xs ${
+                            fairPct >= 100 ? 'text-green-600' : fairPct >= 70 ? 'text-brutal-orange' : 'text-brutal-pink'
+                          }`}>
+                            {fairPct}%
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Percentage bar */}
@@ -182,7 +196,7 @@ export function WeeklyReportPage() {
                         {member.completions} chore{member.completions !== 1 ? 's' : ''} done
                       </span>
                       <span className="font-mono text-[10px] text-brutal-black/40">
-                        {Math.round(pct)}% of total
+                        {hasShares ? `${Math.round(pct)}% done (${expectedShare}% share)` : `${Math.round(pct)}% of total`}
                       </span>
                     </div>
 

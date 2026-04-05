@@ -55,15 +55,21 @@ export function useFairTurn() {
         }
       }
 
-      // Find the member who has done it least
-      let minCount = Infinity
+      // Find the member who is furthest behind their fair share
+      // If shares are set, weight by share; otherwise use equal weighting
+      const hasShares = members.some(m => m.chore_share > 0)
+      let minScore = Infinity
       let candidates: string[] = []
 
       for (const [userId, count] of counts) {
-        if (count < minCount) {
-          minCount = count
+        // Score = completions / expected share (lower = more behind)
+        const member = members.find(m => m.user_id === userId)
+        const share = hasShares && member ? (member.chore_share / 100) : (1 / members.length)
+        const score = share > 0 ? count / share : Infinity
+        if (score < minScore) {
+          minScore = score
           candidates = [userId]
-        } else if (count === minCount) {
+        } else if (score === minScore) {
           candidates.push(userId)
         }
       }

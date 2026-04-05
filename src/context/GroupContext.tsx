@@ -17,6 +17,7 @@ interface GroupContextType {
   joinGroup: (inviteCode: string) => Promise<{ error: string | null }>
   refreshMembers: () => Promise<void>
   leaveGroup: () => void
+  updateMemberShares: (shares: { memberId: string; share: number }[]) => Promise<void>
 }
 
 const GroupContext = createContext<GroupContextType | null>(null)
@@ -165,6 +166,16 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     return { error: null }
   }
 
+  async function updateMemberShares(shares: { memberId: string; share: number }[]) {
+    for (const { memberId, share } of shares) {
+      await supabase
+        .from('group_members')
+        .update({ chore_share: share })
+        .eq('id', memberId)
+    }
+    if (group) await refreshMembersForGroup(group.id)
+  }
+
   function leaveGroup() {
     localStorage.removeItem('dirtylaundry_group_id')
     setGroup(null)
@@ -173,7 +184,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <GroupContext.Provider value={{ group, members, userMember, loading, createGroup, joinGroup, refreshMembers, leaveGroup }}>
+    <GroupContext.Provider value={{ group, members, userMember, loading, createGroup, joinGroup, refreshMembers, leaveGroup, updateMemberShares }}>
       {children}
     </GroupContext.Provider>
   )

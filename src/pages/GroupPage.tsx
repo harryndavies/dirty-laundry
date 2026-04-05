@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
@@ -7,11 +7,11 @@ import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
-import { Copy, Mail } from 'lucide-react'
+import { Copy, Mail, Percent } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 export function GroupPage() {
-  const { group, members, createGroup, joinGroup, loading: groupLoading } = useGroup()
+  const { group, members, createGroup, joinGroup, updateMemberShares, loading: groupLoading } = useGroup()
   const { user } = useAuth()
   const [groupName, setGroupName] = useState('')
   const [inviteCode, setInviteCode] = useState('')
@@ -19,6 +19,12 @@ export function GroupPage() {
   const [inviteEmail, setInviteEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showSplit, setShowSplit] = useState(false)
+  const [shares, setShares] = useState<Record<string, number>>({})
+  const [savingSplit, setSavingSplit] = useState(false)
+
+  const isOwner = members.find(m => m.user_id === user?.id)?.role === 'owner'
+  const shareTotal = Object.values(shares).reduce((sum, v) => sum + v, 0)
 
   if (groupLoading) {
     return (
@@ -187,6 +193,100 @@ export function GroupPage() {
           ))}
         </div>
       </div>
+
+      {/* Chore split */}
+      {isOwner && members.length >= 2 && (
+        <div className="px-4 mt-6">
+          <button
+            onClick={() => {
+              const initial: Record<string, number> = {}
+              const hasCustom = members.some(m => m.chore_share > 0)
+              for (const m of members) {
+                initial[m.id] = hasCustom ? m.chore_share : Math.round(100 / members.length)
+              }
+              setShares(initial)
+              setShowSplit(true)
+            }}
+            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+          >
+            <div className="flex items-center gap-2">
+              <Percent size={16} strokeWidth={3} />
+              <span className="font-mono font-bold text-sm">CHORE SPLIT</span>
+            </div>
+            <span className="font-mono text-xs text-brutal-black/40">
+              {members.some(m => m.chore_share > 0) ? 'CUSTOM' : 'EQUAL'}
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Split editor sheet */}
+      <BottomSheet open={showSplit} onClose={() => setShowSplit(false)}>
+        <h2 className="font-mono font-bold text-lg mb-1">CHORE SPLIT</h2>
+        <p className="font-mono text-xs text-brutal-black/50 mb-4">
+          Set each person's fair share. Must total 100%.
+        </p>
+        <div className="space-y-3">
+          {members.map(m => (
+            <div key={m.id} className="flex items-center gap-3">
+              <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" />
+              <span className="font-mono font-bold text-sm flex-1 truncate">{m.profiles.display_name}</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShares(s => ({ ...s, [m.id]: Math.max(0, (s[m.id] ?? 0) - 5) }))}
+                  className="w-8 h-8 border-2 border-brutal-black bg-brutal-white flex items-center justify-center font-mono font-bold active:bg-brutal-black/10"
+                >
+                  -
+                </button>
+                <span className="font-mono font-bold text-lg w-12 text-center">{shares[m.id] ?? 0}%</span>
+                <button
+                  type="button"
+                  onClick={() => setShares(s => ({ ...s, [m.id]: Math.min(100, (s[m.id] ?? 0) + 5) }))}
+                  className="w-8 h-8 border-2 border-brutal-black bg-brutal-white flex items-center justify-center font-mono font-bold active:bg-brutal-black/10"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className={`mt-4 p-3 border-2 text-center font-mono font-bold text-sm ${
+          shareTotal === 100
+            ? 'border-brutal-lime bg-brutal-lime/20'
+            : 'border-brutal-pink bg-brutal-pink/20'
+        }`}>
+          TOTAL: {shareTotal}% {shareTotal !== 100 && `(need 100%)`}
+        </div>
+        <Button
+          onClick={async () => {
+            setSavingSplit(true)
+            await updateMemberShares(
+              members.map(m => ({ memberId: m.id, share: shares[m.id] ?? 0 }))
+            )
+            setSavingSplit(false)
+            setShowSplit(false)
+            toast('Chore split updated!', 'bg-brutal-lime')
+          }}
+          disabled={shareTotal !== 100 || savingSplit}
+          className="w-full h-12 mt-3 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-40"
+        >
+          {savingSplit ? 'SAVING...' : 'SAVE SPLIT'}
+        </Button>
+        <button
+          onClick={() => {
+            const equal = Math.round(100 / members.length)
+            const initial: Record<string, number> = {}
+            members.forEach((m, i) => {
+              initial[m.id] = i === 0 ? 100 - equal * (members.length - 1) : equal
+            })
+            setShares(initial)
+          }}
+          className="w-full mt-2 font-mono text-xs text-brutal-black/40 font-bold py-2 active:text-brutal-black/60"
+        >
+          RESET TO EQUAL
+        </button>
+      </BottomSheet>
 
       {/* Invite sheet */}
       <BottomSheet open={showInvite} onClose={() => setShowInvite(false)}>
