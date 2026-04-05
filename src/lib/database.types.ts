@@ -172,7 +172,6 @@ export interface Database {
         }
         Relationships: []
       }
-    }
       reactions: {
         Row: {
           id: string
