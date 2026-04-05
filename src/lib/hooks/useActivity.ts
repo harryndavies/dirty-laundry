@@ -30,7 +30,7 @@ export function useActivity() {
     if (!group) return
     const { data } = await supabase
       .from('completions')
-      .select('id, user_id, points_earned, completed_at, profiles(display_name, avatar_color), chores(name), reactions(id, emoji, user_id)')
+      .select('id, user_id, points_earned, completed_at, profiles(display_name, avatar_color), chores!left(name), reactions(id, emoji, user_id)')
       .eq('group_id', group.id)
       .order('completed_at', { ascending: false })
       .limit(50)

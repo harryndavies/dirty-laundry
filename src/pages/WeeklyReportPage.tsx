@@ -79,7 +79,7 @@ export function WeeklyReportPage() {
 
     const { data: completions } = await supabase
       .from('completions')
-      .select('user_id, points_earned, chores(name)')
+      .select('user_id, points_earned, chores!left(name)')
       .eq('group_id', group.id)
       .gte('completed_at', start.toISOString())
       .lte('completed_at', end.toISOString())
