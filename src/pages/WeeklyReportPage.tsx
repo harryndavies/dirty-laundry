@@ -8,7 +8,7 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Navigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Crown } from 'lucide-react'
 
-interface WeeklyMemberStats {
+interface MemberStats {
   user_id: string
   display_name: string
   avatar_color: string
@@ -23,37 +23,59 @@ interface ChoreBreakdown {
   total: number
 }
 
-function getWeekRange(offset: number): { start: Date; end: Date; label: string } {
+type Period = 'week' | 'month' | 'year'
+
+function getRange(period: Period, offset: number): { start: Date; end: Date; label: string } {
   const now = new Date()
-  const dayOfWeek = now.getDay()
-  const monday = new Date(now)
-  monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1) + offset * 7)
-  monday.setHours(0, 0, 0, 0)
 
-  const sunday = new Date(monday)
-  sunday.setDate(monday.getDate() + 6)
-  sunday.setHours(23, 59, 59, 999)
+  if (period === 'week') {
+    const dayOfWeek = now.getDay()
+    const monday = new Date(now)
+    monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1) + offset * 7)
+    monday.setHours(0, 0, 0, 0)
+    const sunday = new Date(monday)
+    sunday.setDate(monday.getDate() + 6)
+    sunday.setHours(23, 59, 59, 999)
+    const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+    const label = offset === 0 ? 'THIS WEEK' : offset === -1 ? 'LAST WEEK' : `${fmt(monday)} – ${fmt(sunday)}`
+    return { start: monday, end: sunday, label }
+  }
 
-  const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-  const label = offset === 0 ? 'THIS WEEK' : offset === -1 ? 'LAST WEEK' : `${fmt(monday)} – ${fmt(sunday)}`
+  if (period === 'month') {
+    const d = new Date(now.getFullYear(), now.getMonth() + offset, 1)
+    const start = new Date(d.getFullYear(), d.getMonth(), 1)
+    start.setHours(0, 0, 0, 0)
+    const end = new Date(d.getFullYear(), d.getMonth() + 1, 0)
+    end.setHours(23, 59, 59, 999)
+    const label = offset === 0 ? 'THIS MONTH' : offset === -1 ? 'LAST MONTH' : d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }).toUpperCase()
+    return { start, end, label }
+  }
 
-  return { start: monday, end: sunday, label }
+  // year
+  const year = now.getFullYear() + offset
+  const start = new Date(year, 0, 1)
+  start.setHours(0, 0, 0, 0)
+  const end = new Date(year, 11, 31)
+  end.setHours(23, 59, 59, 999)
+  const label = offset === 0 ? 'THIS YEAR' : `${year}`
+  return { start, end, label }
 }
 
 export function WeeklyReportPage() {
   const { group, members } = useGroup()
   const { user } = useAuth()
   const { champions, currentLeader } = useChampions()
-  const [weekOffset, setWeekOffset] = useState(0)
-  const [stats, setStats] = useState<WeeklyMemberStats[]>([])
+  const [period, setPeriod] = useState<Period>('week')
+  const [offset, setOffset] = useState(0)
+  const [stats, setStats] = useState<MemberStats[]>([])
   const [choreBreakdown, setChoreBreakdown] = useState<ChoreBreakdown[]>([])
   const [loading, setLoading] = useState(true)
 
-  const { start, end, label } = getWeekRange(weekOffset)
+  const { start, end, label } = getRange(period, offset)
   const totalPoints = stats.reduce((sum, s) => sum + s.points, 0)
   const hasShares = members.some(m => m.chore_share > 0)
 
-  const fetchWeeklyStats = useCallback(async () => {
+  const fetchStats = useCallback(async () => {
     if (!group) return
     setLoading(true)
 
@@ -77,7 +99,7 @@ export function WeeklyReportPage() {
       entry.choreCounts.set(choreName, (entry.choreCounts.get(choreName) ?? 0) + 1)
     }
 
-    const result: WeeklyMemberStats[] = members.map(m => {
+    const result: MemberStats[] = members.map(m => {
       const data = memberMap.get(m.user_id)
       let topChore: string | null = null
       if (data) {
@@ -96,7 +118,7 @@ export function WeeklyReportPage() {
       }
     }).sort((a, b) => b.points - a.points)
 
-    // Build chore breakdown — who does each chore
+    // Build chore breakdown
     const choreMap = new Map<string, Map<string, number>>()
     for (const c of (completions ?? []) as unknown as { user_id: string; points_earned: number; chores: { name: string } | null }[]) {
       const choreName = c.chores?.name ?? 'Unknown'
@@ -128,27 +150,50 @@ export function WeeklyReportPage() {
   }, [group, members, start.getTime(), end.getTime()])
 
   useEffect(() => {
-    fetchWeeklyStats()
-  }, [fetchWeeklyStats])
+    fetchStats()
+  }, [fetchStats])
 
   if (!group) return <Navigate to="/group" replace />
 
   const winner = stats[0]
   const hasActivity = totalPoints > 0
+  const periodLabel = period === 'week' ? 'this week' : period === 'month' ? 'this month' : 'this year'
+  const periodLabels: { label: string; value: Period }[] = [
+    { label: 'WEEK', value: 'week' },
+    { label: 'MONTH', value: 'month' },
+    { label: 'YEAR', value: 'year' },
+  ]
 
   return (
     <div className="min-h-full">
       <div className="sticky top-0 z-10 bg-brutal-blue border-b-4 border-brutal-black px-4 py-4">
-        <h1 className="font-mono font-bold text-2xl tracking-tight text-center text-brutal-white">WEEKLY REPORT</h1>
-        <div className="flex items-center justify-center gap-3 mt-1">
-          <button onClick={() => setWeekOffset(w => w - 1)} className="text-brutal-white/60 active:text-brutal-white">
+        {/* Period toggle */}
+        <div className="flex justify-center gap-1 mb-3">
+          {periodLabels.map(p => (
+            <button
+              key={p.value}
+              onClick={() => { setPeriod(p.value); setOffset(0) }}
+              className={`font-mono text-[10px] font-bold px-3 py-1.5 border border-brutal-white/30 transition-all ${
+                period === p.value
+                  ? 'bg-brutal-white text-brutal-blue'
+                  : 'text-brutal-white/60 active:text-brutal-white'
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Navigation */}
+        <div className="flex items-center justify-center gap-3">
+          <button onClick={() => setOffset(o => o - 1)} className="text-brutal-white/60 active:text-brutal-white">
             <ChevronLeft size={18} />
           </button>
-          <span className="font-mono text-xs text-brutal-white/80 font-bold min-w-[120px] text-center">{label}</span>
+          <span className="font-mono text-xs text-brutal-white/80 font-bold min-w-[140px] text-center">{label}</span>
           <button
-            onClick={() => setWeekOffset(w => Math.min(w + 1, 0))}
-            disabled={weekOffset >= 0}
-            className={`${weekOffset >= 0 ? 'opacity-20' : 'text-brutal-white/60 active:text-brutal-white'}`}
+            onClick={() => setOffset(o => Math.min(o + 1, 0))}
+            disabled={offset >= 0}
+            className={`${offset >= 0 ? 'opacity-20' : 'text-brutal-white/60 active:text-brutal-white'}`}
           >
             <ChevronRight size={18} />
           </button>
@@ -161,7 +206,7 @@ export function WeeklyReportPage() {
         ) : !hasActivity ? (
           <div className="py-12 text-center">
             <div className="text-4xl mb-3">📊</div>
-            <p className="font-mono font-bold text-brutal-black/40 text-sm">NO ACTIVITY THIS WEEK</p>
+            <p className="font-mono font-bold text-brutal-black/40 text-sm">NO ACTIVITY {label}</p>
             <p className="font-mono text-brutal-black/30 text-xs mt-1">Get to work!</p>
           </div>
         ) : (
@@ -176,7 +221,7 @@ export function WeeklyReportPage() {
                 </div>
                 <p className="font-mono font-bold text-3xl mt-1">{winner.points} PTS</p>
                 <p className="font-mono text-xs text-brutal-black/50 mt-1">
-                  {totalPoints > 0 ? Math.round((winner.points / totalPoints) * 100) : 0}% of all work this week.
+                  {totalPoints > 0 ? Math.round((winner.points / totalPoints) * 100) : 0}% of all work {periodLabel}.
                   {Math.round((winner.points / totalPoints) * 100) > 60 ? ' Carrying the team.' : ''}
                 </p>
               </div>
@@ -290,7 +335,7 @@ export function WeeklyReportPage() {
             {stats.length >= 2 && stats[stats.length - 1].points === 0 && (
               <div className="bg-brutal-pink/10 border-2 border-brutal-pink p-3 text-center">
                 <p className="font-mono text-xs font-bold text-brutal-pink">
-                  {stats[stats.length - 1].display_name} did literally nothing this week. Just saying.
+                  {stats[stats.length - 1].display_name} did literally nothing {periodLabel}. Just saying.
                 </p>
               </div>
             )}
