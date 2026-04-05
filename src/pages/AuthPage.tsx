@@ -72,12 +72,12 @@ export function AuthPage() {
             <div className="bg-brutal-yellow/30 border-2 border-brutal-black p-4">
               <h2 className="font-mono font-bold text-sm mb-3">WHAT'S THIS ABOUT?</h2>
               <p className="font-mono text-xs text-brutal-black/80 leading-relaxed">
-                Let's be honest — nobody keeps a mental tally of who last cleaned the bathroom.
-                But everyone <span className="font-bold">thinks</span> they do more.
+                Housework is boring. Nobody wants to do it.
+                But <span className="font-bold">someone</span> has to.
               </p>
               <p className="font-mono text-xs text-brutal-black/80 leading-relaxed mt-2">
-                Dirty Laundry settles it. Add your household chores, earn points when you do them,
-                and let the leaderboard do the talking. No arguments, just receipts.
+                Dirty Laundry turns your household chores into a game. Add chores, earn points,
+                climb the leaderboard, and make the boring stuff a bit more fun.
               </p>
             </div>
 
@@ -92,7 +92,7 @@ export function AuthPage() {
               </div>
               <div className="flex items-start gap-3 p-2">
                 <span className="bg-brutal-blue border-2 border-brutal-black w-8 h-8 flex items-center justify-center font-mono font-bold text-sm text-brutal-white shrink-0">3</span>
-                <p className="font-mono text-xs text-brutal-black/70 pt-1">Mark chores as done, watch your score climb, and see who's actually pulling their weight</p>
+                <p className="font-mono text-xs text-brutal-black/70 pt-1">Complete chores, earn points, and climb the leaderboard. It's weirdly motivating</p>
               </div>
             </div>
 
