@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useActivity } from '@/lib/hooks/useActivity'
 import type { ActivityEntry } from '@/lib/hooks/useActivity'
 import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Navigate } from 'react-router-dom'
 
 const REACTION_EMOJIS = ['👏', '🔥', '😂', '🫡', '💀']
@@ -46,8 +47,44 @@ function groupByDate(activity: ActivityEntry[]): Map<string, ActivityEntry[]> {
 export function ActivityPage() {
   const { group } = useGroup()
   const { user } = useAuth()
-  const { activity, loading, toggleReaction } = useActivity()
+  const { activity, loading, toggleReaction, undoCompletion } = useActivity()
   const [pickerOpen, setPickerOpen] = useState<string | null>(null)
+  const [confirmUndo, setConfirmUndo] = useState<{ id: string; name: string } | null>(null)
+
+  // Swipe state
+  const touchStartX = useRef(0)
+  const swipingIdRef = useRef<string | null>(null)
+  const swipeOffsetRef = useRef(0)
+  const [swipingId, setSwipingId] = useState<string | null>(null)
+  const [swipeOffset, setSwipeOffset] = useState(0)
+
+  function onTouchStart(e: React.TouchEvent, id: string) {
+    touchStartX.current = e.touches[0].clientX
+    swipingIdRef.current = id
+    swipeOffsetRef.current = 0
+    setSwipingId(id)
+    setSwipeOffset(0)
+  }
+
+  function onTouchMove(e: React.TouchEvent) {
+    if (!swipingIdRef.current) return
+    const diff = e.touches[0].clientX - touchStartX.current
+    // Only allow swipe left (negative)
+    const clamped = Math.min(0, diff)
+    swipeOffsetRef.current = clamped
+    setSwipeOffset(clamped)
+  }
+
+  function onTouchEnd(entry: ActivityEntry) {
+    const offset = swipeOffsetRef.current
+    if (offset < -80 && entry.user_id === user?.id) {
+      setConfirmUndo({ id: entry.id, name: entry.chores?.name ?? 'a chore' })
+    }
+    swipingIdRef.current = null
+    swipeOffsetRef.current = 0
+    setSwipingId(null)
+    setSwipeOffset(0)
+  }
 
   if (!group) return <Navigate to="/group" replace />
 
@@ -89,11 +126,25 @@ export function ActivityPage() {
                 {entries.map((entry) => {
                   const reactionGroups = groupReactions(entry.reactions)
                   const isPickerOpen = pickerOpen === entry.id
+                  const isSwiping = swipingId === entry.id
+                  const offset = isSwiping ? swipeOffset : 0
+                  const showUndo = offset < -40 && entry.user_id === user?.id
+                  const isMine = entry.user_id === user?.id
 
                   return (
+                    <div key={entry.id} className="relative overflow-hidden">
+                      {/* Undo background */}
+                      {isMine && (
+                        <div className={`absolute inset-0 bg-brutal-pink flex items-center justify-end px-4 font-mono font-bold text-sm text-brutal-white transition-opacity ${showUndo ? 'opacity-100' : 'opacity-0'}`}>
+                          UNDO ↩
+                        </div>
+                      )}
                     <div
-                      key={entry.id}
-                      className="bg-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3"
+                      className="relative bg-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 touch-pan-y"
+                      style={{ transform: isSwiping ? `translateX(${offset}px)` : 'translateX(0)', transition: isSwiping ? 'none' : 'transform 0.2s' }}
+                      onTouchStart={isMine ? e => onTouchStart(e, entry.id) : undefined}
+                      onTouchMove={isMine ? onTouchMove : undefined}
+                      onTouchEnd={isMine ? () => onTouchEnd(entry) : undefined}
                     >
                       <div className="flex items-center gap-3">
                         <Avatar
@@ -161,6 +212,7 @@ export function ActivityPage() {
                         </div>
                       )}
                     </div>
+                    </div>
                   )
                 })}
               </div>
@@ -168,6 +220,19 @@ export function ActivityPage() {
           ))
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!confirmUndo}
+        title="UNDO COMPLETION"
+        message={confirmUndo ? `Remove "${confirmUndo.name}" completion and subtract the points?` : ''}
+        confirmLabel="UNDO"
+        confirmColor="bg-brutal-pink"
+        onConfirm={async () => {
+          if (confirmUndo) await undoCompletion(confirmUndo.id)
+          setConfirmUndo(null)
+        }}
+        onCancel={() => setConfirmUndo(null)}
+      />
     </div>
   )
 }

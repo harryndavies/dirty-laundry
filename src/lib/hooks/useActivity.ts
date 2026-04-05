@@ -109,5 +109,32 @@ export function useActivity() {
     await fetchActivity()
   }
 
-  return { activity, loading, toggleReaction }
+  async function undoCompletion(completionId: string) {
+    if (!user || !group) return
+
+    const entry = activity.find(a => a.id === completionId)
+    if (!entry || entry.user_id !== user.id) return
+
+    // Subtract points from group_members
+    const { data: membership } = await supabase
+      .from('group_members')
+      .select('id, total_points')
+      .eq('group_id', group.id)
+      .eq('user_id', user.id)
+      .single()
+
+    if (membership) {
+      await supabase
+        .from('group_members')
+        .update({ total_points: Math.max(0, membership.total_points - entry.points_earned) })
+        .eq('id', membership.id)
+    }
+
+    // Delete the completion
+    await supabase.from('completions').delete().eq('id', completionId)
+
+    await fetchActivity()
+  }
+
+  return { activity, loading, toggleReaction, undoCompletion }
 }
