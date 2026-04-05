@@ -378,6 +378,65 @@
       </div>
     </section>
 
+    <!-- CHORE SPLIT -->
+    <section class="section bg-white">
+      <div class="container">
+        <h2>NOT EVERYONE HAS THE SAME FREE TIME</h2>
+        <p class="split-intro">
+          Some weeks you're working late every night. Other weeks you're off.
+          Dirty Laundry lets your group set a <strong>fair chore split</strong> so nobody gets
+          shamed for being busy — and nobody gets a free pass either.
+        </p>
+        <div class="split-grid">
+          <div class="split-card">
+            <div class="split-icon">⚖️</div>
+            <h3>GROUP-AGREED SPLIT</h3>
+            <p>The group owner sets each person's expected share. Everyone can see it. No one can quietly game it.</p>
+          </div>
+          <div class="split-card">
+            <div class="split-icon">📊</div>
+            <h3>FAIR SHARE SCORING</h3>
+            <p>The report scores you against <strong>your share</strong>, not everyone else's. Hit your target and you're golden — even if someone else did more raw points.</p>
+          </div>
+          <div class="split-card">
+            <div class="split-icon">🧠</div>
+            <h3>SMART SUGGESTIONS</h3>
+            <p>"Whose turn" factors in your split. If you're set to 20%, you won't get suggested as often as someone at 40%.</p>
+          </div>
+        </div>
+        <div class="split-example">
+          <div class="split-example-header">EXAMPLE: 3-PERSON FLAT</div>
+          <div class="split-bars">
+            <div class="split-bar-row">
+              <div class="split-bar-avatar" style="background:#FF2D9B;">S</div>
+              <span class="split-bar-name">Sarah</span>
+              <div class="split-bar-track">
+                <div class="split-bar-fill bg-pink" style="width:40%;"></div>
+              </div>
+              <span class="split-bar-pct">40%</span>
+            </div>
+            <div class="split-bar-row">
+              <div class="split-bar-avatar" style="background:#0066FF;">T</div>
+              <span class="split-bar-name">Tom</span>
+              <div class="split-bar-track">
+                <div class="split-bar-fill bg-blue" style="width:35%;"></div>
+              </div>
+              <span class="split-bar-pct">35%</span>
+            </div>
+            <div class="split-bar-row">
+              <div class="split-bar-avatar" style="background:#FF6B00;">J</div>
+              <span class="split-bar-name">Jake</span>
+              <div class="split-bar-track">
+                <div class="split-bar-fill bg-orange" style="width:25%;"></div>
+              </div>
+              <span class="split-bar-pct">25%</span>
+            </div>
+          </div>
+          <p class="split-example-note">Jake works 60-hour weeks. The group agreed on 25%. He does his share, no guilt.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- CTA -->
     <section class="section bg-black">
       <div class="container cta">
@@ -1054,6 +1113,127 @@
   /* ================================
      FOOTER
      ================================ */
+  /* ================================
+     CHORE SPLIT SECTION
+     ================================ */
+
+  .split-intro {
+    font-size: 1rem;
+    color: rgba(0,0,0,0.6);
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .split-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .split-card {
+    border: 3px solid #000;
+    padding: 1.5rem;
+    background: #fff;
+    box-shadow: 6px 6px 0 #000;
+  }
+
+  .split-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .split-card h3 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .split-card p {
+    font-size: 0.75rem;
+    color: rgba(0,0,0,0.5);
+    line-height: 1.5;
+  }
+
+  .split-example {
+    border: 4px solid #000;
+    box-shadow: 8px 8px 0 #000;
+    background: #FFF;
+    max-width: 500px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .split-example-header {
+    background: #000;
+    color: #FFE500;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .split-bars {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .split-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .split-bar-avatar {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .split-bar-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    width: 50px;
+    flex-shrink: 0;
+  }
+
+  .split-bar-track {
+    flex: 1;
+    height: 20px;
+    border: 2px solid #000;
+    background: rgba(0,0,0,0.05);
+  }
+
+  .split-bar-fill {
+    height: 100%;
+  }
+
+  .split-bar-pct {
+    font-size: 0.875rem;
+    font-weight: 700;
+    width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .split-example-note {
+    font-size: 0.6875rem;
+    color: rgba(0,0,0,0.4);
+    padding: 0 1.25rem 1.25rem;
+    text-align: center;
+  }
+
   .footer {
     background: #000;
     border-top: 4px solid #FFE500;
@@ -1096,6 +1276,10 @@
     }
 
     .card-grid, .card-grid.four {
+      grid-template-columns: 1fr;
+    }
+
+    .split-grid {
       grid-template-columns: 1fr;
     }
   }
