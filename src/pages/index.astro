@@ -480,6 +480,50 @@
       </div>
     </section>
 
+    <!-- ADHD -->
+    <section class="section bg-yellow">
+      <div class="container">
+        <h2>BUILT FOR BRAINS THAT STRUGGLE WITH CHORES</h2>
+        <p class="adhd-intro">
+          If you've ever stared at a messy kitchen and felt completely paralysed —
+          you're not lazy. You might just have a brain that needs a different system.
+          Dirty Laundry was built with that in mind.
+        </p>
+        <div class="adhd-grid">
+          <div class="adhd-card">
+            <div class="adhd-icon">🎯</div>
+            <h3>DECISION FATIGUE?</h3>
+            <p><strong>"Whose turn"</strong> tells you exactly what to do next. No staring at the mess wondering where to start.</p>
+          </div>
+          <div class="adhd-card">
+            <div class="adhd-icon">🎰</div>
+            <h3>CAN'T START?</h3>
+            <p><strong>Chore roulette</strong> makes it random and a bit fun. Spin the wheel, do the thing. Takes the weight off choosing.</p>
+          </div>
+          <div class="adhd-card">
+            <div class="adhd-icon">🏆</div>
+            <h3>NEED DOPAMINE?</h3>
+            <p><strong>Points, reactions, and leaderboards</strong> turn boring tasks into a game. Your brain wants a reward — here it is.</p>
+          </div>
+          <div class="adhd-card">
+            <div class="adhd-icon">🔔</div>
+            <h3>OUT OF SIGHT, OUT OF MIND?</h3>
+            <p><strong>Push reminders and nudges</strong> are your external memory. The app remembers so you don't have to.</p>
+          </div>
+          <div class="adhd-card">
+            <div class="adhd-icon">⚖️</div>
+            <h3>GUILT SPIRAL?</h3>
+            <p><strong>The chore split</strong> means you're only measured against your own capacity. Bad week? Adjust the share. No shame.</p>
+          </div>
+          <div class="adhd-card">
+            <div class="adhd-icon">👏</div>
+            <h3>NEED ACKNOWLEDGEMENT?</h3>
+            <p><strong>Reactions on completions</strong> mean your effort gets seen. A 👏 from a housemate goes a long way.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- CTA -->
     <section class="section bg-black">
       <div class="container cta">
@@ -1307,6 +1351,49 @@
     text-align: center;
   }
 
+  /* ================================
+     ADHD SECTION
+     ================================ */
+
+  .adhd-intro {
+    font-size: 1rem;
+    color: rgba(0,0,0,0.6);
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .adhd-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .adhd-card {
+    border: 3px solid #000;
+    padding: 1.5rem;
+    background: #fff;
+    box-shadow: 6px 6px 0 #000;
+  }
+
+  .adhd-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .adhd-card h3 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .adhd-card p {
+    font-size: 0.75rem;
+    color: rgba(0,0,0,0.5);
+    line-height: 1.5;
+  }
+
   .footer {
     background: #000;
     border-top: 4px solid #FFE500;
@@ -1356,7 +1443,7 @@
       font-size: 1.75rem;
     }
 
-    .split-grid {
+    .split-grid, .adhd-grid {
       grid-template-columns: 1fr;
     }
   }
