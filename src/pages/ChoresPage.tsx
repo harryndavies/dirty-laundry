@@ -15,6 +15,8 @@ import { Navigate, useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'persistent' | 'one-time'
 
+const AREAS = ['Kitchen', 'Bathroom', 'Bedroom', 'Living Room', 'Garden', 'Laundry', 'General']
+
 export function ChoresPage() {
   const { group, loading: groupLoading } = useGroup()
   const { user } = useAuth()
@@ -29,6 +31,7 @@ export function ChoresPage() {
   const [newPersistent, setNewPersistent] = useState(true)
   const [newReminderDay, setNewReminderDay] = useState<number | null>(null)
   const [newReminderTime, setNewReminderTime] = useState('09:00')
+  const [newArea, setNewArea] = useState<string | null>(null)
 
   // Confirm dialog state
   const [confirmComplete, setConfirmComplete] = useState<{ id: string; points: number; name: string } | null>(null)
@@ -64,6 +67,7 @@ export function ChoresPage() {
       isPersistent: newPersistent,
       reminderDay: newReminderDay,
       reminderTime: newReminderDay !== null ? newReminderTime : null,
+      area: newArea,
     })
     const addedName = newName.trim()
     setNewName('')
@@ -71,6 +75,7 @@ export function ChoresPage() {
     setNewPersistent(true)
     setNewReminderDay(null)
     setNewReminderTime('09:00')
+    setNewArea(null)
     setShowAdd(false)
     toast(`${addedName} added!`, 'bg-brutal-lime')
   }
@@ -194,7 +199,7 @@ export function ChoresPage() {
       </div>
 
       {/* Chore list */}
-      <div className="px-4 pb-4 space-y-3">
+      <div className="px-4 pb-4">
         {loading ? (
           <div className="py-12"><Spinner /></div>
         ) : filtered.length === 0 ? (
@@ -204,7 +209,23 @@ export function ChoresPage() {
             <p className="font-mono text-brutal-black/30 text-xs mt-1">Tap + to add one</p>
           </div>
         ) : (
-          filtered.map(chore => {
+          (() => {
+            const hasAreas = filtered.some(c => c.area)
+            const grouped = new Map<string, typeof filtered>()
+            for (const c of filtered) {
+              const key = c.area ?? (hasAreas ? 'Uncategorised' : '')
+              if (!grouped.has(key)) grouped.set(key, [])
+              grouped.get(key)!.push(c)
+            }
+            return Array.from(grouped.entries()).map(([area, areaChores]) => (
+              <div key={area} className="mb-4">
+                {area && (
+                  <div className="font-mono font-bold text-[11px] text-brutal-black/40 tracking-widest mb-2 px-1 sticky top-[60px] bg-brutal-white py-1 z-[5]">
+                    {area.toUpperCase()}
+                  </div>
+                )}
+                <div className="space-y-3">
+          {areaChores.map(chore => {
             const isSwiping = swipingId === chore.id
             const offset = isSwiping ? swipeOffset : 0
             const showDone = offset > 40
@@ -280,7 +301,11 @@ export function ChoresPage() {
                 </div>
               </div>
             )
-          })
+          })}
+                </div>
+              </div>
+            ))
+          })()
         )}
       </div>
 
@@ -344,6 +369,33 @@ export function ChoresPage() {
               >
                 ONE-TIME
               </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="font-mono text-xs font-bold uppercase block mb-1">AREA</label>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => setNewArea(null)}
+                className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${
+                  newArea === null ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
+                }`}
+              >
+                NONE
+              </button>
+              {AREAS.map(a => (
+                <button
+                  key={a}
+                  type="button"
+                  onClick={() => setNewArea(a)}
+                  className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${
+                    newArea === a ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
+                  }`}
+                >
+                  {a.toUpperCase()}
+                </button>
+              ))}
             </div>
           </div>
 
