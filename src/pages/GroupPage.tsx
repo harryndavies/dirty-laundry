@@ -7,11 +7,11 @@ import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
-import { Copy, Mail, Percent } from 'lucide-react'
+import { Copy, Mail, Percent, Trophy } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 export function GroupPage() {
-  const { group, members, createGroup, joinGroup, updateMemberShares, loading: groupLoading } = useGroup()
+  const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, loading: groupLoading } = useGroup()
   const { user } = useAuth()
   const [groupName, setGroupName] = useState('')
   const [inviteCode, setInviteCode] = useState('')
@@ -22,6 +22,9 @@ export function GroupPage() {
   const [showSplit, setShowSplit] = useState(false)
   const [shares, setShares] = useState<Record<string, number>>({})
   const [savingSplit, setSavingSplit] = useState(false)
+  const [showPrize, setShowPrize] = useState(false)
+  const [prizeText, setPrizeText] = useState('')
+  const [savingPrize, setSavingPrize] = useState(false)
 
   const isOwner = members.find(m => m.user_id === user?.id)?.role === 'owner'
   const shareTotal = Object.values(shares).reduce((sum, v) => sum + v, 0)
@@ -285,6 +288,75 @@ export function GroupPage() {
             </button>
           </>
         )}
+      </BottomSheet>
+
+      {/* Monthly prizes */}
+      {members.length >= 2 && (
+        <div className="px-4 mt-4">
+          <div className="border-2 border-brutal-black bg-brutal-white">
+            <div className="flex items-center gap-2 px-4 py-3 border-b-2 border-brutal-black bg-brutal-yellow/20">
+              <Trophy size={14} strokeWidth={3} />
+              <span className="font-mono font-bold text-xs">MONTHLY PRIZES</span>
+              <span className="font-mono text-[10px] text-brutal-black/40 ml-auto">Winner takes their prize</span>
+            </div>
+            <div className="divide-y divide-brutal-black/10">
+              {members.map(m => {
+                const isMe = m.user_id === user?.id
+                return (
+                  <div key={m.id} className="flex items-center gap-3 px-4 py-3">
+                    <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" />
+                    <div className="flex-1 min-w-0">
+                      <span className="font-mono font-bold text-xs block truncate">{m.profiles.display_name}</span>
+                      <span className="font-mono text-[10px] text-brutal-black/40 block truncate">
+                        {m.monthly_prize || 'No prize set'}
+                      </span>
+                    </div>
+                    {isMe && (
+                      <button
+                        onClick={() => {
+                          setPrizeText(m.monthly_prize ?? '')
+                          setShowPrize(true)
+                        }}
+                        className="font-mono text-[10px] font-bold px-2 py-1 border border-brutal-black bg-brutal-yellow active:bg-brutal-yellow/60 transition-colors"
+                      >
+                        {m.monthly_prize ? 'EDIT' : 'SET'}
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Prize editor sheet */}
+      <BottomSheet open={showPrize} onClose={() => setShowPrize(false)}>
+        <h2 className="font-mono font-bold text-lg mb-1">YOUR PRIZE</h2>
+        <p className="font-mono text-xs text-brutal-black/50 mb-4">
+          What do you want if you win this month?
+        </p>
+        <Input
+          value={prizeText}
+          onChange={e => setPrizeText(e.target.value)}
+          placeholder="e.g. I pick the takeaway"
+          className="border-2 border-brutal-black font-mono h-12"
+          autoFocus
+          maxLength={100}
+        />
+        <Button
+          onClick={async () => {
+            setSavingPrize(true)
+            await updateMyPrize(prizeText.trim())
+            setSavingPrize(false)
+            setShowPrize(false)
+            toast('Prize updated!', 'bg-brutal-yellow')
+          }}
+          disabled={savingPrize}
+          className="w-full h-12 mt-3 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-40"
+        >
+          {savingPrize ? 'SAVING...' : 'SAVE PRIZE'}
+        </Button>
       </BottomSheet>
 
       {/* Invite sheet */}

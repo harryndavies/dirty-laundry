@@ -9,6 +9,7 @@ interface MonthlyChampion {
   display_name: string
   avatar_color: string
   points: number
+  prize: string | null
   isCurrent: boolean
 }
 
@@ -80,6 +81,7 @@ export function useChampions() {
         display_name: member.profiles.display_name,
         avatar_color: member.profiles.avatar_color,
         points: topPoints,
+        prize: member.monthly_prize ?? null,
         isCurrent,
       }
 

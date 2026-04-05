@@ -44,16 +44,19 @@ export interface Database {
           role: 'owner' | 'member'
           total_points: number
           chore_share: number
+          monthly_prize: string | null
         }
         Insert: {
           group_id: string
           user_id: string
           role?: 'owner' | 'member'
           chore_share?: number
+          monthly_prize?: string | null
         }
         Update: {
           total_points?: number
           chore_share?: number
+          monthly_prize?: string | null
         }
         Relationships: []
       }

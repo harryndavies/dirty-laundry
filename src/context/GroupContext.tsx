@@ -18,6 +18,7 @@ interface GroupContextType {
   refreshMembers: () => Promise<void>
   leaveGroup: () => void
   updateMemberShares: (shares: { memberId: string; share: number }[]) => Promise<void>
+  updateMyPrize: (prize: string) => Promise<void>
 }
 
 const GroupContext = createContext<GroupContextType | null>(null)
@@ -195,6 +196,17 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function updateMyPrize(prize: string) {
+    if (!user || !group) return
+    const member = members.find(m => m.user_id === user.id)
+    if (!member) return
+    await supabase
+      .from('group_members')
+      .update({ monthly_prize: prize || null })
+      .eq('id', member.id)
+    await refreshMembersForGroup(group.id)
+  }
+
   function leaveGroup() {
     localStorage.removeItem('dirtylaundry_group_id')
     setGroup(null)
@@ -203,7 +215,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <GroupContext.Provider value={{ group, members, userMember, loading, createGroup, joinGroup, refreshMembers, leaveGroup, updateMemberShares }}>
+    <GroupContext.Provider value={{ group, members, userMember, loading, createGroup, joinGroup, refreshMembers, leaveGroup, updateMemberShares, updateMyPrize }}>
       {children}
     </GroupContext.Provider>
   )
