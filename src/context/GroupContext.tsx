@@ -205,6 +205,23 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       .update({ monthly_prize: prize || null })
       .eq('id', member.id)
     await refreshMembersForGroup(group.id)
+
+    if (prize.trim()) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single()
+
+      const others = members.filter(m => m.user_id !== user.id)
+      for (const m of others) {
+        sendPushToUser(m.user_id, {
+          title: 'New prize on the line! 🏆',
+          body: `${profile?.display_name ?? 'Someone'} is playing for: "${prize.trim()}"`,
+          url: '/group',
+        }).catch(() => {})
+      }
+    }
   }
 
   function leaveGroup() {
