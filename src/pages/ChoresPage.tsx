@@ -5,6 +5,7 @@ import { useChores } from '@/lib/hooks/useChores'
 import { useGroupStats } from '@/lib/hooks/useGroupStats'
 import { useFairTurn } from '@/lib/hooks/useFairTurn'
 import { useAuth } from '@/context/AuthContext'
+import { Avatar } from '@/components/ui/Avatar'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,7 +20,7 @@ type Filter = 'all' | 'persistent' | 'one-time'
 const AREAS = ['Kitchen', 'Bathroom', 'Bedroom', 'Living Room', 'Garden', 'Laundry', 'General']
 
 export function ChoresPage() {
-  const { group, loading: groupLoading } = useGroup()
+  const { group, members, loading: groupLoading } = useGroup()
   const { user } = useAuth()
   const { chores, loading, addChore, completeChore, deleteChore, boostChore } = useChores()
   const { suggestions } = useFairTurn()
@@ -38,6 +39,7 @@ export function ChoresPage() {
   // Confirm dialog state
   const [confirmComplete, setConfirmComplete] = useState<{ id: string; points: number; name: string } | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [withUserId, setWithUserId] = useState<string | null>(null)
 
   // Bounty state
   const [bountyChore, setBountyChore] = useState<{ id: string; name: string; points: number } | null>(null)
@@ -88,14 +90,22 @@ export function ChoresPage() {
 
   async function doComplete() {
     if (!confirmComplete) return
-    const result = await completeChore.mutateAsync({ choreId: confirmComplete.id, points: confirmComplete.points })
+    const result = await completeChore.mutateAsync({
+      choreId: confirmComplete.id,
+      points: confirmComplete.points,
+      withUserId: withUserId ?? undefined,
+    })
     playComplete()
-    if (result.earnedPoints < confirmComplete.points) {
+    const partner = withUserId ? members.find(m => m.user_id === withUserId) : null
+    if (partner) {
+      toast(`Done! +${result.earnedPoints} pts each for you and ${partner.profiles.display_name}`, 'bg-brutal-lime')
+    } else if (result.earnedPoints < confirmComplete.points) {
       toast(`Done! +${result.earnedPoints} pts (you boosted this one, no bonus for you)`, 'bg-brutal-yellow')
     } else {
       toast(`Done! +${result.earnedPoints} pts for ${confirmComplete.name}`, 'bg-brutal-lime')
     }
     setConfirmComplete(null)
+    setWithUserId(null)
   }
 
   function handleDelete(choreId: string) {
@@ -531,15 +541,52 @@ export function ChoresPage() {
         )}
       </BottomSheet>
 
-      <ConfirmDialog
-        open={!!confirmComplete}
-        title="COMPLETE CHORE"
-        message={confirmComplete ? `Mark "${confirmComplete.name}" as done for +${confirmComplete.points} pts?` : ''}
-        confirmLabel="DONE ✓"
-        confirmColor="bg-brutal-lime"
-        onConfirm={doComplete}
-        onCancel={() => setConfirmComplete(null)}
-      />
+      <BottomSheet open={!!confirmComplete} onClose={() => { setConfirmComplete(null); setWithUserId(null) }}>
+        {confirmComplete && (
+          <>
+            <h2 className="font-mono font-bold text-lg mb-1">COMPLETE CHORE</h2>
+            <p className="font-mono text-xs text-brutal-black/50 mb-4">
+              Mark "{confirmComplete.name}" as done for +{confirmComplete.points} pts?
+            </p>
+
+            {members.length > 1 && (
+              <div className="mb-4">
+                <p className="font-mono text-[10px] font-bold text-brutal-black/40 tracking-widest mb-2">DID THIS WITH...</p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setWithUserId(null)}
+                    className={`flex items-center gap-1.5 px-3 py-2 border-2 border-brutal-black font-mono text-xs font-bold transition-all ${
+                      !withUserId ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white'
+                    }`}
+                  >
+                    JUST ME
+                  </button>
+                  {members.filter(m => m.user_id !== user?.id).map(m => (
+                    <button
+                      key={m.user_id}
+                      onClick={() => setWithUserId(withUserId === m.user_id ? null : m.user_id)}
+                      className={`flex items-center gap-1.5 px-3 py-2 border-2 border-brutal-black font-mono text-xs font-bold transition-all ${
+                        withUserId === m.user_id ? 'bg-brutal-lime' : 'bg-brutal-white'
+                      }`}
+                    >
+                      <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" />
+                      {m.profiles.display_name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <Button
+              onClick={doComplete}
+              disabled={completeChore.isPending}
+              className="w-full h-12 bg-brutal-lime font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+            >
+              {completeChore.isPending ? 'COMPLETING...' : withUserId ? 'DONE TOGETHER ✓' : 'DONE ✓'}
+            </Button>
+          </>
+        )}
+      </BottomSheet>
 
       <ConfirmDialog
         open={!!confirmDelete}

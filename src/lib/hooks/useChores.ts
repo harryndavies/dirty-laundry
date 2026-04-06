@@ -50,7 +50,7 @@ export function useChores() {
   })
 
   const completeChore = useMutation({
-    mutationFn: async ({ choreId, points }: { choreId: string; points: number }) => {
+    mutationFn: async ({ choreId, points, withUserId }: { choreId: string; points: number; withUserId?: string }) => {
       if (!group || !user) throw new Error('No group or user')
 
       // Check if this chore was boosted by the completer
@@ -74,6 +74,19 @@ export function useChores() {
           chore_name: chore?.name ?? null,
         })
       if (error) throw error
+
+      // If done with someone, insert a completion for them too
+      if (withUserId) {
+        await supabase
+          .from('completions')
+          .insert({
+            chore_id: choreId,
+            user_id: withUserId,
+            group_id: group.id,
+            points_earned: earnedPoints,
+            chore_name: chore?.name ?? null,
+          })
+      }
 
       // Reset boosted points back to base
       if (chore && chore.points !== chore.base_points) {
