@@ -26,6 +26,7 @@ export interface Database {
           invite_code: string
           created_by: string
           created_at: string
+          weekly_goal: number | null
         }
         Insert: {
           name: string
@@ -33,6 +34,7 @@ export interface Database {
         }
         Update: {
           name?: string
+          weekly_goal?: number | null
         }
         Relationships: []
       }

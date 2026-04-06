@@ -19,6 +19,7 @@ interface GroupContextType {
   leaveGroup: () => void
   updateMemberShares: (shares: { memberId: string; share: number }[]) => Promise<void>
   updateMyPrize: (prize: string) => Promise<void>
+  updateWeeklyGoal: (goal: number | null) => Promise<void>
 }
 
 const GroupContext = createContext<GroupContextType | null>(null)
@@ -246,8 +247,17 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     setUserMember(null)
   }
 
+  async function updateWeeklyGoal(goal: number | null) {
+    if (!group) return
+    await supabase
+      .from('groups')
+      .update({ weekly_goal: goal })
+      .eq('id', group.id)
+    setGroup(prev => prev ? { ...prev, weekly_goal: goal } : prev)
+  }
+
   return (
-    <GroupContext.Provider value={{ group, members, userMember, loading, createGroup, joinGroup, refreshMembers, leaveGroup, updateMemberShares, updateMyPrize }}>
+    <GroupContext.Provider value={{ group, members, userMember, loading, createGroup, joinGroup, refreshMembers, leaveGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal }}>
       {children}
     </GroupContext.Provider>
   )

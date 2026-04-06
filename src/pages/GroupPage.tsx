@@ -8,11 +8,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Copy, Mail, Percent, Trophy, LogOut } from 'lucide-react'
+import { Copy, Mail, Percent, Trophy, LogOut, Target, Minus, Plus } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 export function GroupPage() {
-  const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, leaveGroup, loading: groupLoading } = useGroup()
+  const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, leaveGroup, loading: groupLoading } = useGroup()
   const { user } = useAuth()
   const [groupName, setGroupName] = useState('')
   const [inviteCode, setInviteCode] = useState('')
@@ -27,6 +27,9 @@ export function GroupPage() {
   const [prizeText, setPrizeText] = useState('')
   const [savingPrize, setSavingPrize] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
+  const [showGoal, setShowGoal] = useState(false)
+  const [goalAmount, setGoalAmount] = useState(0)
+  const [savingGoal, setSavingGoal] = useState(false)
 
   const isOwner = members.find(m => m.user_id === user?.id)?.role === 'owner'
   const shareTotal = Object.values(shares).reduce((sum, v) => sum + v, 0)
@@ -289,6 +292,81 @@ export function GroupPage() {
               RESET TO EQUAL
             </button>
           </>
+        )}
+      </BottomSheet>
+
+      {/* Weekly goal */}
+      {isOwner && (
+        <div className="px-4 mt-4">
+          <button
+            onClick={() => {
+              setGoalAmount(group.weekly_goal ?? 200)
+              setShowGoal(true)
+            }}
+            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+          >
+            <div className="flex items-center gap-2">
+              <Target size={16} strokeWidth={3} />
+              <span className="font-mono font-bold text-sm">WEEKLY GOAL</span>
+            </div>
+            <span className="font-mono text-xs text-brutal-black/40">
+              {group.weekly_goal ? `${group.weekly_goal} PTS` : 'NOT SET'}
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Goal editor sheet */}
+      <BottomSheet open={showGoal} onClose={() => setShowGoal(false)}>
+        <h2 className="font-mono font-bold text-lg mb-1">WEEKLY GOAL</h2>
+        <p className="font-mono text-xs text-brutal-black/50 mb-4">
+          Set a point target for the whole group to hit each week. Teamwork!
+        </p>
+        <div className="flex items-center gap-3 mb-4">
+          <button
+            type="button"
+            onClick={() => setGoalAmount(Math.max(0, goalAmount - 50))}
+            className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+          >
+            <Minus size={18} />
+          </button>
+          <div className="flex-1 h-12 bg-brutal-blue border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-xl text-brutal-white">
+            {goalAmount} PTS
+          </div>
+          <button
+            type="button"
+            onClick={() => setGoalAmount(goalAmount + 50)}
+            className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+        <Button
+          onClick={async () => {
+            setSavingGoal(true)
+            await updateWeeklyGoal(goalAmount > 0 ? goalAmount : null)
+            setSavingGoal(false)
+            setShowGoal(false)
+            toast(goalAmount > 0 ? `Goal set to ${goalAmount} pts!` : 'Goal removed', 'bg-brutal-blue')
+          }}
+          disabled={savingGoal}
+          className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-40"
+        >
+          {savingGoal ? 'SAVING...' : 'SAVE GOAL'}
+        </Button>
+        {group.weekly_goal && (
+          <button
+            onClick={async () => {
+              setSavingGoal(true)
+              await updateWeeklyGoal(null)
+              setSavingGoal(false)
+              setShowGoal(false)
+              toast('Goal removed', 'bg-brutal-white')
+            }}
+            className="w-full mt-2 font-mono text-xs text-brutal-black/40 font-bold py-2 active:text-brutal-black/60"
+          >
+            REMOVE GOAL
+          </button>
         )}
       </BottomSheet>
 
