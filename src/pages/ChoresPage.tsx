@@ -325,7 +325,7 @@ export function ChoresPage() {
                         }`}
                       >
                         {chore.points > chore.base_points && '🔥 '}
-                        {chore.points} PTS <TrendingUp size={10} />
+                        {chore.points} PTS{isKid && group?.pocket_money_rate ? ` (${formatMoney(chore.points * group.pocket_money_rate)})` : ''} <TrendingUp size={10} />
                       </button>
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] font-bold border ${
                         chore.is_persistent
