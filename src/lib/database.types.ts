@@ -203,6 +203,26 @@ export interface Database {
         Update: Record<string, never>
         Relationships: []
       }
+      payouts: {
+        Row: {
+          id: string
+          group_id: string
+          user_id: string
+          paid_by: string
+          amount_pence: number
+          points: number
+          created_at: string
+        }
+        Insert: {
+          group_id: string
+          user_id: string
+          paid_by: string
+          amount_pence: number
+          points: number
+        }
+        Update: Record<string, never>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>

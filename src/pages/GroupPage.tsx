@@ -34,8 +34,8 @@ export function GroupPage() {
   const [showPocketMoney, setShowPocketMoney] = useState(false)
   const [pocketRate, setPocketRate] = useState(0)
   const [savingRate, setSavingRate] = useState(false)
-  const { balances, formatMoney } = usePocketMoney()
-  const [confirmPaid, setConfirmPaid] = useState<{ memberId: string; name: string; amount: number } | null>(null)
+  const { balances, payouts, formatMoney } = usePocketMoney()
+  const [confirmPaid, setConfirmPaid] = useState<{ memberId: string; userId: string; name: string; amount: number; points: number } | null>(null)
 
   const isOwner = members.find(m => m.user_id === user?.id)?.role === 'owner'
   const shareTotal = Object.values(shares).reduce((sum, v) => sum + v, 0)
@@ -219,7 +219,7 @@ export function GroupPage() {
                 </div>
                 {isOwner && m.role === 'kid' && kidBalance && group?.pocket_money_rate && kidBalance.unpaidAmount > 0 && (
                   <button
-                    onClick={() => setConfirmPaid({ memberId: m.id, name: m.profiles.display_name, amount: kidBalance.unpaidAmount })}
+                    onClick={() => setConfirmPaid({ memberId: m.id, userId: m.user_id, name: m.profiles.display_name, amount: kidBalance.unpaidAmount, points: kidBalance.unpaidPoints })}
                     className="font-mono text-[10px] font-bold px-2 py-1 bg-brutal-lime border border-brutal-black active:bg-brutal-lime/60"
                   >
                     PAID
@@ -487,6 +487,36 @@ export function GroupPage() {
         )}
       </BottomSheet>
 
+      {/* Payment history */}
+      {payouts.length > 0 && (
+        <div className="px-4 mt-4">
+          <div className="border-2 border-brutal-black bg-brutal-white">
+            <div className="flex items-center gap-2 px-4 py-3 border-b-2 border-brutal-black bg-brutal-lime/20">
+              <Coins size={14} strokeWidth={3} />
+              <span className="font-mono font-bold text-xs">PAYMENT HISTORY</span>
+            </div>
+            <div className="divide-y divide-brutal-black/10">
+              {payouts.map(p => (
+                <div key={p.id} className="flex items-center justify-between px-4 py-3">
+                  <div>
+                    <span className="font-mono font-bold text-xs">{p.display_name}</span>
+                    <span className="font-mono text-[10px] text-brutal-black/40 ml-2">
+                      {p.points} pts
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-mono font-bold text-sm text-green-600">{formatMoney(p.amount_pence)}</span>
+                    <span className="font-mono text-[10px] text-brutal-black/40 block">
+                      {new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Monthly prizes */}
       {members.length >= 2 && (
         <div className="px-4 mt-4">
@@ -587,7 +617,7 @@ export function GroupPage() {
         confirmColor="bg-brutal-lime"
         onConfirm={async () => {
           if (confirmPaid) {
-            await markAsPaid(confirmPaid.memberId)
+            await markAsPaid(confirmPaid.memberId, confirmPaid.userId, confirmPaid.amount, confirmPaid.points)
             toast(`Marked ${confirmPaid.name} as paid!`, 'bg-brutal-lime')
           }
           setConfirmPaid(null)

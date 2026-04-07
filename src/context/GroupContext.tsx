@@ -22,7 +22,7 @@ interface GroupContextType {
   updateWeeklyGoal: (goal: number | null) => Promise<void>
   updatePocketMoneyRate: (rate: number | null) => Promise<void>
   setMemberRole: (memberId: string, role: 'owner' | 'member' | 'kid') => Promise<void>
-  markAsPaid: (memberId: string) => Promise<void>
+  markAsPaid: (memberId: string, userId: string, amountPence: number, points: number) => Promise<void>
 }
 
 const GroupContext = createContext<GroupContextType | null>(null)
@@ -276,11 +276,24 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     if (group) await refreshMembersForGroup(group.id)
   }
 
-  async function markAsPaid(memberId: string) {
+  async function markAsPaid(memberId: string, userId: string, amountPence: number, points: number) {
+    if (!user || !group) return
+
     await supabase
       .from('group_members')
       .update({ paid_up_to: new Date().toISOString() })
       .eq('id', memberId)
+
+    await supabase
+      .from('payouts')
+      .insert({
+        group_id: group.id,
+        user_id: userId,
+        paid_by: user.id,
+        amount_pence: amountPence,
+        points,
+      })
+
     if (group) await refreshMembersForGroup(group.id)
   }
 

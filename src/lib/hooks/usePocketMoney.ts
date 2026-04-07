@@ -8,9 +8,20 @@ interface PocketMoneyBalance {
   unpaidAmount: number // in pence
 }
 
+export interface PayoutRecord {
+  id: string
+  user_id: string
+  paid_by: string
+  amount_pence: number
+  points: number
+  created_at: string
+  display_name: string
+}
+
 export function usePocketMoney() {
   const { group, members } = useGroup()
   const [balances, setBalances] = useState<Map<string, PocketMoneyBalance>>(new Map())
+  const [payouts, setPayouts] = useState<PayoutRecord[]>([])
 
   const calculate = useCallback(async () => {
     if (!group || !group.pocket_money_rate) return
@@ -42,6 +53,25 @@ export function usePocketMoney() {
     }
 
     setBalances(result)
+
+    // Fetch payout history
+    const { data: payoutData } = await supabase
+      .from('payouts')
+      .select('id, user_id, paid_by, amount_pence, points, created_at')
+      .eq('group_id', group.id)
+      .order('created_at', { ascending: false })
+      .limit(20)
+
+    if (payoutData) {
+      const enriched: PayoutRecord[] = payoutData.map(p => {
+        const member = members.find(m => m.user_id === p.user_id)
+        return {
+          ...p,
+          display_name: member?.profiles.display_name ?? '?',
+        }
+      })
+      setPayouts(enriched)
+    }
   }, [group, members])
 
   useEffect(() => {
@@ -77,5 +107,5 @@ export function usePocketMoney() {
     return `${pence}p`
   }
 
-  return { balances, formatMoney }
+  return { balances, payouts, formatMoney }
 }
