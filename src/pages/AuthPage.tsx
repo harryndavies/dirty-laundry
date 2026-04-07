@@ -119,7 +119,6 @@ export function AuthPage() {
             </p>
           </div>
         ) : (
-          <>
           <Tabs defaultValue="signup">
             <TabsList className="w-full bg-brutal-black/5 border-2 border-brutal-black p-0 h-auto">
               <TabsTrigger
