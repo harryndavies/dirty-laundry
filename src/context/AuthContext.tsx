@@ -10,6 +10,7 @@ interface AuthContextType {
   loading: boolean
   signUp: (email: string, password: string, displayName: string) => Promise<{ error: string | null }>
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
+  signInAnonymously: (displayName: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error: string | null }>
   updatePassword: (password: string) => Promise<{ error: string | null }>
@@ -69,6 +70,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: null }
   }
 
+  async function signInAnonymously(displayName: string) {
+    const { error } = await supabase.auth.signInAnonymously({
+      options: {
+        data: { display_name: displayName },
+      },
+    })
+    if (error) return { error: error.message }
+    return { error: null }
+  }
+
   async function signIn(email: string, password: string) {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) return { error: error.message }
@@ -101,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, user, profile, loading, signUp, signIn, signOut, resetPassword, updatePassword, updateProfile }}>
+    <AuthContext.Provider value={{ session, user, profile, loading, signUp, signIn, signInAnonymously, signOut, resetPassword, updatePassword, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )
