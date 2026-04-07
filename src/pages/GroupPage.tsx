@@ -14,7 +14,7 @@ import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
 
 export function GroupPage() {
   const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid, leaveGroup, loading: groupLoading } = useGroup()
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const [groupName, setGroupName] = useState('')
   const [inviteCode, setInviteCode] = useState(() => {
@@ -136,6 +136,13 @@ export function GroupPage() {
               </Button>
             </form>
           </div>
+
+          <button
+            onClick={signOut}
+            className="w-full font-mono text-xs font-bold text-brutal-black/40 py-2 active:text-brutal-black/60"
+          >
+            SIGN OUT
+          </button>
         </div>
       </div>
     )
