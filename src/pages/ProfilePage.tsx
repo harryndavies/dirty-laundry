@@ -10,6 +10,7 @@ import { toast } from '@/components/ui/Toast'
 import { Check, Pencil, Moon, Sun, Bell, BellOff } from 'lucide-react'
 import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '@/lib/pushNotifications'
 import { supabase } from '@/lib/supabase'
+import { toast } from '@/components/ui/Toast'
 
 const COLORS = ['#FF2D9B', '#0066FF', '#FFE500', '#BFFF00', '#FF6B00', '#8B5CF6', '#06B6D4']
 
@@ -57,11 +58,39 @@ export function ProfilePage() {
       <div className="p-4 space-y-6">
         {/* Avatar + name */}
         <div className="flex flex-col items-center pt-4">
-          <Avatar
-            name={profile?.display_name ?? '?'}
-            color={profile?.avatar_color ?? '#FF2D9B'}
-            size="lg"
-          />
+          <label className="relative cursor-pointer group">
+            <Avatar
+              name={profile?.display_name ?? '?'}
+              color={profile?.avatar_color ?? '#FF2D9B'}
+              size="lg"
+              imageUrl={profile?.avatar_url}
+            />
+            <div className="absolute inset-0 bg-brutal-black/40 flex items-center justify-center opacity-0 group-active:opacity-100 transition-opacity border-2 border-brutal-black">
+              <span className="text-brutal-white text-xs font-bold font-mono">EDIT</span>
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={async e => {
+                const file = e.target.files?.[0]
+                if (!file || !user) return
+                const path = `avatars/${user.id}/${Date.now()}.jpg`
+                const { error: uploadError } = await supabase.storage
+                  .from('completion-photos')
+                  .upload(path, file, { contentType: file.type, upsert: true })
+                if (uploadError) {
+                  toast('Failed to upload photo', 'bg-brutal-pink')
+                  return
+                }
+                const { data: urlData } = supabase.storage
+                  .from('completion-photos')
+                  .getPublicUrl(path)
+                await updateProfile({ avatar_url: urlData.publicUrl })
+                toast('Photo updated!', 'bg-brutal-lime')
+              }}
+            />
+          </label>
 
           {editing ? (
             <div className="flex items-center gap-2 mt-4">

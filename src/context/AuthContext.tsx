@@ -14,7 +14,7 @@ interface AuthContextType {
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error: string | null }>
   updatePassword: (password: string) => Promise<{ error: string | null }>
-  updateProfile: (updates: { display_name?: string; avatar_color?: string }) => Promise<void>
+  updateProfile: (updates: { display_name?: string; avatar_color?: string; avatar_url?: string | null }) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -105,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null)
   }
 
-  async function updateProfile(updates: { display_name?: string; avatar_color?: string }) {
+  async function updateProfile(updates: { display_name?: string; avatar_color?: string; avatar_url?: string | null }) {
     if (!user) return
     await supabase.from('profiles').update(updates).eq('id', user.id)
     setProfile(prev => prev ? { ...prev, ...updates } : prev)
