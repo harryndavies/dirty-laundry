@@ -25,7 +25,7 @@ export function AuthPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [signedUp, setSignedUp] = useState(false)
-  const [showAbout, setShowAbout] = useState(true)
+  const [showAbout, setShowAbout] = useState(!inviteCode)
   const [showForgot, setShowForgot] = useState(false)
   const [forgotEmail, setForgotEmail] = useState('')
   const [resetSent, setResetSent] = useState(false)

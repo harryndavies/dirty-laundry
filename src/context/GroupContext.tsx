@@ -58,6 +58,29 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       .maybeSingle()
 
     if (!membership) {
+      // Check for pending invite code and auto-join
+      const pendingCode = localStorage.getItem('dirtylaundry_invite_code')
+      if (pendingCode) {
+        localStorage.removeItem('dirtylaundry_invite_code')
+        const { data: foundGroup } = await supabase
+          .from('groups')
+          .select('*')
+          .eq('invite_code', pendingCode.toUpperCase().trim())
+          .maybeSingle()
+
+        if (foundGroup) {
+          await supabase
+            .from('group_members')
+            .insert({ group_id: foundGroup.id, user_id: user.id, role: 'member' })
+
+          localStorage.setItem('dirtylaundry_group_id', foundGroup.id)
+          setGroup(foundGroup)
+          await refreshMembersForGroup(foundGroup.id)
+          setLoading(false)
+          return
+        }
+      }
+
       localStorage.removeItem('dirtylaundry_group_id')
       setGroup(null)
       setMembers([])
