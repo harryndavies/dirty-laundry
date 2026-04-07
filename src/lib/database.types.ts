@@ -50,6 +50,8 @@ export interface Database {
           chore_share: number
           monthly_prize: string | null
           paid_up_to: string | null
+          savings_goal: number | null
+          savings_goal_name: string | null
         }
         Insert: {
           group_id: string
@@ -64,6 +66,8 @@ export interface Database {
           monthly_prize?: string | null
           role?: 'owner' | 'member' | 'kid'
           paid_up_to?: string | null
+          savings_goal?: number | null
+          savings_goal_name?: string | null
         }
         Relationships: []
       }

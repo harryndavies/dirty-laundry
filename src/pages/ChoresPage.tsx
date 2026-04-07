@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
-import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Search, Target, Camera, X } from 'lucide-react'
+import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Search, Target, Camera, X, Star } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'persistent' | 'one-time'
@@ -21,7 +21,7 @@ type Filter = 'all' | 'persistent' | 'one-time'
 const AREAS = ['Kitchen', 'Bathroom', 'Bedroom', 'Living Room', 'Garden', 'Laundry', 'General']
 
 export function ChoresPage() {
-  const { group, members, loading: groupLoading } = useGroup()
+  const { group, members, loading: groupLoading, updateSavingsGoal } = useGroup()
   const { user } = useAuth()
   const { chores, loading, addChore, completeChore, deleteChore, boostChore } = useChores()
   const { suggestions } = useFairTurn()
@@ -47,6 +47,9 @@ export function ChoresPage() {
   const [withUserId, setWithUserId] = useState<string | null>(null)
   const [photo, setPhoto] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [showSavingsGoal, setShowSavingsGoal] = useState(false)
+  const [goalName, setGoalName] = useState('')
+  const [goalAmount, setGoalAmount] = useState(500)
 
   // Bounty state
   const [bountyChore, setBountyChore] = useState<{ id: string; name: string; points: number } | null>(null)
@@ -198,6 +201,105 @@ export function ChoresPage() {
           </div>
         </div>
       )}
+
+      {/* Savings goal */}
+      {isKid && group?.pocket_money_rate && (
+        <div className="px-4 pt-2">
+          {userMember?.savings_goal ? (
+            <button
+              onClick={() => {
+                setGoalName(userMember.savings_goal_name ?? '')
+                setGoalAmount(userMember.savings_goal)
+                setShowSavingsGoal(true)
+              }}
+              className="w-full border-2 border-brutal-black bg-brutal-white p-3 active:bg-brutal-black/5 transition-colors text-left"
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-2">
+                  <Star size={14} className="text-brutal-yellow" fill="#FFE500" />
+                  <span className="font-mono text-xs font-bold">{userMember.savings_goal_name ?? 'SAVINGS GOAL'}</span>
+                </div>
+                <span className="font-mono text-xs font-bold">
+                  {formatMoney(myBalance?.unpaidAmount ?? 0)} / {formatMoney(userMember.savings_goal)}
+                </span>
+              </div>
+              <div className="h-3 bg-brutal-black/10 border border-brutal-black/20">
+                <div
+                  className={`h-full transition-all duration-500 ${(myBalance?.unpaidAmount ?? 0) >= userMember.savings_goal ? 'bg-brutal-lime' : 'bg-brutal-yellow'}`}
+                  style={{ width: `${Math.min(100, ((myBalance?.unpaidAmount ?? 0) / userMember.savings_goal) * 100)}%` }}
+                />
+              </div>
+              {(myBalance?.unpaidAmount ?? 0) >= userMember.savings_goal && (
+                <p className="font-mono text-[10px] font-bold text-green-600 mt-1">You've reached your goal! 🎉</p>
+              )}
+            </button>
+          ) : (
+            <button
+              onClick={() => { setGoalName(''); setGoalAmount(500); setShowSavingsGoal(true) }}
+              className="w-full border-2 border-dashed border-brutal-black/30 p-3 font-mono text-xs font-bold text-brutal-black/40 flex items-center justify-center gap-2 active:bg-brutal-black/5"
+            >
+              <Star size={14} /> SET A SAVINGS GOAL
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Savings goal sheet */}
+      <BottomSheet open={showSavingsGoal} onClose={() => setShowSavingsGoal(false)}>
+        <h2 className="font-mono font-bold text-lg mb-1">SAVINGS GOAL</h2>
+        <p className="font-mono text-xs text-brutal-black/50 mb-4">
+          What are you saving for?
+        </p>
+        <Input
+          value={goalName}
+          onChange={e => setGoalName(e.target.value)}
+          placeholder="e.g. New game, headphones"
+          className="border-2 border-brutal-black font-mono h-12 mb-4"
+          autoFocus
+          maxLength={50}
+        />
+        <div className="flex items-center gap-3 mb-4">
+          <button
+            type="button"
+            onClick={() => setGoalAmount(Math.max(100, goalAmount - 100))}
+            className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+          >
+            <Minus size={18} />
+          </button>
+          <div className="flex-1 h-12 bg-brutal-yellow border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-xl">
+            {formatMoney(goalAmount)}
+          </div>
+          <button
+            type="button"
+            onClick={() => setGoalAmount(goalAmount + 100)}
+            className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+        <Button
+          onClick={async () => {
+            await updateSavingsGoal(goalAmount, goalName.trim() || null)
+            setShowSavingsGoal(false)
+            toast('Savings goal set!', 'bg-brutal-yellow')
+          }}
+          className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+        >
+          SAVE GOAL
+        </Button>
+        {userMember?.savings_goal && (
+          <button
+            onClick={async () => {
+              await updateSavingsGoal(null, null)
+              setShowSavingsGoal(false)
+              toast('Goal removed', 'bg-brutal-white')
+            }}
+            className="w-full mt-2 font-mono text-xs text-brutal-black/40 font-bold py-2 active:text-brutal-black/60"
+          >
+            REMOVE GOAL
+          </button>
+        )}
+      </BottomSheet>
 
       {/* Weekly goal banner */}
       {groupStats.weeklyGoal && (

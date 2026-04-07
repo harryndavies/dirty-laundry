@@ -23,6 +23,7 @@ interface GroupContextType {
   updatePocketMoneyRate: (rate: number | null) => Promise<void>
   setMemberRole: (memberId: string, role: 'owner' | 'member' | 'kid') => Promise<void>
   markAsPaid: (memberId: string, userId: string, amountPence: number, points: number) => Promise<void>
+  updateSavingsGoal: (goalPence: number | null, goalName: string | null) => Promise<void>
 }
 
 const GroupContext = createContext<GroupContextType | null>(null)
@@ -297,8 +298,19 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     if (group) await refreshMembersForGroup(group.id)
   }
 
+  async function updateSavingsGoal(goalPence: number | null, goalName: string | null) {
+    if (!user || !group) return
+    const member = members.find(m => m.user_id === user.id)
+    if (!member) return
+    await supabase
+      .from('group_members')
+      .update({ savings_goal: goalPence, savings_goal_name: goalName })
+      .eq('id', member.id)
+    await refreshMembersForGroup(group.id)
+  }
+
   return (
-    <GroupContext.Provider value={{ group, members, userMember, loading, createGroup, joinGroup, refreshMembers, leaveGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid }}>
+    <GroupContext.Provider value={{ group, members, userMember, loading, createGroup, joinGroup, refreshMembers, leaveGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid, updateSavingsGoal }}>
       {children}
     </GroupContext.Provider>
   )
