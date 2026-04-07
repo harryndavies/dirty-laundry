@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { Check, Pencil, Moon, Sun, Bell, BellOff } from 'lucide-react'
 import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '@/lib/pushNotifications'
+import { supabase } from '@/lib/supabase'
 
 const COLORS = ['#FF2D9B', '#0066FF', '#FFE500', '#BFFF00', '#FF6B00', '#8B5CF6', '#06B6D4']
 
@@ -21,6 +22,12 @@ export function ProfilePage() {
   const myBalance = user ? balances.get(user.id) : null
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(profile?.display_name ?? '')
+  const [linkEmail, setLinkEmail] = useState('')
+  const [linkPassword, setLinkPassword] = useState('')
+  const [linkingAccount, setLinkingAccount] = useState(false)
+  const [linkError, setLinkError] = useState('')
+  const [linkSuccess, setLinkSuccess] = useState(false)
+  const isAnonymous = user?.is_anonymous ?? false
   const [pushEnabled, setPushEnabled] = useState(false)
   const [pushLoading, setPushLoading] = useState(false)
   const pushSupported = 'serviceWorker' in navigator && 'PushManager' in window
@@ -81,7 +88,11 @@ export function ProfilePage() {
             </button>
           )}
 
-          <p className="font-mono text-xs text-brutal-black/40 mt-1">{user?.email}</p>
+          {user?.email ? (
+            <p className="font-mono text-xs text-brutal-black/40 mt-1">{user.email}</p>
+          ) : (
+            <p className="font-mono text-xs text-brutal-black/40 mt-1">Guest account</p>
+          )}
           <div className="mt-2 px-3 py-1 bg-brutal-yellow border-2 border-brutal-black font-mono font-bold text-sm">
             {isKid && myBalance && group?.pocket_money_rate
               ? `${formatMoney(myBalance.unpaidAmount)} earned`
@@ -108,6 +119,66 @@ export function ProfilePage() {
             ))}
           </div>
         </div>
+
+        {/* Link account */}
+        {isAnonymous && !linkSuccess && (
+          <div className="border-2 border-brutal-black bg-brutal-yellow/10 p-4">
+            <h3 className="font-mono text-xs font-bold uppercase mb-1">SAVE YOUR ACCOUNT</h3>
+            <p className="font-mono text-[10px] text-brutal-black/40 mb-3">Add an email and password so you don't lose your progress.</p>
+            {linkError && (
+              <div className="bg-brutal-pink/20 border border-brutal-pink p-2 font-mono text-xs font-bold mb-3">{linkError}</div>
+            )}
+            <form
+              onSubmit={async e => {
+                e.preventDefault()
+                if (!linkEmail.trim() || !linkPassword) return
+                setLinkingAccount(true)
+                setLinkError('')
+                const { error } = await supabase.auth.updateUser({
+                  email: linkEmail.trim(),
+                  password: linkPassword,
+                })
+                if (error) {
+                  setLinkError(error.message)
+                } else {
+                  setLinkSuccess(true)
+                }
+                setLinkingAccount(false)
+              }}
+              className="space-y-2"
+            >
+              <Input
+                type="email"
+                value={linkEmail}
+                onChange={e => setLinkEmail(e.target.value)}
+                placeholder="Email"
+                className="border-2 border-brutal-black font-mono h-10"
+                required
+              />
+              <Input
+                type="password"
+                value={linkPassword}
+                onChange={e => setLinkPassword(e.target.value)}
+                placeholder="Password"
+                className="border-2 border-brutal-black font-mono h-10"
+                minLength={6}
+                required
+              />
+              <Button
+                type="submit"
+                disabled={linkingAccount}
+                className="w-full h-10 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-xs border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+              >
+                {linkingAccount ? 'SAVING...' : 'SAVE ACCOUNT'}
+              </Button>
+            </form>
+          </div>
+        )}
+        {linkSuccess && (
+          <div className="border-2 border-brutal-lime bg-brutal-lime/20 p-4 text-center">
+            <p className="font-mono text-xs font-bold">Account saved! You can now log in with your email.</p>
+          </div>
+        )}
 
         {/* Dark mode toggle */}
         <div>
