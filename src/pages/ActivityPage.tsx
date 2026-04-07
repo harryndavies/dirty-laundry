@@ -152,6 +152,7 @@ export function ActivityPage() {
                           name={entry.profiles.display_name}
                           color={entry.profiles.avatar_color}
                           size="sm"
+                          imageUrl={entry.profiles.avatar_url}
                         />
                         <div className="flex-1 min-w-0">
                           <p className="font-mono text-sm">

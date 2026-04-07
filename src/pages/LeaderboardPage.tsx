@@ -98,6 +98,7 @@ export function LeaderboardPage() {
                         name={member.profiles.display_name}
                         color={member.profiles.avatar_color}
                         size="sm"
+                        imageUrl={member.profiles.avatar_url}
                       />
                       <span className="font-mono font-bold text-sm truncate">
                         {member.profiles.display_name}

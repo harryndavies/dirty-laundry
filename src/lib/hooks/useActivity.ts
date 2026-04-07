@@ -17,7 +17,7 @@ export interface ActivityEntry {
   completed_at: string
   chore_name: string | null
   photo_url: string | null
-  profiles: { display_name: string; avatar_color: string }
+  profiles: { display_name: string; avatar_color: string; avatar_url: string | null }
   reactions: Reaction[]
 }
 
@@ -31,7 +31,7 @@ export function useActivity() {
     if (!group) return
     const { data } = await supabase
       .from('completions')
-      .select('id, user_id, points_earned, completed_at, chore_name, photo_url, profiles(display_name, avatar_color), reactions(id, emoji, user_id)')
+      .select('id, user_id, points_earned, completed_at, chore_name, photo_url, profiles(display_name, avatar_color, avatar_url), reactions(id, emoji, user_id)')
       .eq('group_id', group.id)
       .order('completed_at', { ascending: false })
       .limit(50)

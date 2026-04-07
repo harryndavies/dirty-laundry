@@ -819,7 +819,7 @@ export function ChoresPage() {
                         withUserId === m.user_id ? 'bg-brutal-lime' : 'bg-brutal-white'
                       }`}
                     >
-                      <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" />
+                      <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" imageUrl={m.profiles.avatar_url} />
                       {m.profiles.display_name}
                     </button>
                   ))}

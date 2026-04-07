@@ -196,7 +196,7 @@ export function GroupPage() {
               key={m.id}
               className="border-2 border-brutal-black p-3 flex items-center gap-3 bg-brutal-white"
             >
-              <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} />
+              <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} imageUrl={m.profiles.avatar_url} />
               <div className="flex-1 min-w-0">
                 <p className="font-mono font-bold text-sm truncate">{m.profiles.display_name}</p>
                 <div className="flex items-center gap-2">
@@ -255,7 +255,7 @@ export function GroupPage() {
                 const isMe = m.user_id === user?.id
                 return (
                   <div key={m.id} className="flex items-center gap-3 px-4 py-3">
-                    <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" />
+                    <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" imageUrl={m.profiles.avatar_url} />
                     <div className="flex-1 min-w-0">
                       <span className="font-mono font-bold text-xs block truncate">{m.profiles.display_name}</span>
                       <span className="font-mono text-[10px] text-brutal-black/40 block truncate">
@@ -345,7 +345,7 @@ export function GroupPage() {
         <div className="space-y-3">
           {members.map(m => (
             <div key={m.id} className="flex items-center gap-3">
-              <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" />
+              <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" imageUrl={m.profiles.avatar_url} />
               <span className="font-mono font-bold text-sm flex-1 truncate">{m.profiles.display_name}</span>
               {isOwner ? (
                 <div className="flex items-center gap-2">
