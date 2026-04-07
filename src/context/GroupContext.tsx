@@ -20,6 +20,9 @@ interface GroupContextType {
   updateMemberShares: (shares: { memberId: string; share: number }[]) => Promise<void>
   updateMyPrize: (prize: string) => Promise<void>
   updateWeeklyGoal: (goal: number | null) => Promise<void>
+  updatePocketMoneyRate: (rate: number | null) => Promise<void>
+  setMemberRole: (memberId: string, role: 'owner' | 'member' | 'kid') => Promise<void>
+  markAsPaid: (memberId: string) => Promise<void>
 }
 
 const GroupContext = createContext<GroupContextType | null>(null)
@@ -256,8 +259,33 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     setGroup(prev => prev ? { ...prev, weekly_goal: goal } : prev)
   }
 
+  async function updatePocketMoneyRate(rate: number | null) {
+    if (!group) return
+    await supabase
+      .from('groups')
+      .update({ pocket_money_rate: rate })
+      .eq('id', group.id)
+    setGroup(prev => prev ? { ...prev, pocket_money_rate: rate } : prev)
+  }
+
+  async function setMemberRole(memberId: string, role: 'owner' | 'member' | 'kid') {
+    await supabase
+      .from('group_members')
+      .update({ role })
+      .eq('id', memberId)
+    if (group) await refreshMembersForGroup(group.id)
+  }
+
+  async function markAsPaid(memberId: string) {
+    await supabase
+      .from('group_members')
+      .update({ paid_up_to: new Date().toISOString() })
+      .eq('id', memberId)
+    if (group) await refreshMembersForGroup(group.id)
+  }
+
   return (
-    <GroupContext.Provider value={{ group, members, userMember, loading, createGroup, joinGroup, refreshMembers, leaveGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal }}>
+    <GroupContext.Provider value={{ group, members, userMember, loading, createGroup, joinGroup, refreshMembers, leaveGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid }}>
       {children}
     </GroupContext.Provider>
   )

@@ -3,6 +3,7 @@ import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
 import { useChores } from '@/lib/hooks/useChores'
 import { useGroupStats } from '@/lib/hooks/useGroupStats'
+import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
 import { useFairTurn } from '@/lib/hooks/useFairTurn'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
@@ -25,6 +26,10 @@ export function ChoresPage() {
   const { chores, loading, addChore, completeChore, deleteChore, boostChore } = useChores()
   const { suggestions } = useFairTurn()
   const groupStats = useGroupStats()
+  const { balances, formatMoney } = usePocketMoney()
+  const userMember = members.find(m => m.user_id === user?.id)
+  const isKid = userMember?.role === 'kid'
+  const myBalance = user ? balances.get(user.id) : null
   const navigate = useNavigate()
   const [showAdd, setShowAdd] = useState(false)
   const [filter, setFilter] = useState<Filter>('all')
@@ -174,6 +179,20 @@ export function ChoresPage() {
           </button>
         </div>
       </div>
+
+      {/* Kid earnings banner */}
+      {isKid && myBalance && group?.pocket_money_rate && (
+        <div className="px-4 pt-3">
+          <div className="flex items-center gap-3 bg-brutal-yellow border-2 border-brutal-black p-3">
+            <span className="text-xl">💰</span>
+            <div className="flex-1">
+              <span className="font-mono font-bold text-lg">{formatMoney(myBalance.unpaidAmount)}</span>
+              <span className="font-mono text-[10px] text-brutal-black/50 ml-2">EARNED</span>
+            </div>
+            <span className="font-mono text-[10px] text-brutal-black/40">{group.pocket_money_rate}p per pt</span>
+          </div>
+        </div>
+      )}
 
       {/* Group stats banner */}
       {(groupStats.streak > 0 || groupStats.weeklyGoal) && (

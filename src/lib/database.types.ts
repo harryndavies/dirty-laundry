@@ -27,6 +27,7 @@ export interface Database {
           created_by: string
           created_at: string
           weekly_goal: number | null
+          pocket_money_rate: number | null
         }
         Insert: {
           name: string
@@ -35,6 +36,7 @@ export interface Database {
         Update: {
           name?: string
           weekly_goal?: number | null
+          pocket_money_rate?: number | null
         }
         Relationships: []
       }
@@ -43,15 +45,16 @@ export interface Database {
           id: string
           group_id: string
           user_id: string
-          role: 'owner' | 'member'
+          role: 'owner' | 'member' | 'kid'
           total_points: number
           chore_share: number
           monthly_prize: string | null
+          paid_up_to: string | null
         }
         Insert: {
           group_id: string
           user_id: string
-          role?: 'owner' | 'member'
+          role?: 'owner' | 'member' | 'kid'
           chore_share?: number
           monthly_prize?: string | null
         }
@@ -59,6 +62,8 @@ export interface Database {
           total_points?: number
           chore_share?: number
           monthly_prize?: string | null
+          role?: 'owner' | 'member' | 'kid'
+          paid_up_to?: string | null
         }
         Relationships: []
       }

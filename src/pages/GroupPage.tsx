@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Copy, Mail, Percent, Trophy, LogOut, Target, Minus, Plus } from 'lucide-react'
+import { Copy, Mail, Percent, Trophy, LogOut, Target, Minus, Plus, Coins } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
 
 export function GroupPage() {
-  const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, leaveGroup, loading: groupLoading } = useGroup()
+  const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid, leaveGroup, loading: groupLoading } = useGroup()
   const { user } = useAuth()
   const [groupName, setGroupName] = useState('')
   const [inviteCode, setInviteCode] = useState('')
@@ -30,6 +31,10 @@ export function GroupPage() {
   const [showGoal, setShowGoal] = useState(false)
   const [goalAmount, setGoalAmount] = useState(0)
   const [savingGoal, setSavingGoal] = useState(false)
+  const [showPocketMoney, setShowPocketMoney] = useState(false)
+  const [pocketRate, setPocketRate] = useState(0)
+  const [savingRate, setSavingRate] = useState(false)
+  const { balances, formatMoney } = usePocketMoney()
 
   const isOwner = members.find(m => m.user_id === user?.id)?.role === 'owner'
   const shareTotal = Object.values(shares).reduce((sum, v) => sum + v, 0)
@@ -175,7 +180,9 @@ export function GroupPage() {
         </div>
 
         <div className="space-y-2">
-          {members.map(m => (
+          {members.map(m => {
+            const kidBalance = balances.get(m.user_id)
+            return (
             <div
               key={m.id}
               className="border-2 border-brutal-black p-3 flex items-center gap-3 bg-brutal-white"
@@ -183,13 +190,44 @@ export function GroupPage() {
               <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} />
               <div className="flex-1 min-w-0">
                 <p className="font-mono font-bold text-sm truncate">{m.profiles.display_name}</p>
-                <p className="font-mono text-[10px] text-brutal-black/40 uppercase">{m.role}</p>
+                <div className="flex items-center gap-2">
+                  {isOwner && m.role !== 'owner' ? (
+                    <button
+                      onClick={() => setMemberRole(m.id, m.role === 'kid' ? 'member' : 'kid')}
+                      className={`font-mono text-[10px] font-bold uppercase px-1.5 py-0.5 border transition-colors ${
+                        m.role === 'kid'
+                          ? 'bg-brutal-yellow border-brutal-black text-brutal-black'
+                          : 'border-brutal-black/20 text-brutal-black/40'
+                      }`}
+                    >
+                      {m.role === 'kid' ? '👶 KID' : m.role}
+                    </button>
+                  ) : (
+                    <span className="font-mono text-[10px] text-brutal-black/40 uppercase">{m.role === 'kid' ? '👶 KID' : m.role}</span>
+                  )}
+                  {m.role === 'kid' && kidBalance && group?.pocket_money_rate && (
+                    <span className="font-mono text-[10px] font-bold text-green-600">
+                      {formatMoney(kidBalance.unpaidAmount)} unpaid
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className="font-mono font-bold text-sm">
-                {m.total_points} <span className="text-[10px] text-brutal-black/40">PTS</span>
+              <div className="flex items-center gap-2">
+                <div className="font-mono font-bold text-sm">
+                  {m.total_points} <span className="text-[10px] text-brutal-black/40">PTS</span>
+                </div>
+                {isOwner && m.role === 'kid' && kidBalance && group?.pocket_money_rate && kidBalance.unpaidAmount > 0 && (
+                  <button
+                    onClick={() => { markAsPaid(m.id); toast(`Marked ${m.profiles.display_name} as paid!`, 'bg-brutal-lime') }}
+                    className="font-mono text-[10px] font-bold px-2 py-1 bg-brutal-lime border border-brutal-black active:bg-brutal-lime/60"
+                  >
+                    PAID
+                  </button>
+                )}
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
@@ -366,6 +404,84 @@ export function GroupPage() {
             className="w-full mt-2 font-mono text-xs text-brutal-black/40 font-bold py-2 active:text-brutal-black/60"
           >
             REMOVE GOAL
+          </button>
+        )}
+      </BottomSheet>
+
+      {/* Pocket money */}
+      {isOwner && (
+        <div className="px-4 mt-4">
+          <button
+            onClick={() => {
+              setPocketRate(group.pocket_money_rate ?? 1)
+              setShowPocketMoney(true)
+            }}
+            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+          >
+            <div className="flex items-center gap-2">
+              <Coins size={16} strokeWidth={3} />
+              <span className="font-mono font-bold text-sm">POCKET MONEY</span>
+            </div>
+            <span className="font-mono text-xs text-brutal-black/40">
+              {group.pocket_money_rate ? `${group.pocket_money_rate}p PER PT` : 'OFF'}
+            </span>
+          </button>
+        </div>
+      )}
+
+      {/* Pocket money sheet */}
+      <BottomSheet open={showPocketMoney} onClose={() => setShowPocketMoney(false)}>
+        <h2 className="font-mono font-bold text-lg mb-1">POCKET MONEY</h2>
+        <p className="font-mono text-xs text-brutal-black/50 mb-4">
+          Set how much each point is worth. Mark members as "kid" to enable their balance.
+        </p>
+        <div className="flex items-center gap-3 mb-4">
+          <button
+            type="button"
+            onClick={() => setPocketRate(Math.max(0, pocketRate - 1))}
+            className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+          >
+            <Minus size={18} />
+          </button>
+          <div className="flex-1 h-12 bg-brutal-yellow border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-xl">
+            {pocketRate}p per point
+          </div>
+          <button
+            type="button"
+            onClick={() => setPocketRate(pocketRate + 1)}
+            className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+        <p className="font-mono text-[10px] text-brutal-black/40 text-center mb-4">
+          Example: a 15pt chore = {formatMoney(15 * pocketRate)}
+        </p>
+        <Button
+          onClick={async () => {
+            setSavingRate(true)
+            await updatePocketMoneyRate(pocketRate > 0 ? pocketRate : null)
+            setSavingRate(false)
+            setShowPocketMoney(false)
+            toast(pocketRate > 0 ? `Rate set to ${pocketRate}p per point!` : 'Pocket money disabled', 'bg-brutal-yellow')
+          }}
+          disabled={savingRate}
+          className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-40"
+        >
+          {savingRate ? 'SAVING...' : 'SAVE RATE'}
+        </Button>
+        {group.pocket_money_rate && (
+          <button
+            onClick={async () => {
+              setSavingRate(true)
+              await updatePocketMoneyRate(null)
+              setSavingRate(false)
+              setShowPocketMoney(false)
+              toast('Pocket money disabled', 'bg-brutal-white')
+            }}
+            className="w-full mt-2 font-mono text-xs text-brutal-black/40 font-bold py-2 active:text-brutal-black/60"
+          >
+            DISABLE POCKET MONEY
           </button>
         )}
       </BottomSheet>
