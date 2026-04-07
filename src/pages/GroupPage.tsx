@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
@@ -9,8 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Copy, Share2, Percent, Trophy, LogOut, Target, Minus, Plus, Coins } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { Share2, Percent, Trophy, LogOut, Target, Minus, Plus, Coins } from 'lucide-react'
 import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
 
 export function GroupPage() {
