@@ -10,7 +10,6 @@ import { toast } from '@/components/ui/Toast'
 import { Check, Pencil, Moon, Sun, Bell, BellOff } from 'lucide-react'
 import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '@/lib/pushNotifications'
 import { supabase } from '@/lib/supabase'
-import { toast } from '@/components/ui/Toast'
 
 const COLORS = ['#FF2D9B', '#0066FF', '#FFE500', '#BFFF00', '#FF6B00', '#8B5CF6', '#06B6D4']
 
