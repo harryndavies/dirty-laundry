@@ -240,6 +240,35 @@ export function ChoresPage() {
         </div>
       </div>
 
+      {/* Chore of the day */}
+      {(() => {
+        const persistentChores = chores.filter(c => c.is_persistent)
+        if (persistentChores.length === 0) return null
+        // Seed random by date so everyone sees the same chore
+        const today = new Date()
+        const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate()
+        const index = seed % persistentChores.length
+        const dailyChore = persistentChores[index]
+        const bonusPoints = dailyChore.points * 2
+        return (
+          <div className="px-4 pt-3">
+            <button
+              onClick={() => handleComplete(dailyChore.id, bonusPoints, dailyChore.name)}
+              className="w-full bg-brutal-pink/10 border-2 border-brutal-pink p-3 flex items-center gap-3 active:bg-brutal-pink/20 transition-colors text-left"
+            >
+              <span className="text-xl">⭐</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-mono text-[10px] font-bold text-brutal-pink tracking-widest">CHORE OF THE DAY</p>
+                <p className="font-mono font-bold text-sm truncate">{dailyChore.name}</p>
+              </div>
+              <div className="font-mono font-bold text-sm bg-brutal-pink text-brutal-white border border-brutal-black px-2 py-0.5">
+                {bonusPoints} PTS
+              </div>
+            </button>
+          </div>
+        )
+      })()}
+
       {/* Kid earnings banner */}
       {isKid && myBalance && group?.pocket_money_rate && (
         <div className="px-4 pt-3">
