@@ -573,12 +573,20 @@ export function ChoresPage() {
                     </div>
                     {chore.is_persistent && suggestions.get(chore.id) && (
                       <div className="mt-1.5 flex items-center gap-1.5">
-                        <div
-                          className="w-4 h-4 border border-brutal-black flex items-center justify-center font-mono text-[8px] font-bold text-white shrink-0"
-                          style={{ background: suggestions.get(chore.id)!.avatar_color }}
-                        >
-                          {suggestions.get(chore.id)!.display_name[0]}
-                        </div>
+                        {suggestions.get(chore.id)!.avatar_url ? (
+                          <img
+                            src={suggestions.get(chore.id)!.avatar_url!}
+                            alt=""
+                            className="w-4 h-4 border border-brutal-black object-cover shrink-0"
+                          />
+                        ) : (
+                          <div
+                            className="w-4 h-4 border border-brutal-black flex items-center justify-center font-mono text-[8px] font-bold text-white shrink-0"
+                            style={{ background: suggestions.get(chore.id)!.avatar_color }}
+                          >
+                            {suggestions.get(chore.id)!.display_name[0]}
+                          </div>
+                        )}
                         <span className="font-mono text-[10px] text-brutal-black/50">
                           {suggestions.get(chore.id)!.display_name}'s turn
                         </span>

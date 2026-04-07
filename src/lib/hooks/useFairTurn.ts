@@ -6,6 +6,7 @@ interface TurnSuggestion {
   user_id: string
   display_name: string
   avatar_color: string
+  avatar_url: string | null
   reason: string
 }
 
@@ -106,6 +107,7 @@ export function useFairTurn() {
         user_id: chosen,
         display_name: member.profiles.display_name,
         avatar_color: member.profiles.avatar_color,
+        avatar_url: member.profiles.avatar_url ?? null,
         reason,
       })
     }
