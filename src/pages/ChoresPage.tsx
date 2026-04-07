@@ -179,12 +179,14 @@ export function ChoresPage() {
           >
             <Dices size={20} strokeWidth={2.5} />
           </button>
-          <button
-            onClick={() => setShowAdd(true)}
-            className="w-11 h-11 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
-          >
-            <Plus size={20} strokeWidth={3} />
-          </button>
+          {!isKid && (
+            <button
+              onClick={() => setShowAdd(true)}
+              className="w-11 h-11 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+            >
+              <Plus size={20} strokeWidth={3} />
+            </button>
+          )}
         </div>
       </div>
 
