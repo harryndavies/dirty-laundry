@@ -44,6 +44,8 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       return
     }
 
+    setLoading(true)
+
     // Check localStorage for cached group
     const cachedGroupId = localStorage.getItem('dirtylaundry_group_id')
 
