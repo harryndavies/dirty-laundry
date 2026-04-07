@@ -35,6 +35,7 @@ export function GroupPage() {
   const [pocketRate, setPocketRate] = useState(0)
   const [savingRate, setSavingRate] = useState(false)
   const { balances, formatMoney } = usePocketMoney()
+  const [confirmPaid, setConfirmPaid] = useState<{ memberId: string; name: string; amount: number } | null>(null)
 
   const isOwner = members.find(m => m.user_id === user?.id)?.role === 'owner'
   const shareTotal = Object.values(shares).reduce((sum, v) => sum + v, 0)
@@ -218,7 +219,7 @@ export function GroupPage() {
                 </div>
                 {isOwner && m.role === 'kid' && kidBalance && group?.pocket_money_rate && kidBalance.unpaidAmount > 0 && (
                   <button
-                    onClick={() => { markAsPaid(m.id); toast(`Marked ${m.profiles.display_name} as paid!`, 'bg-brutal-lime') }}
+                    onClick={() => setConfirmPaid({ memberId: m.id, name: m.profiles.display_name, amount: kidBalance.unpaidAmount })}
                     className="font-mono text-[10px] font-bold px-2 py-1 bg-brutal-lime border border-brutal-black active:bg-brutal-lime/60"
                   >
                     PAID
@@ -576,6 +577,22 @@ export function GroupPage() {
           setConfirmLeave(false)
         }}
         onCancel={() => setConfirmLeave(false)}
+      />
+
+      <ConfirmDialog
+        open={!!confirmPaid}
+        title="MARK AS PAID"
+        message={confirmPaid ? `Confirm you've paid ${confirmPaid.name} ${formatMoney(confirmPaid.amount)}?` : ''}
+        confirmLabel="PAID ✓"
+        confirmColor="bg-brutal-lime"
+        onConfirm={async () => {
+          if (confirmPaid) {
+            await markAsPaid(confirmPaid.memberId)
+            toast(`Marked ${confirmPaid.name} as paid!`, 'bg-brutal-lime')
+          }
+          setConfirmPaid(null)
+        }}
+        onCancel={() => setConfirmPaid(null)}
       />
 
       {/* Invite sheet */}
