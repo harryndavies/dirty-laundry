@@ -203,13 +203,14 @@ export function GroupPage() {
                   {isOwner && m.role !== 'owner' ? (
                     <button
                       onClick={() => setMemberRole(m.id, m.role === 'kid' ? 'member' : 'kid')}
-                      className={`font-mono text-[10px] font-bold uppercase px-1.5 py-0.5 border transition-colors ${
-                        m.role === 'kid'
-                          ? 'bg-brutal-yellow border-brutal-black text-brutal-black'
-                          : 'border-brutal-black/20 text-brutal-black/40'
-                      }`}
+                      className="flex items-center gap-1.5"
                     >
-                      {m.role === 'kid' ? '👶 KID' : m.role}
+                      <div className={`w-10 h-6 border-2 border-brutal-black flex items-center p-0.5 transition-colors ${m.role === 'kid' ? 'bg-brutal-yellow justify-end' : 'bg-brutal-white justify-start'}`}>
+                        <div className="w-4 h-4 bg-brutal-black" />
+                      </div>
+                      <span className={`font-mono text-[10px] font-bold uppercase ${m.role === 'kid' ? 'text-brutal-black' : 'text-brutal-black/40'}`}>
+                        {m.role === 'kid' ? '👶 KID' : 'ADULT'}
+                      </span>
                     </button>
                   ) : (
                     <span className="font-mono text-[10px] text-brutal-black/40 uppercase">{m.role === 'kid' ? '👶 KID' : m.role}</span>
