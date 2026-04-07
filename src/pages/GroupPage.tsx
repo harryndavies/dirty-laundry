@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
@@ -15,6 +16,7 @@ import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
 export function GroupPage() {
   const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid, leaveGroup, loading: groupLoading } = useGroup()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [groupName, setGroupName] = useState('')
   const [inviteCode, setInviteCode] = useState(() => {
     const saved = localStorage.getItem('dirtylaundry_invite_code')
@@ -78,6 +80,7 @@ export function GroupPage() {
                 setError('')
                 await createGroup(groupName.trim())
                 setLoading(false)
+                navigate('/chores')
               }}
               className="space-y-3"
             >
@@ -108,7 +111,11 @@ export function GroupPage() {
                 setLoading(true)
                 setError('')
                 const { error } = await joinGroup(inviteCode.trim())
-                if (error) setError(error)
+                if (error) {
+                  setError(error)
+                } else {
+                  navigate('/chores')
+                }
                 setLoading(false)
               }}
               className="space-y-3"
