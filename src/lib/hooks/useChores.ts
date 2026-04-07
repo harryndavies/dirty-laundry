@@ -50,7 +50,7 @@ export function useChores() {
   })
 
   const completeChore = useMutation({
-    mutationFn: async ({ choreId, points, withUserId }: { choreId: string; points: number; withUserId?: string }) => {
+    mutationFn: async ({ choreId, points, withUserId, photo }: { choreId: string; points: number; withUserId?: string; photo?: File }) => {
       if (!group || !user) throw new Error('No group or user')
 
       // Check if this chore was boosted by the completer
@@ -64,6 +64,21 @@ export function useChores() {
         ? chore.base_points
         : points
 
+      // Upload photo if provided
+      let photoUrl: string | null = null
+      if (photo) {
+        const path = `${group.id}/${user.id}/${Date.now()}.jpg`
+        const { error: uploadError } = await supabase.storage
+          .from('completion-photos')
+          .upload(path, photo, { contentType: photo.type })
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage
+            .from('completion-photos')
+            .getPublicUrl(path)
+          photoUrl = urlData.publicUrl
+        }
+      }
+
       const { error } = await supabase
         .from('completions')
         .insert({
@@ -72,6 +87,7 @@ export function useChores() {
           group_id: group.id,
           points_earned: earnedPoints,
           chore_name: chore?.name ?? null,
+          photo_url: photoUrl,
         })
       if (error) throw error
 

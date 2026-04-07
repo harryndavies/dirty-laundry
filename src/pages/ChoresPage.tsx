@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
-import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Search, Flame, Target } from 'lucide-react'
+import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Search, Flame, Target, Camera, X } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'persistent' | 'one-time'
@@ -45,6 +45,8 @@ export function ChoresPage() {
   const [confirmComplete, setConfirmComplete] = useState<{ id: string; points: number; name: string } | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [withUserId, setWithUserId] = useState<string | null>(null)
+  const [photo, setPhoto] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
 
   // Bounty state
   const [bountyChore, setBountyChore] = useState<{ id: string; name: string; points: number } | null>(null)
@@ -99,6 +101,7 @@ export function ChoresPage() {
       choreId: confirmComplete.id,
       points: confirmComplete.points,
       withUserId: withUserId ?? undefined,
+      photo: photo ?? undefined,
     })
     playComplete()
     const partner = withUserId ? members.find(m => m.user_id === withUserId) : null
@@ -111,6 +114,8 @@ export function ChoresPage() {
     }
     setConfirmComplete(null)
     setWithUserId(null)
+    setPhoto(null)
+    setPhotoPreview(null)
   }
 
   function handleDelete(choreId: string) {
@@ -595,6 +600,39 @@ export function ChoresPage() {
                 </div>
               </div>
             )}
+
+            {/* Photo proof */}
+            <div className="mb-4">
+              <p className="font-mono text-[10px] font-bold text-brutal-black/40 tracking-widest mb-2">PHOTO PROOF (OPTIONAL)</p>
+              {photoPreview ? (
+                <div className="relative">
+                  <img src={photoPreview} alt="Proof" className="w-full h-32 object-cover border-2 border-brutal-black" />
+                  <button
+                    onClick={() => { setPhoto(null); setPhotoPreview(null) }}
+                    className="absolute top-1 right-1 w-6 h-6 bg-brutal-black text-brutal-white flex items-center justify-center"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center justify-center gap-2 h-12 border-2 border-dashed border-brutal-black/30 bg-brutal-white font-mono text-xs font-bold text-brutal-black/40 active:bg-brutal-black/5 cursor-pointer">
+                  <Camera size={16} /> ADD PHOTO
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    onChange={e => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        setPhoto(file)
+                        setPhotoPreview(URL.createObjectURL(file))
+                      }
+                    }}
+                  />
+                </label>
+              )}
+            </div>
 
             <Button
               onClick={doComplete}

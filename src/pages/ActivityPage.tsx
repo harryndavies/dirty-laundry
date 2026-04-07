@@ -167,6 +167,15 @@ export function ActivityPage() {
                         </div>
                       </div>
 
+                      {/* Photo proof */}
+                      {entry.photo_url && (
+                        <img
+                          src={entry.photo_url}
+                          alt="Proof"
+                          className="w-full h-40 object-cover border-2 border-brutal-black mt-2"
+                        />
+                      )}
+
                       {/* Reactions row */}
                       <div className="flex items-center gap-1.5 mt-2 flex-wrap">
                         {Array.from(reactionGroups.entries()).map(([emoji, userIds]) => {
