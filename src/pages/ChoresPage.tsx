@@ -20,6 +20,55 @@ type Filter = 'all' | 'persistent' | 'one-time'
 
 const AREAS = ['Kitchen', 'Bathroom', 'Bedroom', 'Living Room', 'Garden', 'Laundry', 'General']
 
+const CHORE_PACKS: { name: string; emoji: string; chores: { name: string; points: number; area: string }[] }[] = [
+  {
+    name: 'STUDENT FLAT',
+    emoji: '🎓',
+    chores: [
+      { name: 'Do the dishes', points: 10, area: 'Kitchen' },
+      { name: 'Take the bins out', points: 10, area: 'General' },
+      { name: 'Hoover the flat', points: 15, area: 'Living Room' },
+      { name: 'Clean the bathroom', points: 20, area: 'Bathroom' },
+      { name: 'Wipe kitchen surfaces', points: 10, area: 'Kitchen' },
+      { name: 'Take out recycling', points: 5, area: 'General' },
+      { name: 'Mop the kitchen floor', points: 15, area: 'Kitchen' },
+      { name: 'Clean the toilet', points: 10, area: 'Bathroom' },
+    ],
+  },
+  {
+    name: 'FAMILY HOME',
+    emoji: '🏠',
+    chores: [
+      { name: 'Do the dishes', points: 10, area: 'Kitchen' },
+      { name: 'Hoover downstairs', points: 15, area: 'Living Room' },
+      { name: 'Hoover upstairs', points: 15, area: 'Bedroom' },
+      { name: 'Clean the bathroom', points: 20, area: 'Bathroom' },
+      { name: 'Put a wash on', points: 10, area: 'Laundry' },
+      { name: 'Hang out washing', points: 10, area: 'Laundry' },
+      { name: 'Cook dinner', points: 20, area: 'Kitchen' },
+      { name: 'Take the bins out', points: 10, area: 'General' },
+      { name: 'Mow the grass', points: 25, area: 'Garden' },
+      { name: 'Wipe kitchen surfaces', points: 10, area: 'Kitchen' },
+      { name: 'Unload dishwasher', points: 5, area: 'Kitchen' },
+      { name: 'Tidy living room', points: 10, area: 'Living Room' },
+    ],
+  },
+  {
+    name: 'COUPLE',
+    emoji: '💑',
+    chores: [
+      { name: 'Do the dishes', points: 10, area: 'Kitchen' },
+      { name: 'Cook dinner', points: 20, area: 'Kitchen' },
+      { name: 'Hoover the flat', points: 15, area: 'Living Room' },
+      { name: 'Clean the bathroom', points: 20, area: 'Bathroom' },
+      { name: 'Put a wash on', points: 10, area: 'Laundry' },
+      { name: 'Food shop', points: 20, area: 'General' },
+      { name: 'Take the bins out', points: 10, area: 'General' },
+      { name: 'Change the bedsheets', points: 15, area: 'Bedroom' },
+    ],
+  },
+]
+
 export function ChoresPage() {
   const { group, members, loading: groupLoading, updateSavingsGoal } = useGroup()
   const { user } = useAuth()
@@ -48,6 +97,7 @@ export function ChoresPage() {
   const [photo, setPhoto] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [showSavingsGoal, setShowSavingsGoal] = useState(false)
+  const [addingPack, setAddingPack] = useState(false)
   const [goalName, setGoalName] = useState('')
   const [goalAmount, setGoalAmount] = useState(500)
 
@@ -364,11 +414,50 @@ export function ChoresPage() {
         {loading ? (
           <div className="py-12"><Spinner /></div>
         ) : filtered.length === 0 ? (
-          <div className="py-12 text-center">
-            <div className="text-4xl mb-3">🧹</div>
-            <p className="font-mono font-bold text-brutal-black/40 text-sm">NO CHORES YET</p>
-            <p className="font-mono text-brutal-black/30 text-xs mt-1">Tap + to add one</p>
-          </div>
+          chores.length === 0 && !isKid ? (
+            <div className="py-8">
+              <div className="text-center mb-4">
+                <div className="text-4xl mb-3">🧹</div>
+                <p className="font-mono font-bold text-brutal-black/40 text-sm">NO CHORES YET</p>
+                <p className="font-mono text-brutal-black/30 text-xs mt-1">Pick a starter pack or add your own</p>
+              </div>
+              <div className="space-y-2">
+                {CHORE_PACKS.map(pack => (
+                  <button
+                    key={pack.name}
+                    disabled={addingPack}
+                    onClick={async () => {
+                      setAddingPack(true)
+                      for (const c of pack.chores) {
+                        await addChore.mutateAsync({
+                          name: c.name,
+                          points: c.points,
+                          isPersistent: true,
+                          area: c.area,
+                        })
+                      }
+                      setAddingPack(false)
+                      toast(`${pack.chores.length} chores added!`, 'bg-brutal-lime')
+                    }}
+                    className="w-full border-2 border-brutal-black bg-brutal-white p-4 flex items-center gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-50"
+                  >
+                    <span className="text-2xl">{pack.emoji}</span>
+                    <div className="flex-1 text-left">
+                      <span className="font-mono font-bold text-sm block">{pack.name}</span>
+                      <span className="font-mono text-[10px] text-brutal-black/40">{pack.chores.length} chores</span>
+                    </div>
+                    <span className="font-mono text-xs text-brutal-black/40">ADD ALL</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="py-12 text-center">
+              <div className="text-4xl mb-3">🧹</div>
+              <p className="font-mono font-bold text-brutal-black/40 text-sm">NO CHORES FOUND</p>
+              <p className="font-mono text-brutal-black/30 text-xs mt-1">{search ? 'Try a different search' : 'Tap + to add one'}</p>
+            </div>
+          )
         ) : (
           (() => {
             const hasAreas = filtered.some(c => c.area)
