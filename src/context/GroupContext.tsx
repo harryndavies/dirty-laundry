@@ -128,6 +128,29 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     fetchGroup()
   }, [fetchGroup])
 
+  // Realtime: refresh when group settings or member roles change
+  useEffect(() => {
+    if (!group) return
+
+    const channel = supabase
+      .channel(`group-sync-${group.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'group_members', filter: `group_id=eq.${group.id}` },
+        () => refreshMembersForGroup(group.id)
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'groups', filter: `id=eq.${group.id}` },
+        () => fetchGroup()
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [group?.id])
+
   async function createGroup(name: string) {
     if (!user) return
 
