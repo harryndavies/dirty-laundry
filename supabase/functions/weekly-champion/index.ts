@@ -78,14 +78,14 @@ Deno.serve(async () => {
       if (!members?.length) continue
 
       const name = champion?.display_name ?? 'Someone'
-      const sassy = [
-        { title: "Bow down 👑", body: `${name} wiped the floor with everyone. ${maxPoints} pts.` },
-        { title: "It's not even close", body: `${name} carried the whole house. ${maxPoints} pts. You're welcome.` },
-        { title: "While you were sleeping 💅", body: `${name} racked up ${maxPoints} pts. What's your excuse?` },
-        { title: "Someone did the work", body: `Spoiler: it was ${name}. Again. ${maxPoints} pts.` },
-        { title: "The receipts are in 🧾", body: `${name} on top with ${maxPoints} pts. No debate.` },
+      const messages = [
+        { title: "Weekly champion! 👑", body: `${name} smashed it this week with ${maxPoints} pts. Nice one!` },
+        { title: "This week's MVP 🏆", body: `${name} topped the leaderboard with ${maxPoints} pts!` },
+        { title: "What a week! 🔥", body: `${name} earned ${maxPoints} pts this week. Legendary effort.` },
+        { title: "Champion crowned 👑", body: `${name} takes the top spot with ${maxPoints} pts. Well deserved!` },
+        { title: "Look who's winning! 🎉", body: `${name} led the way this week — ${maxPoints} pts. Keep it up!` },
       ]
-      const pick = sassy[Math.floor(Math.random() * sassy.length)]
+      const pick = messages[Math.floor(Math.random() * messages.length)]
       const payload = {
         title: pick.title,
         body: pick.body,

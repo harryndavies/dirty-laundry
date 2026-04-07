@@ -141,8 +141,8 @@ export function useChores() {
           // Notify if we just overtook them (they were above us, now we're above them)
           if (theirPoints > 0 && previousPoints <= theirPoints && myPoints > theirPoints) {
             sendPushToUser(m.user_id, {
-              title: 'You got overtaken! 😤',
-              body: `${profile?.display_name ?? 'Someone'} just passed you on the leaderboard`,
+              title: 'Leaderboard update! 🏆',
+              body: `${profile?.display_name ?? 'Someone'} just moved ahead of you — time to catch up!`,
               url: '/leaderboard',
             }).catch(() => {})
           } else {

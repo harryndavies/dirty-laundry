@@ -108,8 +108,8 @@ export function useStats() {
   return { stats, loading }
 }
 
-export function formatShame(lastCompletion: string | null): string {
-  if (!lastCompletion) return 'NEVER DONE A CHORE'
+export function formatLastActive(lastCompletion: string | null): string {
+  if (!lastCompletion) return 'NOT YET ACTIVE'
 
   const seconds = Math.floor((Date.now() - new Date(lastCompletion).getTime()) / 1000)
   if (seconds < 60) return 'just now'

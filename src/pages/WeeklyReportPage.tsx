@@ -329,11 +329,11 @@ export function WeeklyReportPage() {
               </div>
             )}
 
-            {/* Sass */}
+            {/* Encouragement */}
             {stats.length >= 2 && stats[stats.length - 1].points === 0 && (
-              <div className="bg-brutal-pink/10 border-2 border-brutal-pink p-3 text-center">
-                <p className="font-mono text-xs font-bold text-brutal-pink">
-                  {stats[stats.length - 1].display_name} did literally nothing {periodLabel}. Just saying.
+              <div className="bg-brutal-blue/10 border-2 border-brutal-blue p-3 text-center">
+                <p className="font-mono text-xs font-bold text-brutal-blue">
+                  {stats[stats.length - 1].display_name} hasn't scored {periodLabel} yet — there's still time!
                 </p>
               </div>
             )}

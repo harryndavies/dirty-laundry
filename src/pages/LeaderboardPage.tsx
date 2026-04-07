@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLeaderboard } from '@/lib/hooks/useLeaderboard'
-import { useStats, formatShame } from '@/lib/hooks/useStats'
+import { useStats, formatLastActive } from '@/lib/hooks/useStats'
 import { useNudges } from '@/lib/hooks/useNudges'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
@@ -71,7 +71,7 @@ export function LeaderboardPage() {
             const isMe = member.user_id === user?.id
             const barWidth = maxPoints > 0 ? (member.total_points / maxPoints) * 100 : 0
             const memberStats = stats.get(member.user_id)
-            const shame = formatShame(memberStats?.last_completion ?? null)
+            const lastActive = formatLastActive(memberStats?.last_completion ?? null)
             const streak = memberStats?.current_streak ?? 0
 
             return (
@@ -125,15 +125,15 @@ export function LeaderboardPage() {
                   </div>
                 </div>
 
-                {/* Shame timer + nudge */}
+                {/* Last active + nudge */}
                 <div className="border-t-2 border-brutal-black/15 px-3 py-1.5 flex justify-between items-center">
                   <span className="font-mono text-[10px] text-brutal-black/40">LAST ACTIVE</span>
                   <div className="flex items-center gap-2">
                     <span className={`font-mono text-[10px] font-bold ${
                       !memberStats?.last_completion ? 'text-brutal-pink' :
-                      shame.includes('day') ? 'text-brutal-orange' : 'text-brutal-black/50'
+                      lastActive.includes('day') ? 'text-brutal-orange' : 'text-brutal-black/50'
                     }`}>
-                      {shame.toUpperCase()}
+                      {lastActive.toUpperCase()}
                     </span>
                     {!isMe && (
                       <button
