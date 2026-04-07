@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
 import { Navigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ShareCard } from '@/components/ShareCard'
 
 interface MemberStats {
   user_id: string
@@ -337,6 +338,21 @@ export function WeeklyReportPage() {
                 </p>
               </div>
             )}
+
+            {/* Share card */}
+            <ShareCard
+              groupName={group.name}
+              period={label}
+              totalChores={stats.reduce((sum, s) => sum + s.completions, 0)}
+              totalPoints={totalPoints}
+              members={stats.map(s => ({
+                name: s.display_name,
+                color: s.avatar_color,
+                points: s.points,
+                pct: totalPoints > 0 ? Math.round((s.points / totalPoints) * 100) : 0,
+              }))}
+              topChore={stats[0]?.topChore ?? null}
+            />
           </div>
         )}
 
