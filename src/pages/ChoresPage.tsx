@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
-import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Search, Flame, Target, Camera, X } from 'lucide-react'
+import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Search, Target, Camera, X } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'persistent' | 'one-time'
@@ -199,35 +199,24 @@ export function ChoresPage() {
         </div>
       )}
 
-      {/* Group stats banner */}
-      {(groupStats.streak > 0 || groupStats.weeklyGoal) && (
-        <div className="flex gap-2 px-4 pt-3">
-          {groupStats.streak > 0 && (
-            <div className="flex-1 flex items-center gap-2 bg-brutal-orange/10 border-2 border-brutal-orange/30 px-3 py-2">
-              <Flame size={14} className="text-brutal-orange" />
+      {/* Weekly goal banner */}
+      {groupStats.weeklyGoal && (
+        <div className="px-4 pt-3">
+          <div className="border-2 border-brutal-black/20 px-3 py-2">
+            <div className="flex items-center gap-2 mb-1">
+              <Target size={14} className="text-brutal-blue" />
               <span className="font-mono text-xs font-bold">
-                {groupStats.streak} DAY{groupStats.streak !== 1 ? 'S' : ''}
+                {groupStats.weeklyPoints}/{groupStats.weeklyGoal}
               </span>
-              <span className="font-mono text-[10px] text-brutal-black/40">GROUP STREAK</span>
+              <span className="font-mono text-[10px] text-brutal-black/40">GOAL</span>
             </div>
-          )}
-          {groupStats.weeklyGoal && (
-            <div className="flex-1 border-2 border-brutal-black/20 px-3 py-2">
-              <div className="flex items-center gap-2 mb-1">
-                <Target size={14} className="text-brutal-blue" />
-                <span className="font-mono text-xs font-bold">
-                  {groupStats.weeklyPoints}/{groupStats.weeklyGoal}
-                </span>
-                <span className="font-mono text-[10px] text-brutal-black/40">GOAL</span>
-              </div>
-              <div className="h-1.5 bg-brutal-black/10">
-                <div
-                  className={`h-full transition-all duration-500 ${groupStats.weeklyPoints >= groupStats.weeklyGoal ? 'bg-brutal-lime' : 'bg-brutal-blue'}`}
-                  style={{ width: `${Math.min(100, (groupStats.weeklyPoints / groupStats.weeklyGoal) * 100)}%` }}
-                />
-              </div>
+            <div className="h-1.5 bg-brutal-black/10">
+              <div
+                className={`h-full transition-all duration-500 ${groupStats.weeklyPoints >= groupStats.weeklyGoal ? 'bg-brutal-lime' : 'bg-brutal-blue'}`}
+                style={{ width: `${Math.min(100, (groupStats.weeklyPoints / groupStats.weeklyGoal) * 100)}%` }}
+              />
             </div>
-          )}
+          </div>
         </div>
       )}
 
