@@ -50,6 +50,7 @@ export function ActivityPage() {
   const { activity, loading, toggleReaction, undoCompletion } = useActivity()
   const [pickerOpen, setPickerOpen] = useState<string | null>(null)
   const [confirmUndo, setConfirmUndo] = useState<{ id: string; name: string } | null>(null)
+  const [expandedPhoto, setExpandedPhoto] = useState<string | null>(null)
 
   // Swipe state
   const touchStartX = useRef(0)
@@ -172,7 +173,8 @@ export function ActivityPage() {
                         <img
                           src={entry.photo_url}
                           alt="Proof"
-                          className="w-full h-40 object-cover border-2 border-brutal-black mt-2"
+                          onClick={() => setExpandedPhoto(entry.photo_url)}
+                          className="w-full h-40 object-cover border-2 border-brutal-black mt-2 cursor-pointer active:opacity-80"
                         />
                       )}
 
@@ -242,6 +244,20 @@ export function ActivityPage() {
         }}
         onCancel={() => setConfirmUndo(null)}
       />
+
+      {/* Expanded photo overlay */}
+      {expandedPhoto && (
+        <div
+          onClick={() => setExpandedPhoto(null)}
+          className="fixed inset-0 z-50 bg-brutal-black/90 flex items-center justify-center p-4"
+        >
+          <img
+            src={expandedPhoto}
+            alt="Proof"
+            className="max-w-full max-h-full object-contain border-4 border-brutal-white"
+          />
+        </div>
+      )}
     </div>
   )
 }
