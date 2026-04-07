@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Navigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -7,6 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function AuthPage() {
   const { session, signIn, signUp, resetPassword } = useAuth()
+  const [searchParams] = useSearchParams()
+  const inviteCode = searchParams.get('code')
+
+  useEffect(() => {
+    if (inviteCode) {
+      localStorage.setItem('dirtylaundry_invite_code', inviteCode)
+    }
+  }, [inviteCode])
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
   const [signupEmail, setSignupEmail] = useState('')

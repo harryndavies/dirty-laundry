@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Copy, Mail, Percent, Trophy, LogOut, Target, Minus, Plus, Coins } from 'lucide-react'
+import { Copy, Share2, Percent, Trophy, LogOut, Target, Minus, Plus, Coins } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
 
@@ -16,9 +16,11 @@ export function GroupPage() {
   const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid, leaveGroup, loading: groupLoading } = useGroup()
   const { user } = useAuth()
   const [groupName, setGroupName] = useState('')
-  const [inviteCode, setInviteCode] = useState('')
-  const [showInvite, setShowInvite] = useState(false)
-  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteCode, setInviteCode] = useState(() => {
+    const saved = localStorage.getItem('dirtylaundry_invite_code')
+    if (saved) localStorage.removeItem('dirtylaundry_invite_code')
+    return saved ?? ''
+  })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showSplit, setShowSplit] = useState(false)
@@ -134,25 +136,26 @@ export function GroupPage() {
   }
 
   // Has group — show details
-  function copyCode() {
-    navigator.clipboard.writeText(group!.invite_code)
-    toast('Code copied!', 'bg-brutal-lime')
+  const joinLink = `${window.location.origin}/auth?code=${group.invite_code}`
+
+  async function shareGroup() {
+    const shareData = {
+      title: `Join ${group!.name} on Dirty Laundry`,
+      text: `Join my household on Dirty Laundry! Use code ${group!.invite_code} or tap the link:`,
+      url: joinLink,
+    }
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData)
+      } catch {
+        // User cancelled
+      }
+    } else {
+      navigator.clipboard.writeText(joinLink)
+      toast('Link copied!', 'bg-brutal-lime')
+    }
   }
 
-  async function handleInvite(e: React.FormEvent) {
-    e.preventDefault()
-    if (!inviteEmail.trim() || !user || !group) return
-    setLoading(true)
-    await supabase.from('invitations').insert({
-      group_id: group.id,
-      invited_email: inviteEmail.trim(),
-      invited_by: user.id,
-    })
-    setInviteEmail('')
-    setShowInvite(false)
-    setLoading(false)
-    toast('Invite sent!', 'bg-brutal-lime')
-  }
 
   return (
     <div className="min-h-full">
@@ -164,20 +167,12 @@ export function GroupPage() {
       <div className="px-4 pt-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-mono font-bold text-sm">MEMBERS ({members.length})</h2>
-          <div className="flex gap-2">
-            <button
-              onClick={copyCode}
-              className="flex items-center gap-1.5 font-mono text-xs font-bold px-3 py-2 bg-brutal-yellow border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
-            >
-              <Copy size={14} /> {group.invite_code}
-            </button>
-            <button
-              onClick={() => setShowInvite(true)}
-              className="flex items-center gap-1.5 font-mono text-xs font-bold px-3 py-2 bg-brutal-pink text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
-            >
-              <Mail size={14} /> INVITE
-            </button>
-          </div>
+          <button
+            onClick={shareGroup}
+            className="flex items-center gap-1.5 font-mono text-xs font-bold px-3 py-2 bg-brutal-pink text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+          >
+            <Share2 size={14} /> INVITE
+          </button>
         </div>
 
         <div className="space-y-2">
@@ -625,34 +620,6 @@ export function GroupPage() {
         onCancel={() => setConfirmPaid(null)}
       />
 
-      {/* Invite sheet */}
-      <BottomSheet open={showInvite} onClose={() => setShowInvite(false)}>
-        <h2 className="font-mono font-bold text-lg mb-4">INVITE BY EMAIL</h2>
-        <form onSubmit={handleInvite} className="space-y-4">
-          <div>
-            <label className="font-mono text-xs font-bold uppercase block mb-1">EMAIL</label>
-            <Input
-              type="email"
-              value={inviteEmail}
-              onChange={e => setInviteEmail(e.target.value)}
-              placeholder="friend@email.com"
-              className="border-2 border-brutal-black font-mono h-12"
-              autoFocus
-              required
-            />
-          </div>
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full h-12 bg-brutal-pink text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
-          >
-            SEND INVITE
-          </Button>
-        </form>
-        <p className="font-mono text-[10px] text-brutal-black/40 mt-3 text-center">
-          Or just share the invite code: {group.invite_code}
-        </p>
-      </BottomSheet>
     </div>
   )
 }
