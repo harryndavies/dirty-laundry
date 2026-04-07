@@ -21,7 +21,7 @@ export interface ActivityEntry {
 }
 
 export function useActivity() {
-  const { group } = useGroup()
+  const { group, refreshMembers } = useGroup()
   const { user } = useAuth()
   const [activity, setActivity] = useState<ActivityEntry[]>([])
   const [loading, setLoading] = useState(true)
@@ -121,7 +121,7 @@ export function useActivity() {
       .select('id, total_points')
       .eq('group_id', group.id)
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
     if (membership) {
       await supabase
@@ -134,6 +134,7 @@ export function useActivity() {
     await supabase.from('completions').delete().eq('id', completionId)
 
     await fetchActivity()
+    await refreshMembers()
   }
 
   return { activity, loading, toggleReaction, undoCompletion }
