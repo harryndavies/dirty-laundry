@@ -8,9 +8,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="h-screen flex flex-col items-center justify-center gap-4 bg-brutal-yellow">
-        <h1 className="font-mono text-4xl font-bold text-brutal-black">
-          DIRTY LAUNDRY
-        </h1>
+        <img src="/logo.png" alt="Dirty Laundry" className="w-48 h-auto" />
         <Spinner size="lg" />
       </div>
     )
