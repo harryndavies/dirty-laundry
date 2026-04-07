@@ -230,6 +230,46 @@ export function AuthPage() {
             </TabsContent>
 
             <TabsContent value="signup">
+              {showAnon ? (
+                <div className="mt-4">
+                  <form
+                    onSubmit={async e => {
+                      e.preventDefault()
+                      if (!anonName.trim()) return
+                      setLoading(true)
+                      setError('')
+                      const { error } = await signInAnonymously(anonName.trim())
+                      if (error) setError(error)
+                      setLoading(false)
+                    }}
+                    className="space-y-3"
+                  >
+                    <p className="font-mono text-xs text-brutal-black/50 text-center">Just enter your name to get started</p>
+                    <Input
+                      value={anonName}
+                      onChange={e => setAnonName(e.target.value)}
+                      placeholder="Your name"
+                      className="border-2 border-brutal-black font-mono h-12 text-center"
+                      autoFocus
+                      required
+                    />
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full h-12 bg-brutal-lime font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+                    >
+                      {loading ? 'JOINING...' : 'JOIN WITHOUT ACCOUNT'}
+                    </Button>
+                  </form>
+                  <button
+                    onClick={() => setShowAnon(false)}
+                    className="w-full mt-3 font-mono text-xs font-bold text-brutal-black/40 py-2 active:text-brutal-black/60"
+                  >
+                    ← BACK TO SIGN UP
+                  </button>
+                </div>
+              ) : (
+              <>
               <form onSubmit={handleSignup} className="space-y-4 mt-4">
                 <div>
                   <label className="font-mono text-xs font-bold uppercase block mb-1">DISPLAY NAME</label>
@@ -272,45 +312,15 @@ export function AuthPage() {
               </form>
 
               <div className="mt-4 pt-4 border-t-2 border-brutal-black/10">
-                {showAnon ? (
-                  <form
-                    onSubmit={async e => {
-                      e.preventDefault()
-                      if (!anonName.trim()) return
-                      setLoading(true)
-                      setError('')
-                      const { error } = await signInAnonymously(anonName.trim())
-                      if (error) setError(error)
-                      setLoading(false)
-                    }}
-                    className="space-y-3"
-                  >
-                    <p className="font-mono text-xs text-brutal-black/50 text-center">Just enter your name to get started</p>
-                    <Input
-                      value={anonName}
-                      onChange={e => setAnonName(e.target.value)}
-                      placeholder="Your name"
-                      className="border-2 border-brutal-black font-mono h-12 text-center"
-                      autoFocus
-                      required
-                    />
-                    <Button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full h-12 bg-brutal-lime font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
-                    >
-                      {loading ? 'JOINING...' : 'JOIN WITHOUT ACCOUNT'}
-                    </Button>
-                  </form>
-                ) : (
-                  <button
-                    onClick={() => setShowAnon(true)}
-                    className="w-full font-mono text-xs font-bold text-brutal-black/40 py-2 active:text-brutal-black/60"
-                  >
-                    NO EMAIL? JOIN WITHOUT AN ACCOUNT
-                  </button>
-                )}
+                <button
+                  onClick={() => setShowAnon(true)}
+                  className="w-full font-mono text-xs font-bold text-brutal-black/40 py-2 active:text-brutal-black/60"
+                >
+                  NO EMAIL? JOIN WITHOUT AN ACCOUNT
+                </button>
               </div>
+              </>
+              )}
             </TabsContent>
           </Tabs>
         )}
