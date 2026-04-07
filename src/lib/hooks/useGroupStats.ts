@@ -65,17 +65,10 @@ export function useGroupStats() {
 
     const weeklyPoints = (weekCompletions ?? []).reduce((sum, c) => sum + c.points_earned, 0)
 
-    // Fetch group goal
-    const { data: groupData } = await supabase
-      .from('groups')
-      .select('weekly_goal')
-      .eq('id', group.id)
-      .single()
-
     setStats({
       streak,
       weeklyPoints,
-      weeklyGoal: groupData?.weekly_goal ?? null,
+      weeklyGoal: group.weekly_goal ?? null,
     })
   }, [group])
 
