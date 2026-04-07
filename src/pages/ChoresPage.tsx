@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
-import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Search, Target, Camera, X, Star } from 'lucide-react'
+import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Search, Target, Camera, X, Star, Focus } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'persistent' | 'one-time'
@@ -89,6 +89,10 @@ export function ChoresPage() {
   const [newReminderDay, setNewReminderDay] = useState<number | null>(null)
   const [newReminderTime, setNewReminderTime] = useState('09:00')
   const [newArea, setNewArea] = useState<string | null>(null)
+
+  // Just do one mode
+  const [justDoOne, setJustDoOne] = useState(false)
+  const [justDoOneIndex, setJustDoOneIndex] = useState(0)
 
   // Confirm dialog state
   const [confirmComplete, setConfirmComplete] = useState<{ id: string; points: number; name: string } | null>(null)
@@ -223,6 +227,17 @@ export function ChoresPage() {
       <div className="sticky top-0 z-10 bg-brutal-white border-b-4 border-brutal-black px-4 py-3 flex items-center justify-between">
         <h1 className="font-mono font-bold text-lg tracking-tight">{group.name}</h1>
         <div className="flex gap-2">
+          <button
+            onClick={() => {
+              const persistent = chores.filter(c => c.is_persistent)
+              if (persistent.length === 0) return
+              setJustDoOneIndex(Math.floor(Math.random() * persistent.length))
+              setJustDoOne(true)
+            }}
+            className="w-11 h-11 bg-brutal-yellow border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+          >
+            <Focus size={20} strokeWidth={2.5} />
+          </button>
           <button
             onClick={() => navigate('/roulette')}
             className="w-11 h-11 bg-brutal-pink text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
@@ -864,6 +879,63 @@ export function ChoresPage() {
         onConfirm={doDelete}
         onCancel={() => setConfirmDelete(null)}
       />
+
+      {/* Just do one mode */}
+      {justDoOne && (() => {
+        const persistent = chores.filter(c => c.is_persistent)
+        if (persistent.length === 0) return null
+        const chore = persistent[justDoOneIndex % persistent.length]
+        return (
+          <div className="fixed inset-0 z-50 bg-brutal-yellow flex flex-col items-center justify-center p-6" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+            <button
+              onClick={() => setJustDoOne(false)}
+              className="absolute top-4 right-4 w-10 h-10 bg-brutal-black text-brutal-white flex items-center justify-center font-bold" style={{ marginTop: 'env(safe-area-inset-top)' }}
+            >
+              <X size={20} />
+            </button>
+
+            <p className="font-mono text-xs font-bold text-brutal-black/40 tracking-widest mb-4">JUST DO ONE</p>
+            <div className="bg-brutal-white border-4 border-brutal-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 w-full max-w-sm text-center">
+              {chore.area && (
+                <p className="font-mono text-[10px] text-brutal-black/40 font-bold tracking-widest mb-2">{chore.area.toUpperCase()}</p>
+              )}
+              <h2 className="font-mono font-bold text-2xl mb-2">{chore.name}</h2>
+              <div className="inline-flex items-center gap-1 border border-brutal-black px-3 py-1 font-mono text-sm font-bold bg-brutal-yellow">
+                {chore.points} PTS
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-8 w-full max-w-sm">
+              <button
+                onClick={() => {
+                  setJustDoOneIndex((justDoOneIndex + 1) % persistent.length)
+                }}
+                className="flex-1 h-14 bg-brutal-white font-mono font-bold uppercase text-sm border-3 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+              >
+                SKIP
+              </button>
+              <button
+                onClick={async () => {
+                  await completeChore.mutateAsync({ choreId: chore.id, points: chore.points })
+                  playComplete()
+                  toast(`Done! +${chore.points} pts for ${chore.name}`, 'bg-brutal-lime')
+                  const remaining = persistent.filter(c => c.id !== chore.id)
+                  if (remaining.length === 0) {
+                    setJustDoOne(false)
+                  } else {
+                    setJustDoOneIndex(Math.floor(Math.random() * persistent.length))
+                  }
+                }}
+                className="flex-1 h-14 bg-brutal-lime font-mono font-bold uppercase text-sm border-3 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+              >
+                DONE ✓
+              </button>
+            </div>
+
+            <p className="font-mono text-[10px] text-brutal-black/30 mt-4">Just this one. You've got this.</p>
+          </div>
+        )
+      })()}
     </div>
   )
 }
