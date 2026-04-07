@@ -30,25 +30,18 @@ export function useActivity() {
 
   const fetchActivity = useCallback(async () => {
     if (!group) return
-    const { data } = await supabase
+    const { data, error: fetchError } = await supabase
       .from('completions')
       .select('id, user_id, points_earned, completed_at, chore_name, photo_url, with_user_id, profiles(display_name, avatar_color, avatar_url), reactions(id, emoji, user_id)')
       .eq('group_id', group.id)
       .order('completed_at', { ascending: false })
       .limit(50)
 
-    // Deduplicate team completions — only keep the initiator's entry
-    const entries = (data as unknown as ActivityEntry[]) ?? []
-    const seen = new Set<string>()
-    const filtered = entries.filter(entry => {
-      if (!entry.with_user_id) return true
-      // Create a unique key for this pair
-      const pairKey = [entry.user_id, entry.with_user_id].sort().join('-') + '-' + entry.chore_name
-      if (seen.has(pairKey)) return false
-      seen.add(pairKey)
-      return true
-    })
-    setActivity(filtered)
+    if (fetchError) {
+      console.error('Activity fetch error:', fetchError)
+    }
+
+    if (data) setActivity(data as unknown as ActivityEntry[])
     setLoading(false)
   }, [group])
 
