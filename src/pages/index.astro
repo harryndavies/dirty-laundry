@@ -56,9 +56,8 @@
     <!-- HERO -->
     <section class="hero">
       <div class="container">
-        <div class="hero-badge">HOUSEWORK, BUT MAKE IT FUN</div>
         <img src="/logo.png" alt="Dirty Laundry" class="hero-logo" />
-        <p class="hero-tagline">Chores don't have to feel like chores.</p>
+        <div class="hero-badge">HOUSEWORK, BUT MAKE IT FUN</div>
         <p class="hero-desc">
           Turn your household to-do list into a game.<br />
           Points. Leaderboards. A little bit of chaos.
@@ -743,8 +742,15 @@
   .hero {
     background: #FFE500;
     border-bottom: 4px solid #000;
-    padding: 3rem 0 2.5rem;
+    padding: 2.5rem 0 2rem;
     text-align: center;
+  }
+
+  .hero-logo {
+    max-width: 400px;
+    width: 80%;
+    height: auto;
+    margin-bottom: 0.75rem;
   }
 
   .hero-badge {
@@ -755,15 +761,8 @@
     background: #000;
     color: #FFE500;
     padding: 0.4rem 1rem;
-    margin-bottom: 1rem;
-    border: 2px solid #000;
-  }
-
-  .hero-logo {
-    max-width: 420px;
-    width: 85%;
-    height: auto;
     margin-bottom: 0.75rem;
+    border: 2px solid #000;
   }
 
   .hero h1 {
