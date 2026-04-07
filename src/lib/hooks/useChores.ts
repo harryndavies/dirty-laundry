@@ -88,6 +88,7 @@ export function useChores() {
           points_earned: earnedPoints,
           chore_name: chore?.name ?? null,
           photo_url: photoUrl,
+          with_user_id: withUserId ?? null,
         })
       if (error) throw error
 
@@ -101,6 +102,7 @@ export function useChores() {
             group_id: group.id,
             points_earned: earnedPoints,
             chore_name: chore?.name ?? null,
+            with_user_id: user.id,
           })
       }
 

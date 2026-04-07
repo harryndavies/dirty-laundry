@@ -45,7 +45,7 @@ function groupByDate(activity: ActivityEntry[]): Map<string, ActivityEntry[]> {
 }
 
 export function ActivityPage() {
-  const { group } = useGroup()
+  const { group, members } = useGroup()
   const { user } = useAuth()
   const { activity, loading, toggleReaction, undoCompletion } = useActivity()
   const [pickerOpen, setPickerOpen] = useState<string | null>(null)
@@ -157,6 +157,10 @@ export function ActivityPage() {
                         <div className="flex-1 min-w-0">
                           <p className="font-mono text-sm">
                             <span className="font-bold">{entry.profiles.display_name}</span>
+                            {entry.with_user_id && (() => {
+                              const partner = members.find(m => m.user_id === entry.with_user_id)
+                              return partner ? <> <span className="text-brutal-black/50">&</span> <span className="font-bold">{partner.profiles.display_name}</span></> : null
+                            })()}
                             {' completed '}
                             <span className="font-bold">{entry.chore_name ?? 'a chore'}</span>
                           </p>
