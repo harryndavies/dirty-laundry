@@ -211,7 +211,7 @@ export function ChoresPage() {
             <button
               onClick={() => {
                 setGoalName(userMember.savings_goal_name ?? '')
-                setGoalAmount(userMember.savings_goal)
+                setGoalAmount(userMember.savings_goal ?? 500)
                 setShowSavingsGoal(true)
               }}
               className="w-full border-2 border-brutal-black bg-brutal-white p-3 active:bg-brutal-black/5 transition-colors text-left"
