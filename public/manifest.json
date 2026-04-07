@@ -1,7 +1,7 @@
 {
   "name": "Dirty Laundry",
   "short_name": "Dirty Laundry",
-  "description": "Airing your dirty laundry since 2026.",
+  "description": "Housework, but make it fun. Track chores, earn points, climb the leaderboard.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFE500",
