@@ -144,6 +144,11 @@ export function GroupProvider({ children }: { children: ReactNode }) {
         { event: 'UPDATE', schema: 'public', table: 'groups', filter: `id=eq.${group.id}` },
         () => fetchGroup()
       )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'profiles' },
+        () => refreshMembersForGroup(group.id)
+      )
       .subscribe()
 
     return () => {

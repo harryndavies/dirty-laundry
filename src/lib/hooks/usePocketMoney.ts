@@ -93,6 +93,16 @@ export function usePocketMoney() {
         },
         () => calculate()
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'group_members',
+          filter: `group_id=eq.${group.id}`,
+        },
+        () => calculate()
+      )
       .subscribe()
 
     return () => {
