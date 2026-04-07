@@ -20,6 +20,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.sticky.top-0 {
+  padding-top: calc(env(safe-area-inset-top) + 0.75rem);
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
