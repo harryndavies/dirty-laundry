@@ -6,7 +6,7 @@ import { sendPushToUser } from '@/lib/pushNotifications'
 
 export function useChores() {
   const { user } = useAuth()
-  const { group } = useGroup()
+  const { group, refreshMembers } = useGroup()
   const queryClient = useQueryClient()
 
   const choresQuery = useQuery({
@@ -162,6 +162,7 @@ export function useChores() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['chores', group?.id] })
       queryClient.invalidateQueries({ queryKey: ['leaderboard', group?.id] })
+      refreshMembers()
     },
   })
 
