@@ -226,5 +226,22 @@ export function useChores() {
     },
   })
 
-  return { chores: choresQuery.data ?? [], loading: choresQuery.isLoading, addChore, completeChore, deleteChore, boostChore }
+  const editChore = useMutation({
+    mutationFn: async ({ choreId, updates }: { choreId: string; updates: { name?: string; points?: number; is_persistent?: boolean; area?: string | null; reminder_day?: number | null; reminder_time?: string | null } }) => {
+      const updateData: Record<string, unknown> = { ...updates }
+      if (updates.points !== undefined) {
+        updateData.base_points = updates.points
+      }
+      const { error } = await supabase
+        .from('chores')
+        .update(updateData)
+        .eq('id', choreId)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chores', group?.id] })
+    },
+  })
+
+  return { chores: choresQuery.data ?? [], loading: choresQuery.isLoading, addChore, completeChore, deleteChore, boostChore, editChore }
 }

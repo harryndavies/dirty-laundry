@@ -72,7 +72,7 @@ const CHORE_PACKS: { name: string; emoji: string; chores: { name: string; points
 export function ChoresPage() {
   const { group, members, loading: groupLoading, updateSavingsGoal } = useGroup()
   const { user } = useAuth()
-  const { chores, loading, addChore, completeChore, deleteChore, boostChore } = useChores()
+  const { chores, loading, addChore, completeChore, deleteChore, boostChore, editChore } = useChores()
   const { suggestions } = useFairTurn()
   const groupStats = useGroupStats()
   const { balances, formatMoney } = usePocketMoney()
@@ -102,6 +102,7 @@ export function ChoresPage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [showSavingsGoal, setShowSavingsGoal] = useState(false)
   const [addingPack, setAddingPack] = useState(false)
+  const [editingChore, setEditingChore] = useState<{ id: string; name: string; points: number; is_persistent: boolean; area: string | null; reminder_day: number | null; reminder_time: string | null } | null>(null)
   const [goalName, setGoalName] = useState('')
   const [goalAmount, setGoalAmount] = useState(500)
 
@@ -202,12 +203,20 @@ export function ChoresPage() {
     setSwipeOffset(diff)
   }
 
-  function onTouchEnd(choreId: string, points: number, name: string, createdBy: string) {
+  function onTouchEnd(chore: typeof chores[0]) {
     const offset = swipeOffsetRef.current
     if (offset > 80) {
-      handleComplete(choreId, points, name)
-    } else if (offset < -80 && createdBy === user?.id) {
-      handleDelete(choreId)
+      handleComplete(chore.id, chore.points, chore.name)
+    } else if (offset < -80 && chore.created_by === user?.id) {
+      setEditingChore({
+        id: chore.id,
+        name: chore.name,
+        points: chore.points,
+        is_persistent: chore.is_persistent,
+        area: chore.area,
+        reminder_day: chore.reminder_day,
+        reminder_time: chore.reminder_time,
+      })
     }
     swipingIdRef.current = null
     swipeOffsetRef.current = 0
@@ -523,7 +532,7 @@ export function ChoresPage() {
             const isSwiping = swipingId === chore.id
             const offset = isSwiping ? swipeOffset : 0
             const showDone = offset > 40
-            const showDelete = offset < -40 && chore.created_by === user?.id
+            const showEdit = offset < -40 && chore.created_by === user?.id
 
             return (
               <div key={chore.id} className="relative overflow-hidden">
@@ -532,8 +541,8 @@ export function ChoresPage() {
                   <div className={`flex-1 bg-brutal-lime flex items-center px-4 font-mono font-bold text-sm transition-opacity ${showDone ? 'opacity-100' : 'opacity-0'}`}>
                     DONE ✓
                   </div>
-                  <div className={`flex-1 bg-brutal-pink flex items-center justify-end px-4 font-mono font-bold text-sm text-brutal-white transition-opacity ${showDelete ? 'opacity-100' : 'opacity-0'}`}>
-                    DELETE ✕
+                  <div className={`flex-1 bg-brutal-blue flex items-center justify-end px-4 font-mono font-bold text-sm text-brutal-white transition-opacity ${showEdit ? 'opacity-100' : 'opacity-0'}`}>
+                    EDIT ✎
                   </div>
                 </div>
 
@@ -542,7 +551,7 @@ export function ChoresPage() {
                   style={{ transform: isSwiping ? `translateX(${offset}px)` : 'translateX(0)', transition: isSwiping ? 'none' : 'transform 0.2s' }}
                   onTouchStart={e => onTouchStart(e, chore.id)}
                   onTouchMove={onTouchMove}
-                  onTouchEnd={() => onTouchEnd(chore.id, chore.points, chore.name, chore.created_by)}
+                  onTouchEnd={() => onTouchEnd(chore)}
                 >
                   <div className="flex-1 min-w-0">
                     <h3 className="font-mono font-bold text-base truncate">{chore.name}</h3>
@@ -874,6 +883,83 @@ export function ChoresPage() {
             >
               {completeChore.isPending ? 'COMPLETING...' : withUserId ? 'DONE TOGETHER ✓' : 'DONE ✓'}
             </Button>
+          </>
+        )}
+      </BottomSheet>
+
+      {/* Edit chore sheet */}
+      <BottomSheet open={!!editingChore} onClose={() => setEditingChore(null)}>
+        {editingChore && (
+          <>
+            <h2 className="font-mono font-bold text-lg mb-4">EDIT CHORE</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="font-mono text-xs font-bold uppercase block mb-1">NAME</label>
+                <Input
+                  value={editingChore.name}
+                  onChange={e => setEditingChore({ ...editingChore, name: e.target.value })}
+                  className="border-2 border-brutal-black font-mono h-12"
+                />
+              </div>
+              <div>
+                <label className="font-mono text-xs font-bold uppercase block mb-1">POINTS</label>
+                <div className="flex items-center gap-3">
+                  <button type="button" onClick={() => setEditingChore({ ...editingChore, points: Math.max(1, editingChore.points - 5) })}
+                    className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all">
+                    <Minus size={18} />
+                  </button>
+                  <div className="flex-1 h-12 bg-brutal-yellow border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-xl">
+                    {editingChore.points}
+                  </div>
+                  <button type="button" onClick={() => setEditingChore({ ...editingChore, points: editingChore.points + 5 })}
+                    className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all">
+                    <Plus size={18} />
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="font-mono text-xs font-bold uppercase block mb-1">AREA</label>
+                <div className="flex flex-wrap gap-1.5">
+                  <button type="button" onClick={() => setEditingChore({ ...editingChore, area: null })}
+                    className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${editingChore.area === null ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white'}`}>
+                    NONE
+                  </button>
+                  {AREAS.map(a => (
+                    <button key={a} type="button" onClick={() => setEditingChore({ ...editingChore, area: a })}
+                      className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${editingChore.area === a ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white'}`}>
+                      {a.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <Button
+                onClick={async () => {
+                  await editChore.mutateAsync({
+                    choreId: editingChore.id,
+                    updates: {
+                      name: editingChore.name.trim(),
+                      points: editingChore.points,
+                      area: editingChore.area,
+                    },
+                  })
+                  toast('Chore updated!', 'bg-brutal-lime')
+                  setEditingChore(null)
+                }}
+                disabled={editChore.isPending || !editingChore.name.trim()}
+                className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-40"
+              >
+                {editChore.isPending ? 'SAVING...' : 'SAVE CHANGES'}
+              </Button>
+              <button
+                onClick={() => {
+                  setEditingChore(null)
+                  handleDelete(editingChore.id)
+                }}
+                className="w-full mt-2 font-mono text-xs font-bold text-brutal-pink py-2 active:text-brutal-pink/60"
+              >
+                DELETE CHORE
+              </button>
+            </div>
           </>
         )}
       </BottomSheet>
