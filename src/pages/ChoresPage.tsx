@@ -207,7 +207,7 @@ export function ChoresPage() {
     const offset = swipeOffsetRef.current
     if (offset > 80) {
       handleComplete(chore.id, chore.points, chore.name)
-    } else if (offset < -80 && chore.created_by === user?.id) {
+    } else if (offset < -80 && !isKid) {
       setEditingChore({
         id: chore.id,
         name: chore.name,
@@ -532,7 +532,7 @@ export function ChoresPage() {
             const isSwiping = swipingId === chore.id
             const offset = isSwiping ? swipeOffset : 0
             const showDone = offset > 40
-            const showEdit = offset < -40 && chore.created_by === user?.id
+            const showEdit = offset < -40 && !isKid
 
             return (
               <div key={chore.id} className="relative overflow-hidden">
