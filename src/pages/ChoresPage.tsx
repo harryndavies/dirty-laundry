@@ -82,6 +82,7 @@ export function ChoresPage() {
   const navigate = useNavigate()
   const [showAdd, setShowAdd] = useState(false)
   const [filter, setFilter] = useState<Filter>('all')
+  const [areaFilter, setAreaFilter] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [newName, setNewName] = useState('')
   const [newPoints, setNewPoints] = useState(10)
@@ -120,11 +121,19 @@ export function ChoresPage() {
   if (groupLoading) return null
   if (!group) return <Navigate to="/group" replace />
 
+  const today = new Date().getDay()
+
   const filtered = chores.filter(c => {
     if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false
     if (filter === 'persistent') return c.is_persistent
     if (filter === 'one-time') return !c.is_persistent
+    if (areaFilter && c.area !== areaFilter) return false
     return true
+  }).sort((a, b) => {
+    // Due today chores first
+    const aDue = a.reminder_day === today ? 1 : 0
+    const bDue = b.reminder_day === today ? 1 : 0
+    return bDue - aDue
   })
 
   async function handleAdd(e: React.FormEvent) {
@@ -427,19 +436,33 @@ export function ChoresPage() {
         </div>
       )}
 
-      {/* Filter pills */}
-      <div className="flex gap-2 px-4 py-3 overflow-x-auto">
+      {/* Filters */}
+      <div className="px-4 pt-3 pb-1 flex gap-1.5 overflow-x-auto">
         {filters.map(f => (
           <button
             key={f.value}
-            onClick={() => setFilter(f.value)}
-            className={`font-mono text-xs font-bold px-4 py-2 border-2 border-brutal-black whitespace-nowrap transition-all ${
-              filter === f.value
+            onClick={() => { setFilter(f.value); setAreaFilter(null) }}
+            className={`font-mono text-[10px] font-bold px-3 py-1.5 border-2 border-brutal-black whitespace-nowrap transition-all ${
+              filter === f.value && !areaFilter
                 ? 'bg-brutal-black text-brutal-white'
                 : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
             }`}
           >
             {f.label}
+          </button>
+        ))}
+        <div className="w-px bg-brutal-black/20 mx-1" />
+        {[...new Set(chores.map(c => c.area).filter(Boolean))].map(area => (
+          <button
+            key={area}
+            onClick={() => { setAreaFilter(areaFilter === area ? null : area!); setFilter('all') }}
+            className={`font-mono text-[10px] font-bold px-3 py-1.5 border-2 border-brutal-black whitespace-nowrap transition-all ${
+              areaFilter === area
+                ? 'bg-brutal-blue text-brutal-white'
+                : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
+            }`}
+          >
+            {area!.toUpperCase()}
           </button>
         ))}
       </div>
@@ -575,9 +598,15 @@ export function ChoresPage() {
                         {chore.is_persistent ? <><RotateCw size={10} /> RECURRING</> : <><Zap size={10} /> ONE-TIME</>}
                       </span>
                       {chore.reminder_day !== null && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] font-bold border bg-brutal-yellow/20 border-brutal-yellow text-brutal-black/60">
-                          <Bell size={10} /> {['SUN','MON','TUE','WED','THU','FRI','SAT'][chore.reminder_day]} {chore.reminder_time?.slice(0, 5)}
-                        </span>
+                        chore.reminder_day === today ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] font-bold border bg-brutal-pink/20 border-brutal-pink text-brutal-pink">
+                            <Bell size={10} /> DUE TODAY
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] font-bold border bg-brutal-yellow/20 border-brutal-yellow text-brutal-black/60">
+                            <Bell size={10} /> {['SUN','MON','TUE','WED','THU','FRI','SAT'][chore.reminder_day]} {chore.reminder_time?.slice(0, 5)}
+                          </span>
+                        )
                       )}
                     </div>
                     {chore.is_persistent && suggestions.get(chore.id) && (
