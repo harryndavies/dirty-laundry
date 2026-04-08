@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 
 interface BottomSheetProps {
   open: boolean
@@ -7,9 +7,17 @@ interface BottomSheetProps {
 }
 
 export function BottomSheet({ open, onClose, children }: BottomSheetProps) {
+  const contentRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden'
+      // Scroll to top and focus first input
+      requestAnimationFrame(() => {
+        if (contentRef.current) {
+          contentRef.current.scrollTop = 0
+        }
+      })
     } else {
       document.body.style.overflow = ''
     }
@@ -24,11 +32,13 @@ export function BottomSheet({ open, onClose, children }: BottomSheetProps) {
     <div className="fixed inset-0 z-[90]">
       <div className="absolute inset-0 bg-brutal-black/40" onClick={onClose} />
       <div
-        className="absolute bottom-0 left-0 right-0 bg-brutal-white border-t-4 border-brutal-black p-6 animate-in slide-in-from-bottom duration-200"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)' }}
+        className="absolute bottom-0 left-0 right-0 bg-brutal-white border-t-4 border-brutal-black flex flex-col"
+        style={{ maxHeight: '85vh', paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <div className="w-12 h-1.5 bg-brutal-black/30 mx-auto mb-4 rounded-full" />
-        {children}
+        <div className="w-12 h-1.5 bg-brutal-black/30 mx-auto mt-3 mb-2 rounded-full shrink-0" />
+        <div ref={contentRef} className="overflow-y-auto px-6 pb-6">
+          {children}
+        </div>
       </div>
     </div>
   )
