@@ -961,6 +961,45 @@ export function ChoresPage() {
                   ))}
                 </div>
               </div>
+              <div>
+                <label className="font-mono text-xs font-bold uppercase block mb-1">REMINDER</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { label: 'NONE', value: null },
+                    { label: 'MON', value: 1 },
+                    { label: 'TUE', value: 2 },
+                    { label: 'WED', value: 3 },
+                    { label: 'THU', value: 4 },
+                    { label: 'FRI', value: 5 },
+                    { label: 'SAT', value: 6 },
+                    { label: 'SUN', value: 0 },
+                  ].map(d => (
+                    <button
+                      key={d.label}
+                      type="button"
+                      onClick={() => setEditingChore({ ...editingChore, reminder_day: d.value })}
+                      className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${
+                        editingChore.reminder_day === d.value
+                          ? 'bg-brutal-black text-brutal-white'
+                          : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
+                      }`}
+                    >
+                      {d.label}
+                    </button>
+                  ))}
+                </div>
+                {editingChore.reminder_day !== null && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <Bell size={14} className="text-brutal-black/50" />
+                    <input
+                      type="time"
+                      value={editingChore.reminder_time ?? '09:00'}
+                      onChange={e => setEditingChore({ ...editingChore, reminder_time: e.target.value })}
+                      className="flex-1 h-10 border-2 border-brutal-black px-3 font-mono text-sm bg-brutal-white"
+                    />
+                  </div>
+                )}
+              </div>
               <Button
                 onClick={async () => {
                   await editChore.mutateAsync({
@@ -969,6 +1008,8 @@ export function ChoresPage() {
                       name: editingChore.name.trim(),
                       points: editingChore.points,
                       area: editingChore.area,
+                      reminder_day: editingChore.reminder_day,
+                      reminder_time: editingChore.reminder_day !== null ? (editingChore.reminder_time ?? '09:00') : null,
                     },
                   })
                   toast('Chore updated!', 'bg-brutal-lime')
