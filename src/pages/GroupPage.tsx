@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Share2, Percent, Trophy, LogOut, Target, Minus, Plus, Coins } from 'lucide-react'
+import { Share2, Percent, Trophy, LogOut, Target, Minus, Plus, Coins, Settings } from 'lucide-react'
 import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
 
 export function GroupPage() {
@@ -31,6 +31,7 @@ export function GroupPage() {
   const [prizeText, setPrizeText] = useState('')
   const [savingPrize, setSavingPrize] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [showGoal, setShowGoal] = useState(false)
   const [goalAmount, setGoalAmount] = useState(0)
   const [savingGoal, setSavingGoal] = useState(false)
@@ -310,11 +311,28 @@ export function GroupPage() {
         </Button>
       </BottomSheet>
 
-      {/* Chore split */}
-      {members.length >= 2 && (
-        <div className="px-4 mt-6">
+      {/* Group settings button */}
+      {isOwner && (
+        <div className="px-4 mt-4">
+          <button
+            onClick={() => setShowSettings(true)}
+            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+          >
+            <div className="flex items-center gap-2">
+              <Settings size={16} strokeWidth={3} />
+              <span className="font-mono font-bold text-sm">GROUP SETTINGS</span>
+            </div>
+          </button>
+        </div>
+      )}
+
+      {/* Settings sheet */}
+      <BottomSheet open={showSettings} onClose={() => setShowSettings(false)}>
+        <h2 className="font-mono font-bold text-lg mb-4">GROUP SETTINGS</h2>
+        <div className="space-y-3">
           <button
             onClick={() => {
+              setShowSettings(false)
               const initial: Record<string, number> = {}
               const hasCustom = members.some(m => m.chore_share > 0)
               for (const m of members) {
@@ -323,18 +341,50 @@ export function GroupPage() {
               setShares(initial)
               setShowSplit(true)
             }}
-            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black bg-brutal-white active:bg-brutal-black/5"
           >
             <div className="flex items-center gap-2">
-              <Percent size={16} strokeWidth={3} />
+              <Percent size={16} />
               <span className="font-mono font-bold text-sm">CHORE SPLIT</span>
             </div>
             <span className="font-mono text-xs text-brutal-black/40">
               {members.some(m => m.chore_share > 0) ? 'CUSTOM' : 'EQUAL'}
             </span>
           </button>
+          <button
+            onClick={() => {
+              setShowSettings(false)
+              setGoalAmount(group.weekly_goal ?? 200)
+              setShowGoal(true)
+            }}
+            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black bg-brutal-white active:bg-brutal-black/5"
+          >
+            <div className="flex items-center gap-2">
+              <Target size={16} />
+              <span className="font-mono font-bold text-sm">WEEKLY GOAL</span>
+            </div>
+            <span className="font-mono text-xs text-brutal-black/40">
+              {group.weekly_goal ? `${group.weekly_goal} PTS` : 'NOT SET'}
+            </span>
+          </button>
+          <button
+            onClick={() => {
+              setShowSettings(false)
+              setPocketRate(group.pocket_money_rate ?? 1)
+              setShowPocketMoney(true)
+            }}
+            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black bg-brutal-white active:bg-brutal-black/5"
+          >
+            <div className="flex items-center gap-2">
+              <Coins size={16} />
+              <span className="font-mono font-bold text-sm">POCKET MONEY</span>
+            </div>
+            <span className="font-mono text-xs text-brutal-black/40">
+              {group.pocket_money_rate ? `${group.pocket_money_rate}p PER PT` : 'OFF'}
+            </span>
+          </button>
         </div>
-      )}
+      </BottomSheet>
 
       {/* Split editor sheet */}
       <BottomSheet open={showSplit} onClose={() => setShowSplit(false)}>
@@ -412,27 +462,6 @@ export function GroupPage() {
         )}
       </BottomSheet>
 
-      {/* Weekly goal */}
-      {isOwner && (
-        <div className="px-4 mt-4">
-          <button
-            onClick={() => {
-              setGoalAmount(group.weekly_goal ?? 200)
-              setShowGoal(true)
-            }}
-            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
-          >
-            <div className="flex items-center gap-2">
-              <Target size={16} strokeWidth={3} />
-              <span className="font-mono font-bold text-sm">WEEKLY GOAL</span>
-            </div>
-            <span className="font-mono text-xs text-brutal-black/40">
-              {group.weekly_goal ? `${group.weekly_goal} PTS` : 'NOT SET'}
-            </span>
-          </button>
-        </div>
-      )}
-
       {/* Goal editor sheet */}
       <BottomSheet open={showGoal} onClose={() => setShowGoal(false)}>
         <h2 className="font-mono font-bold text-lg mb-1">WEEKLY GOAL</h2>
@@ -486,27 +515,6 @@ export function GroupPage() {
           </button>
         )}
       </BottomSheet>
-
-      {/* Pocket money */}
-      {isOwner && (
-        <div className="px-4 mt-4">
-          <button
-            onClick={() => {
-              setPocketRate(group.pocket_money_rate ?? 1)
-              setShowPocketMoney(true)
-            }}
-            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
-          >
-            <div className="flex items-center gap-2">
-              <Coins size={16} strokeWidth={3} />
-              <span className="font-mono font-bold text-sm">POCKET MONEY</span>
-            </div>
-            <span className="font-mono text-xs text-brutal-black/40">
-              {group.pocket_money_rate ? `${group.pocket_money_rate}p PER PT` : 'OFF'}
-            </span>
-          </button>
-        </div>
-      )}
 
       {/* Pocket money sheet */}
       <BottomSheet open={showPocketMoney} onClose={() => setShowPocketMoney(false)}>
@@ -564,36 +572,6 @@ export function GroupPage() {
           </button>
         )}
       </BottomSheet>
-
-      {/* Payment history */}
-      {payouts.length > 0 && (
-        <div className="px-4 mt-4">
-          <div className="border-2 border-brutal-black bg-brutal-white">
-            <div className="flex items-center gap-2 px-4 py-3 border-b-2 border-brutal-black bg-brutal-lime/20">
-              <Coins size={14} strokeWidth={3} />
-              <span className="font-mono font-bold text-xs">PAYMENT HISTORY</span>
-            </div>
-            <div className="divide-y divide-brutal-black/10">
-              {payouts.map(p => (
-                <div key={p.id} className="flex items-center justify-between px-4 py-3">
-                  <div>
-                    <span className="font-mono font-bold text-xs">{p.display_name}</span>
-                    <span className="font-mono text-[10px] text-brutal-black/40 ml-2">
-                      {p.points} pts
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-mono font-bold text-sm text-green-600">{formatMoney(p.amount_pence)}</span>
-                    <span className="font-mono text-[10px] text-brutal-black/40 block">
-                      {new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Leave group */}
       <div className="px-4 mt-6 mb-6">
