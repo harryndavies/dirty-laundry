@@ -38,7 +38,7 @@ export function GroupPage() {
   const [showPocketMoney, setShowPocketMoney] = useState(false)
   const [pocketRate, setPocketRate] = useState(0)
   const [savingRate, setSavingRate] = useState(false)
-  const { balances, payouts, formatMoney } = usePocketMoney()
+  const { balances, formatMoney } = usePocketMoney()
   const [confirmPaid, setConfirmPaid] = useState<{ memberId: string; userId: string; name: string; amount: number; points: number } | null>(null)
 
   const isOwner = members.find(m => m.user_id === user?.id)?.role === 'owner'
