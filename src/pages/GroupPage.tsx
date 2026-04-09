@@ -203,7 +203,19 @@ export function GroupPage() {
                 <div className="flex items-center gap-2">
                   {isOwner && m.role !== 'owner' ? (
                     <button
-                      onClick={() => setMemberRole(m.id, m.role === 'kid' ? 'member' : 'kid')}
+                      onClick={async () => {
+                        const newRole = m.role === 'kid' ? 'member' : 'kid'
+                        await setMemberRole(m.id, newRole)
+                        if (newRole === 'kid' && !group.pocket_money_rate) {
+                          toast('Set a pocket money rate in Group Settings', 'bg-brutal-yellow')
+                          setShowSettings(true)
+                          setTimeout(() => {
+                            setPocketRate(1)
+                            setShowSettings(false)
+                            setShowPocketMoney(true)
+                          }, 300)
+                        }
+                      }}
                       className="flex items-center gap-1.5"
                     >
                       <div className={`w-10 h-6 border-2 border-brutal-black flex items-center p-0.5 transition-colors ${m.role === 'kid' ? 'bg-brutal-yellow justify-end' : 'bg-brutal-white justify-start'}`}>
@@ -550,7 +562,12 @@ export function GroupPage() {
             await updatePocketMoneyRate(pocketRate > 0 ? pocketRate : null)
             setSavingRate(false)
             setShowPocketMoney(false)
-            toast(pocketRate > 0 ? `Rate set to ${pocketRate}p per point!` : 'Pocket money disabled', 'bg-brutal-yellow')
+            const hasKids = members.some(m => m.role === 'kid')
+            if (pocketRate > 0 && !hasKids) {
+              toast('Rate set! Now toggle a member to Kid on the group page', 'bg-brutal-yellow')
+            } else {
+              toast(pocketRate > 0 ? `Rate set to ${pocketRate}p per point!` : 'Pocket money disabled', 'bg-brutal-yellow')
+            }
           }}
           disabled={savingRate}
           className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-40"
