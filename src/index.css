@@ -28,10 +28,13 @@ html, body {
   margin: 0;
   height: 100%;
   overflow: hidden;
+  position: fixed;
+  width: 100%;
   font-family: var(--font-sans);
   background: var(--color-brutal-white);
   color: var(--color-brutal-black);
   overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 input, textarea, select {
