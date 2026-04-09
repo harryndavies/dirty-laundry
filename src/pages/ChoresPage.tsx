@@ -2,7 +2,6 @@ import { useState, useRef } from 'react'
 import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
 import { useChores } from '@/lib/hooks/useChores'
-import { useGroupStats } from '@/lib/hooks/useGroupStats'
 import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
 import { useFairTurn } from '@/lib/hooks/useFairTurn'
 import { useAuth } from '@/context/AuthContext'
@@ -13,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
-import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Search, Target, Camera, X, Star, Focus } from 'lucide-react'
+import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Camera, X, Star, Focus } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'persistent' | 'one-time' | 'mine'
@@ -74,7 +73,6 @@ export function ChoresPage() {
   const { user } = useAuth()
   const { chores, loading, addChore, completeChore, deleteChore, boostChore, editChore } = useChores()
   const { suggestions } = useFairTurn()
-  const groupStats = useGroupStats()
   const { balances, formatMoney } = usePocketMoney()
   const userMember = members.find(m => m.user_id === user?.id)
   const isKid = userMember?.role === 'kid'
@@ -84,7 +82,6 @@ export function ChoresPage() {
   const [showAdd, setShowAdd] = useState(false)
   const [filter, setFilter] = useState<Filter>('all')
   const [areaFilter, setAreaFilter] = useState<string | null>(null)
-  const [search, setSearch] = useState('')
   const [newName, setNewName] = useState('')
   const [newPoints, setNewPoints] = useState(10)
   const [newPersistent, setNewPersistent] = useState(true)
@@ -126,7 +123,6 @@ export function ChoresPage() {
   const today = new Date().getDay()
 
   const filtered = chores.filter(c => {
-    if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false
     if (filter === 'mine') return c.assigned_to === user?.id || suggestions.get(c.id)?.user_id === user?.id
     if (filter === 'persistent') return c.is_persistent
     if (filter === 'one-time') return !c.is_persistent
@@ -281,35 +277,6 @@ export function ChoresPage() {
         </div>
       </div>
 
-      {/* Chore of the day */}
-      {(() => {
-        const persistentChores = chores.filter(c => c.is_persistent)
-        if (persistentChores.length === 0) return null
-        // Seed random by date so everyone sees the same chore
-        const today = new Date()
-        const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate()
-        const index = seed % persistentChores.length
-        const dailyChore = persistentChores[index]
-        const bonusPoints = dailyChore.points * 2
-        return (
-          <div className="px-4 pt-3">
-            <button
-              onClick={() => handleComplete(dailyChore.id, bonusPoints, dailyChore.name)}
-              className="w-full bg-brutal-pink/10 border-2 border-brutal-pink p-3 flex items-center gap-3 active:bg-brutal-pink/20 transition-colors text-left"
-            >
-              <span className="text-xl">⭐</span>
-              <div className="flex-1 min-w-0">
-                <p className="font-mono text-[10px] font-bold text-brutal-pink tracking-widest">CHORE OF THE DAY</p>
-                <p className="font-mono font-bold text-sm truncate">{dailyChore.name}</p>
-              </div>
-              <div className="font-mono font-bold text-sm bg-brutal-pink text-brutal-white border border-brutal-black px-2 py-0.5">
-                {bonusPoints} PTS
-              </div>
-            </button>
-          </div>
-        )
-      })()}
-
       {/* Kid earnings banner */}
       {isKid && myBalance && group?.pocket_money_rate && (
         <div className="px-4 pt-3">
@@ -423,27 +390,6 @@ export function ChoresPage() {
         )}
       </BottomSheet>
 
-      {/* Weekly goal banner */}
-      {groupStats.weeklyGoal && (
-        <div className="px-4 pt-3">
-          <div className="border-2 border-brutal-black/20 px-3 py-2">
-            <div className="flex items-center gap-2 mb-1">
-              <Target size={14} className="text-brutal-blue" />
-              <span className="font-mono text-xs font-bold">
-                {groupStats.weeklyPoints}/{groupStats.weeklyGoal}
-              </span>
-              <span className="font-mono text-[10px] text-brutal-black/40">GOAL</span>
-            </div>
-            <div className="h-1.5 bg-brutal-black/10">
-              <div
-                className={`h-full transition-all duration-500 ${groupStats.weeklyPoints >= groupStats.weeklyGoal ? 'bg-brutal-lime' : 'bg-brutal-blue'}`}
-                style={{ width: `${Math.min(100, (groupStats.weeklyPoints / groupStats.weeklyGoal) * 100)}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Anonymous account nudge */}
       {isAnonymous && (
         <button
@@ -483,24 +429,6 @@ export function ChoresPage() {
             {area!.toUpperCase()}
           </button>
         ))}
-      </div>
-
-      {/* Search */}
-      <div className="px-4 pb-3">
-        <div className="flex items-center border-2 border-brutal-black bg-brutal-white h-10">
-          <Search size={14} className="ml-3 text-brutal-black/30" />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search chores..."
-            className="flex-1 h-full px-2 font-mono text-xs bg-transparent outline-none"
-          />
-          {search && (
-            <button onClick={() => setSearch('')} className="px-3 font-mono text-xs text-brutal-black/40 font-bold">
-              ✕
-            </button>
-          )}
-        </div>
       </div>
 
       {/* Chore list */}
@@ -549,10 +477,10 @@ export function ChoresPage() {
             <div className="py-12 text-center">
               <div className="text-4xl mb-3">🧹</div>
               <p className="font-mono font-bold text-brutal-black/40 text-sm">
-                {search ? 'NO CHORES FOUND' : chores.length === 0 ? 'NO CHORES YET' : 'NO CHORES MATCH'}
+                {chores.length === 0 ? 'NO CHORES YET' : 'NO CHORES MATCH'}
               </p>
               <p className="font-mono text-brutal-black/30 text-xs mt-1">
-                {search ? 'Try a different search' : isKid ? 'Ask a parent to add some chores' : 'Tap + to add one'}
+                {isKid ? 'Ask a parent to add some chores' : 'Tap + to add one'}
               </p>
             </div>
           )
