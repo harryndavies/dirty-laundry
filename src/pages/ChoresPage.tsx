@@ -616,9 +616,15 @@ export function ChoresPage() {
                       if (!assignee) return null
                       return (
                         <div className="mt-1.5 flex items-center gap-1.5">
-                          <Avatar name={assignee.profiles.display_name} color={assignee.profiles.avatar_color} size="sm" imageUrl={assignee.profiles.avatar_url} />
-                          <span className="font-mono text-[10px] text-brutal-orange font-bold">
-                            Assigned to {assignee.profiles.display_name}
+                          {assignee.profiles.avatar_url ? (
+                            <img src={assignee.profiles.avatar_url} alt="" className="w-4 h-4 border border-brutal-black object-cover shrink-0" />
+                          ) : (
+                            <div className="w-4 h-4 border border-brutal-black flex items-center justify-center font-mono text-[8px] font-bold text-white shrink-0" style={{ background: assignee.profiles.avatar_color }}>
+                              {assignee.profiles.display_name[0]}
+                            </div>
+                          )}
+                          <span className="font-mono text-[10px] text-brutal-black/50">
+                            {assignee.profiles.display_name}'s job
                           </span>
                         </div>
                       )
