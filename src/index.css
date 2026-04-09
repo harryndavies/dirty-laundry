@@ -24,8 +24,10 @@
   padding-top: calc(env(safe-area-inset-top) + 0.75rem);
 }
 
-body {
+html, body {
   margin: 0;
+  height: 100%;
+  overflow: hidden;
   font-family: var(--font-sans);
   background: var(--color-brutal-white);
   color: var(--color-brutal-black);
