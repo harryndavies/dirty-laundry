@@ -36,7 +36,7 @@ export function BottomSheet({ open, onClose, children }: BottomSheetProps) {
         style={{ maxHeight: '85vh' }}
       >
         <div className="w-12 h-1.5 bg-brutal-black/30 mx-auto mt-3 mb-2 rounded-full shrink-0" />
-        <div ref={contentRef} className="overflow-y-auto px-6" style={{ paddingBottom: 'calc(3rem + env(safe-area-inset-bottom))' }}>
+        <div ref={contentRef} className="overflow-y-auto px-6 pb-24">
           {children}
         </div>
       </div>
