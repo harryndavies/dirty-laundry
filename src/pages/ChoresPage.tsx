@@ -104,6 +104,7 @@ export function ChoresPage() {
   const [showSavingsGoal, setShowSavingsGoal] = useState(false)
   const [addingPack, setAddingPack] = useState(false)
   const [editingChore, setEditingChore] = useState<{ id: string; name: string; points: number; is_persistent: boolean; area: string | null; reminder_day: number | null; reminder_time: string | null; assigned_to: string | null } | null>(null)
+  const [assigningChore, setAssigningChore] = useState<{ id: string; name: string; assigned_to: string | null } | null>(null)
   const [goalName, setGoalName] = useState('')
   const [goalAmount, setGoalAmount] = useState(500)
 
@@ -214,8 +215,8 @@ export function ChoresPage() {
 
   function onTouchEnd(chore: typeof chores[0]) {
     const offset = swipeOffsetRef.current
-    if (offset < -80) {
-      handleComplete(chore.id, chore.points, chore.name)
+    if (offset < -80 && !isKid) {
+      setAssigningChore({ id: chore.id, name: chore.name, assigned_to: chore.assigned_to })
     } else if (offset > 80 && !isKid) {
       setEditingChore({
         id: chore.id,
@@ -556,7 +557,7 @@ export function ChoresPage() {
             const isSwiping = swipingId === chore.id
             const offset = isSwiping ? swipeOffset : 0
             const showEdit = offset > 40 && !isKid
-            const showDone = offset < -40
+            const showAssign = offset < -40 && !isKid
 
             return (
               <div key={chore.id} className="relative overflow-hidden">
@@ -565,8 +566,8 @@ export function ChoresPage() {
                   <div className={`flex-1 bg-brutal-blue flex items-center px-4 font-mono font-bold text-sm text-brutal-white transition-opacity ${showEdit ? 'opacity-100' : 'opacity-0'}`}>
                     EDIT ✎
                   </div>
-                  <div className={`flex-1 bg-brutal-lime flex items-center justify-end px-4 font-mono font-bold text-sm transition-opacity ${showDone ? 'opacity-100' : 'opacity-0'}`}>
-                    DONE ✓
+                  <div className={`flex-1 bg-brutal-orange flex items-center justify-end px-4 font-mono font-bold text-sm text-brutal-white transition-opacity ${showAssign ? 'opacity-100' : 'opacity-0'}`}>
+                    ASSIGN 📋
                   </div>
                 </div>
 
@@ -925,6 +926,48 @@ export function ChoresPage() {
             >
               {completeChore.isPending ? 'COMPLETING...' : withUserId ? 'DONE TOGETHER ✓' : 'DONE ✓'}
             </Button>
+          </>
+        )}
+      </BottomSheet>
+
+      {/* Assign sheet */}
+      <BottomSheet open={!!assigningChore} onClose={() => setAssigningChore(null)}>
+        {assigningChore && (
+          <>
+            <h2 className="font-mono font-bold text-lg mb-1">ASSIGN CHORE</h2>
+            <p className="font-mono text-xs text-brutal-black/50 mb-4">
+              Who should do "{assigningChore.name}"?
+            </p>
+            <div className="space-y-2">
+              <button
+                onClick={async () => {
+                  await editChore.mutateAsync({ choreId: assigningChore.id, updates: { assigned_to: null } })
+                  toast('Assignment removed', 'bg-brutal-white')
+                  setAssigningChore(null)
+                }}
+                className={`w-full flex items-center gap-3 p-3 border-2 border-brutal-black transition-all ${
+                  !assigningChore.assigned_to ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white active:bg-brutal-black/5'
+                }`}
+              >
+                <span className="font-mono font-bold text-sm">ANYONE</span>
+              </button>
+              {members.map(m => (
+                <button
+                  key={m.user_id}
+                  onClick={async () => {
+                    await editChore.mutateAsync({ choreId: assigningChore.id, updates: { assigned_to: m.user_id, name: assigningChore.name } })
+                    toast(`Assigned to ${m.profiles.display_name}!`, 'bg-brutal-orange')
+                    setAssigningChore(null)
+                  }}
+                  className={`w-full flex items-center gap-3 p-3 border-2 border-brutal-black transition-all ${
+                    assigningChore.assigned_to === m.user_id ? 'bg-brutal-orange text-brutal-white' : 'bg-brutal-white active:bg-brutal-black/5'
+                  }`}
+                >
+                  <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" imageUrl={m.profiles.avatar_url} />
+                  <span className="font-mono font-bold text-sm">{m.profiles.display_name}</span>
+                </button>
+              ))}
+            </div>
           </>
         )}
       </BottomSheet>
