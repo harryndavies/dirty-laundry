@@ -78,6 +78,7 @@ export function ChoresPage() {
   const { balances, formatMoney } = usePocketMoney()
   const userMember = members.find(m => m.user_id === user?.id)
   const isKid = userMember?.role === 'kid'
+  const isAnonymous = user?.is_anonymous ?? false
   const myBalance = user ? balances.get(user.id) : null
   const navigate = useNavigate()
   const [showAdd, setShowAdd] = useState(false)
@@ -252,7 +253,10 @@ export function ChoresPage() {
           <button
             onClick={() => {
               const persistent = chores.filter(c => c.is_persistent)
-              if (persistent.length === 0) return
+              if (persistent.length === 0) {
+                toast('Add some recurring chores first', 'bg-brutal-yellow')
+                return
+              }
               setJustDoOneIndex(Math.floor(Math.random() * persistent.length))
               setJustDoOne(true)
             }}
@@ -440,6 +444,16 @@ export function ChoresPage() {
         </div>
       )}
 
+      {/* Anonymous account nudge */}
+      {isAnonymous && (
+        <button
+          onClick={() => navigate('/profile')}
+          className="mx-4 mt-2 p-2 bg-brutal-yellow/30 border border-brutal-yellow font-mono text-[10px] text-brutal-black/50 text-center active:bg-brutal-yellow/50"
+        >
+          Guest account — tap to save your progress with an email
+        </button>
+      )}
+
       {/* Filters */}
       <div className="px-4 pt-3 pb-1 flex gap-1.5 overflow-x-auto">
         {filters.map(f => (
@@ -534,8 +548,12 @@ export function ChoresPage() {
           ) : (
             <div className="py-12 text-center">
               <div className="text-4xl mb-3">🧹</div>
-              <p className="font-mono font-bold text-brutal-black/40 text-sm">NO CHORES FOUND</p>
-              <p className="font-mono text-brutal-black/30 text-xs mt-1">{search ? 'Try a different search' : 'Tap + to add one'}</p>
+              <p className="font-mono font-bold text-brutal-black/40 text-sm">
+                {search ? 'NO CHORES FOUND' : chores.length === 0 ? 'NO CHORES YET' : 'NO CHORES MATCH'}
+              </p>
+              <p className="font-mono text-brutal-black/30 text-xs mt-1">
+                {search ? 'Try a different search' : isKid ? 'Ask a parent to add some chores' : 'Tap + to add one'}
+              </p>
             </div>
           )
         ) : (
