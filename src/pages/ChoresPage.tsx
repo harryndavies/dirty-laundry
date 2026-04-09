@@ -546,7 +546,7 @@ export function ChoresPage() {
             return Array.from(grouped.entries()).map(([area, areaChores]) => (
               <div key={area} className="mb-4">
                 {area && (
-                  <div className="font-mono font-bold text-[11px] text-brutal-black/40 tracking-widest mb-2 px-1 sticky top-[60px] bg-brutal-white py-1 z-[5]">
+                  <div className="font-mono font-bold text-[11px] text-brutal-black/40 tracking-widest mb-2 px-1 sticky top-0 bg-brutal-white py-2 z-[5]">
                     {area.toUpperCase()}
                   </div>
                 )}
