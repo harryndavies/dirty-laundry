@@ -47,7 +47,7 @@ function groupByDate(activity: ActivityEntry[]): Map<string, ActivityEntry[]> {
 export function ActivityPage() {
   const { group, members } = useGroup()
   const { user } = useAuth()
-  const { activity, loading, toggleReaction, undoCompletion } = useActivity()
+  const { activity, loading, hasMore, loadingMore, loadMore, toggleReaction, undoCompletion } = useActivity()
   const [pickerOpen, setPickerOpen] = useState<string | null>(null)
   const [confirmUndo, setConfirmUndo] = useState<{ id: string; name: string } | null>(null)
   const [expandedPhoto, setExpandedPhoto] = useState<string | null>(null)
@@ -234,6 +234,18 @@ export function ActivityPage() {
               </div>
             </div>
           ))
+        )}
+
+        {hasMore && activity.length > 0 && (
+          <div className="py-4 text-center">
+            <button
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="font-mono text-xs font-bold px-6 py-3 border-2 border-brutal-black bg-brutal-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all disabled:opacity-50"
+            >
+              {loadingMore ? 'LOADING...' : 'LOAD MORE'}
+            </button>
+          </div>
         )}
       </div>
 

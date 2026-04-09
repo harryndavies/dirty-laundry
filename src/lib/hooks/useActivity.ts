@@ -25,8 +25,11 @@ export interface ActivityEntry {
 export function useActivity() {
   const { group, refreshMembers } = useGroup()
   const { user } = useAuth()
+  const PAGE_SIZE = 20
   const [activity, setActivity] = useState<ActivityEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [hasMore, setHasMore] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
 
   const fetchActivity = useCallback(async () => {
     if (!group) return
@@ -35,15 +38,37 @@ export function useActivity() {
       .select('id, user_id, points_earned, completed_at, chore_name, photo_url, with_user_id, profiles!completions_user_id_fkey(display_name, avatar_color, avatar_url), reactions(id, emoji, user_id)')
       .eq('group_id', group.id)
       .order('completed_at', { ascending: false })
-      .limit(50)
+      .limit(PAGE_SIZE)
 
     if (fetchError) {
       console.error('Activity fetch error:', fetchError)
     }
 
-    if (data) setActivity(data as unknown as ActivityEntry[])
+    if (data) {
+      setActivity(data as unknown as ActivityEntry[])
+      setHasMore(data.length === PAGE_SIZE)
+    }
     setLoading(false)
   }, [group])
+
+  async function loadMore() {
+    if (!group || !hasMore || loadingMore || activity.length === 0) return
+    setLoadingMore(true)
+    const lastItem = activity[activity.length - 1]
+    const { data } = await supabase
+      .from('completions')
+      .select('id, user_id, points_earned, completed_at, chore_name, photo_url, with_user_id, profiles!completions_user_id_fkey(display_name, avatar_color, avatar_url), reactions(id, emoji, user_id)')
+      .eq('group_id', group.id)
+      .order('completed_at', { ascending: false })
+      .lt('completed_at', lastItem.completed_at)
+      .limit(PAGE_SIZE)
+
+    if (data) {
+      setActivity(prev => [...prev, ...(data as unknown as ActivityEntry[])])
+      setHasMore(data.length === PAGE_SIZE)
+    }
+    setLoadingMore(false)
+  }
 
   useEffect(() => {
     fetchActivity()
@@ -143,5 +168,5 @@ export function useActivity() {
     await refreshMembers()
   }
 
-  return { activity, loading, toggleReaction, undoCompletion }
+  return { activity, loading, hasMore, loadingMore, loadMore, toggleReaction, undoCompletion }
 }
