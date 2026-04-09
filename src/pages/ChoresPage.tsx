@@ -214,9 +214,9 @@ export function ChoresPage() {
 
   function onTouchEnd(chore: typeof chores[0]) {
     const offset = swipeOffsetRef.current
-    if (offset > 80) {
+    if (offset < -80) {
       handleComplete(chore.id, chore.points, chore.name)
-    } else if (offset < -80 && !isKid) {
+    } else if (offset > 80 && !isKid) {
       setEditingChore({
         id: chore.id,
         name: chore.name,
@@ -554,18 +554,18 @@ export function ChoresPage() {
           {areaChores.map(chore => {
             const isSwiping = swipingId === chore.id
             const offset = isSwiping ? swipeOffset : 0
-            const showDone = offset > 40
-            const showEdit = offset < -40 && !isKid
+            const showEdit = offset > 40 && !isKid
+            const showDone = offset < -40
 
             return (
               <div key={chore.id} className="relative overflow-hidden">
                 {/* Swipe backgrounds */}
                 <div className="absolute inset-0 flex">
-                  <div className={`flex-1 bg-brutal-lime flex items-center px-4 font-mono font-bold text-sm transition-opacity ${showDone ? 'opacity-100' : 'opacity-0'}`}>
-                    DONE ✓
-                  </div>
-                  <div className={`flex-1 bg-brutal-blue flex items-center justify-end px-4 font-mono font-bold text-sm text-brutal-white transition-opacity ${showEdit ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className={`flex-1 bg-brutal-blue flex items-center px-4 font-mono font-bold text-sm text-brutal-white transition-opacity ${showEdit ? 'opacity-100' : 'opacity-0'}`}>
                     EDIT ✎
+                  </div>
+                  <div className={`flex-1 bg-brutal-lime flex items-center justify-end px-4 font-mono font-bold text-sm transition-opacity ${showDone ? 'opacity-100' : 'opacity-0'}`}>
+                    DONE ✓
                   </div>
                 </div>
 
