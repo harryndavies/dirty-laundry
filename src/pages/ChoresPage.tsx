@@ -16,7 +16,7 @@ import { playComplete, playDelete, playBoost } from '@/lib/sounds'
 import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Search, Target, Camera, X, Star, Focus } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
-type Filter = 'all' | 'persistent' | 'one-time'
+type Filter = 'all' | 'persistent' | 'one-time' | 'mine'
 
 const AREAS = ['Kitchen', 'Bathroom', 'Bedroom', 'Living Room', 'Garden', 'Laundry', 'General']
 
@@ -126,6 +126,7 @@ export function ChoresPage() {
 
   const filtered = chores.filter(c => {
     if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false
+    if (filter === 'mine') return c.assigned_to === user?.id || suggestions.get(c.id)?.user_id === user?.id
     if (filter === 'persistent') return c.is_persistent
     if (filter === 'one-time') return !c.is_persistent
     if (areaFilter && c.area !== areaFilter) return false
@@ -237,6 +238,7 @@ export function ChoresPage() {
 
   const filters: { label: string; value: Filter }[] = [
     { label: 'ALL', value: 'all' },
+    { label: 'MINE', value: 'mine' },
     { label: 'RECURRING', value: 'persistent' },
     { label: 'ONE-TIME', value: 'one-time' },
   ]
