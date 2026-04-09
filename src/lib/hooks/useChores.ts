@@ -165,7 +165,8 @@ export function useChores() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['chores', group?.id] })
       queryClient.invalidateQueries({ queryKey: ['leaderboard', group?.id] })
-      refreshMembers()
+      // Small delay to let the database trigger update points before we fetch
+      setTimeout(() => refreshMembers(), 500)
     },
   })
 
