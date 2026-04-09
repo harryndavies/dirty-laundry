@@ -7,6 +7,9 @@ import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Navigate } from 'react-router-dom'
+import { supabase } from '@/lib/supabase'
+import { toast } from '@/components/ui/Toast'
+import { Camera } from 'lucide-react'
 
 const REACTION_EMOJIS = ['👏', '🔥', '😂', '🫡', '💀']
 
@@ -51,6 +54,7 @@ export function ActivityPage() {
   const [pickerOpen, setPickerOpen] = useState<string | null>(null)
   const [confirmUndo, setConfirmUndo] = useState<{ id: string; name: string } | null>(null)
   const [expandedPhoto, setExpandedPhoto] = useState<string | null>(null)
+  const [uploadingPhotoId, setUploadingPhotoId] = useState<string | null>(null)
 
   // Swipe state
   const touchStartX = useRef(0)
@@ -183,32 +187,79 @@ export function ActivityPage() {
                         />
                       )}
 
-                      {/* Reactions row */}
-                      <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                        {Array.from(reactionGroups.entries()).map(([emoji, userIds]) => {
-                          const iMine = userIds.includes(user?.id ?? '')
-                          return (
-                            <button
-                              key={emoji}
-                              onClick={() => toggleReaction(entry.id, emoji)}
-                              className={`flex items-center gap-1 px-2 py-0.5 border font-mono text-xs transition-all active:scale-95 ${
-                                iMine
-                                  ? 'border-brutal-black bg-brutal-yellow/40'
-                                  : 'border-brutal-black/20 bg-brutal-white'
-                              }`}
-                            >
+                      {/* Reactions row — only on other people's completions */}
+                      {entry.user_id !== user?.id && (
+                        <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                          {Array.from(reactionGroups.entries()).map(([emoji, userIds]) => {
+                            const iMine = userIds.includes(user?.id ?? '')
+                            return (
+                              <button
+                                key={emoji}
+                                onClick={() => toggleReaction(entry.id, emoji)}
+                                className={`flex items-center gap-1 px-2 py-0.5 border font-mono text-xs transition-all active:scale-95 ${
+                                  iMine
+                                    ? 'border-brutal-black bg-brutal-yellow/40'
+                                    : 'border-brutal-black/20 bg-brutal-white'
+                                }`}
+                              >
+                                <span>{emoji}</span>
+                                <span className="font-bold text-[10px]">{userIds.length}</span>
+                              </button>
+                            )
+                          })}
+                          <button
+                            onClick={() => setPickerOpen(isPickerOpen ? null : entry.id)}
+                            className="w-7 h-7 border border-brutal-black/20 bg-brutal-white flex items-center justify-center font-mono text-xs active:bg-brutal-black/5 transition-colors"
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Show reactions from others on your own completions (read-only) + add photo */}
+                      {entry.user_id === user?.id && (
+                        <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                          {Array.from(reactionGroups.entries()).map(([emoji, userIds]) => (
+                            <span key={emoji} className="flex items-center gap-1 px-2 py-0.5 border border-brutal-black/20 bg-brutal-white font-mono text-xs">
                               <span>{emoji}</span>
                               <span className="font-bold text-[10px]">{userIds.length}</span>
-                            </button>
-                          )
-                        })}
-                        <button
-                          onClick={() => setPickerOpen(isPickerOpen ? null : entry.id)}
-                          className="w-7 h-7 border border-brutal-black/20 bg-brutal-white flex items-center justify-center font-mono text-xs active:bg-brutal-black/5 transition-colors"
-                        >
-                          +
-                        </button>
-                      </div>
+                            </span>
+                          ))}
+                          {!entry.photo_url && (
+                            <label className={`flex items-center gap-1 px-2 py-0.5 border border-brutal-black/20 bg-brutal-white font-mono text-[10px] font-bold text-brutal-black/40 cursor-pointer active:bg-brutal-black/5 ${uploadingPhotoId === entry.id ? 'opacity-50' : ''}`}>
+                              <Camera size={12} /> PHOTO
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                disabled={uploadingPhotoId === entry.id}
+                                onChange={async e => {
+                                  const file = e.target.files?.[0]
+                                  if (!file || !user || !group) return
+                                  setUploadingPhotoId(entry.id)
+                                  const path = `${group.id}/${user.id}/${Date.now()}.jpg`
+                                  const { error: uploadError } = await supabase.storage
+                                    .from('completion-photos')
+                                    .upload(path, file, { contentType: file.type })
+                                  if (uploadError) {
+                                    toast('Failed to upload photo', 'bg-brutal-pink')
+                                  } else {
+                                    const { data: urlData } = supabase.storage
+                                      .from('completion-photos')
+                                      .getPublicUrl(path)
+                                    await supabase
+                                      .from('completions')
+                                      .update({ photo_url: urlData.publicUrl })
+                                      .eq('id', entry.id)
+                                    toast('Photo added!', 'bg-brutal-lime')
+                                  }
+                                  setUploadingPhotoId(null)
+                                }}
+                              />
+                            </label>
+                          )}
+                        </div>
+                      )}
 
                       {/* Emoji picker */}
                       {isPickerOpen && (

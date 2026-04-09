@@ -137,7 +137,9 @@ export interface Database {
           photo_url?: string | null
           with_user_id?: string | null
         }
-        Update: Record<string, never>
+        Update: {
+          photo_url?: string | null
+        }
         Relationships: []
       }
       invitations: {
