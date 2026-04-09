@@ -33,10 +33,10 @@ export function BottomSheet({ open, onClose, children }: BottomSheetProps) {
       <div className="absolute inset-0 bg-brutal-black/40" onClick={onClose} />
       <div
         className="absolute bottom-0 left-0 right-0 bg-brutal-white border-t-4 border-brutal-black flex flex-col"
-        style={{ maxHeight: '85vh', paddingBottom: 'env(safe-area-inset-bottom)' }}
+        style={{ maxHeight: '85vh' }}
       >
         <div className="w-12 h-1.5 bg-brutal-black/30 mx-auto mt-3 mb-2 rounded-full shrink-0" />
-        <div ref={contentRef} className="overflow-y-auto px-6 pb-6">
+        <div ref={contentRef} className="overflow-y-auto px-6" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}>
           {children}
         </div>
       </div>
