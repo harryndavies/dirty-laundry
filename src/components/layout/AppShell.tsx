@@ -10,8 +10,7 @@ export function AppShell() {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <main
-        className="flex-1 overflow-y-auto overscroll-contain"
-        style={group ? { paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' } : undefined}
+        className={`flex-1 overflow-y-auto overscroll-contain ${group ? 'pb-28' : ''}`}
       >
         <Outlet />
       </main>
