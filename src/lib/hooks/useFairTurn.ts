@@ -76,15 +76,28 @@ export function useFairTurn() {
       }
 
       // If tied, pick whoever did it least recently (or never)
-      let chosen = candidates[0]
-      let chosenLastTime: number = Infinity
+      // If all are tied with no history, use chore ID to distribute evenly
+      const allNeverDone = candidates.every(id => !lastDone.has(id))
+      let chosen: string
 
-      for (const userId of candidates) {
-        const last = lastDone.get(userId)
-        const time = last ? new Date(last).getTime() : 0
-        if (time < chosenLastTime) {
-          chosenLastTime = time
-          chosen = userId
+      if (allNeverDone && candidates.length > 1) {
+        // Hash the chore ID to pick a different person per chore
+        let hash = 0
+        for (let i = 0; i < chore.id.length; i++) {
+          hash = ((hash << 5) - hash) + chore.id.charCodeAt(i)
+        }
+        chosen = candidates[Math.abs(hash) % candidates.length]
+      } else {
+        chosen = candidates[0]
+        let chosenLastTime: number = Infinity
+
+        for (const userId of candidates) {
+          const last = lastDone.get(userId)
+          const time = last ? new Date(last).getTime() : 0
+          if (time < chosenLastTime) {
+            chosenLastTime = time
+            chosen = userId
+          }
         }
       }
 
