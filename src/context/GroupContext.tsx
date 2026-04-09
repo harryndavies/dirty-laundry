@@ -116,7 +116,12 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       .eq('group_id', groupId)
       .order('total_points', { ascending: false })
 
-    setMembers((membersData as MemberWithProfile[]) ?? [])
+    const updated = (membersData as MemberWithProfile[]) ?? []
+    setMembers(updated)
+    if (user) {
+      const me = updated.find(m => m.user_id === user.id)
+      if (me) setUserMember(me)
+    }
   }
 
   const refreshMembers = useCallback(async () => {
