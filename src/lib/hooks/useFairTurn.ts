@@ -81,12 +81,19 @@ export function useFairTurn() {
       let chosen: string
 
       if (allNeverDone && candidates.length > 1) {
-        // Hash the chore ID to pick a different person per chore
+        // Distribute based on chore share weights
         let hash = 0
         for (let i = 0; i < chore.id.length; i++) {
           hash = ((hash << 5) - hash) + chore.id.charCodeAt(i)
         }
-        chosen = candidates[Math.abs(hash) % candidates.length]
+        // Build weighted pool — higher share = more entries
+        const weighted: string[] = []
+        for (const id of candidates) {
+          const m = members.find(m => m.user_id === id)
+          const weight = hasShares && m ? Math.max(1, Math.round(m.chore_share / 10)) : 1
+          for (let i = 0; i < weight; i++) weighted.push(id)
+        }
+        chosen = weighted[Math.abs(hash) % weighted.length]
       } else {
         chosen = candidates[0]
         let chosenLastTime: number = Infinity
