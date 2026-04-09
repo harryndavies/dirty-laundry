@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, useCallback, type React
 import { supabase } from '@/lib/supabase'
 import { useAuth } from './AuthContext'
 import { sendPushToUser } from '@/lib/pushNotifications'
+import { toast } from '@/components/ui/Toast'
 import type { Group, GroupMember, Profile } from '@/lib/database.types'
 
 interface MemberWithProfile extends GroupMember {
@@ -306,60 +307,50 @@ export function GroupProvider({ children }: { children: ReactNode }) {
 
   async function updateWeeklyGoal(goal: number | null) {
     if (!group) return
-    await supabase
-      .from('groups')
-      .update({ weekly_goal: goal })
-      .eq('id', group.id)
-    setGroup(prev => prev ? { ...prev, weekly_goal: goal } : prev)
+    try {
+      const { error } = await supabase.from('groups').update({ weekly_goal: goal }).eq('id', group.id)
+      if (error) throw error
+      setGroup(prev => prev ? { ...prev, weekly_goal: goal } : prev)
+    } catch { toast('Failed to update goal', 'bg-brutal-pink') }
   }
 
   async function updatePocketMoneyRate(rate: number | null) {
     if (!group) return
-    await supabase
-      .from('groups')
-      .update({ pocket_money_rate: rate })
-      .eq('id', group.id)
-    setGroup(prev => prev ? { ...prev, pocket_money_rate: rate } : prev)
+    try {
+      const { error } = await supabase.from('groups').update({ pocket_money_rate: rate }).eq('id', group.id)
+      if (error) throw error
+      setGroup(prev => prev ? { ...prev, pocket_money_rate: rate } : prev)
+    } catch { toast('Failed to update rate', 'bg-brutal-pink') }
   }
 
   async function setMemberRole(memberId: string, role: 'owner' | 'member' | 'kid') {
-    await supabase
-      .from('group_members')
-      .update({ role })
-      .eq('id', memberId)
-    if (group) await refreshMembersForGroup(group.id)
+    try {
+      const { error } = await supabase.from('group_members').update({ role }).eq('id', memberId)
+      if (error) throw error
+      if (group) await refreshMembersForGroup(group.id)
+    } catch { toast('Failed to update role', 'bg-brutal-pink') }
   }
 
   async function markAsPaid(memberId: string, userId: string, amountPence: number, points: number) {
     if (!user || !group) return
-
-    await supabase
-      .from('group_members')
-      .update({ paid_up_to: new Date().toISOString() })
-      .eq('id', memberId)
-
-    await supabase
-      .from('payouts')
-      .insert({
-        group_id: group.id,
-        user_id: userId,
-        paid_by: user.id,
-        amount_pence: amountPence,
-        points,
-      })
-
-    if (group) await refreshMembersForGroup(group.id)
+    try {
+      const { error: updateError } = await supabase.from('group_members').update({ paid_up_to: new Date().toISOString() }).eq('id', memberId)
+      if (updateError) throw updateError
+      const { error: insertError } = await supabase.from('payouts').insert({ group_id: group.id, user_id: userId, paid_by: user.id, amount_pence: amountPence, points })
+      if (insertError) throw insertError
+      if (group) await refreshMembersForGroup(group.id)
+    } catch { toast('Failed to mark as paid', 'bg-brutal-pink') }
   }
 
   async function updateSavingsGoal(goalPence: number | null, goalName: string | null) {
     if (!user || !group) return
     const member = members.find(m => m.user_id === user.id)
     if (!member) return
-    await supabase
-      .from('group_members')
-      .update({ savings_goal: goalPence, savings_goal_name: goalName })
-      .eq('id', member.id)
-    await refreshMembersForGroup(group.id)
+    try {
+      const { error } = await supabase.from('group_members').update({ savings_goal: goalPence, savings_goal_name: goalName }).eq('id', member.id)
+      if (error) throw error
+      await refreshMembersForGroup(group.id)
+    } catch { toast('Failed to update savings goal', 'bg-brutal-pink') }
   }
 
   return (

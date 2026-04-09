@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { useGroup } from '@/context/GroupContext'
 import { sendPushToUser } from '@/lib/pushNotifications'
+import { toast } from '@/components/ui/Toast'
 
 export function useChores() {
   const { user } = useAuth()
@@ -71,7 +72,9 @@ export function useChores() {
         const { error: uploadError } = await supabase.storage
           .from('completion-photos')
           .upload(path, photo, { contentType: photo.type })
-        if (!uploadError) {
+        if (uploadError) {
+          toast('Photo failed to upload', 'bg-brutal-pink')
+        } else {
           const { data: urlData } = supabase.storage
             .from('completion-photos')
             .getPublicUrl(path)
