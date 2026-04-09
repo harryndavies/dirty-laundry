@@ -88,6 +88,7 @@ export interface Database {
           reminder_day: number | null
           reminder_time: string | null
           area: string | null
+          assigned_to: string | null
         }
         Insert: {
           group_id: string
@@ -100,6 +101,7 @@ export interface Database {
           reminder_day?: number | null
           reminder_time?: string | null
           area?: string | null
+          assigned_to?: string | null
         }
         Update: {
           name?: string
@@ -110,6 +112,7 @@ export interface Database {
           reminder_day?: number | null
           reminder_time?: string | null
           area?: string | null
+          assigned_to?: string | null
         }
         Relationships: []
       }

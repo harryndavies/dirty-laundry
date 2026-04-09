@@ -230,7 +230,7 @@ export function useChores() {
   })
 
   const editChore = useMutation({
-    mutationFn: async ({ choreId, updates }: { choreId: string; updates: { name?: string; points?: number; is_persistent?: boolean; area?: string | null; reminder_day?: number | null; reminder_time?: string | null } }) => {
+    mutationFn: async ({ choreId, updates }: { choreId: string; updates: { name?: string; points?: number; is_persistent?: boolean; area?: string | null; reminder_day?: number | null; reminder_time?: string | null; assigned_to?: string | null } }) => {
       const updateData: Record<string, unknown> = { ...updates }
       if (updates.points !== undefined) {
         updateData.base_points = updates.points
@@ -240,6 +240,21 @@ export function useChores() {
         .update(updateData)
         .eq('id', choreId)
       if (error) throw error
+
+      // Notify assigned person
+      if (updates.assigned_to && user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single()
+        const choreName = updates.name ?? 'a chore'
+        sendPushToUser(updates.assigned_to, {
+          title: 'You\'ve been assigned! 📋',
+          body: `${profile?.display_name ?? 'Someone'} assigned "${choreName}" to you`,
+          url: '/chores',
+        }).catch(() => {})
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['chores', group?.id] })

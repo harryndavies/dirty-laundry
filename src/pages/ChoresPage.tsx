@@ -103,7 +103,7 @@ export function ChoresPage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [showSavingsGoal, setShowSavingsGoal] = useState(false)
   const [addingPack, setAddingPack] = useState(false)
-  const [editingChore, setEditingChore] = useState<{ id: string; name: string; points: number; is_persistent: boolean; area: string | null; reminder_day: number | null; reminder_time: string | null } | null>(null)
+  const [editingChore, setEditingChore] = useState<{ id: string; name: string; points: number; is_persistent: boolean; area: string | null; reminder_day: number | null; reminder_time: string | null; assigned_to: string | null } | null>(null)
   const [goalName, setGoalName] = useState('')
   const [goalAmount, setGoalAmount] = useState(500)
 
@@ -225,6 +225,7 @@ export function ChoresPage() {
         area: chore.area,
         reminder_day: chore.reminder_day,
         reminder_time: chore.reminder_time,
+        assigned_to: chore.assigned_to,
       })
     }
     swipingIdRef.current = null
@@ -609,7 +610,19 @@ export function ChoresPage() {
                         )
                       )}
                     </div>
-                    {chore.is_persistent && suggestions.get(chore.id) && (
+                    {chore.assigned_to && (() => {
+                      const assignee = members.find(m => m.user_id === chore.assigned_to)
+                      if (!assignee) return null
+                      return (
+                        <div className="mt-1.5 flex items-center gap-1.5">
+                          <Avatar name={assignee.profiles.display_name} color={assignee.profiles.avatar_color} size="sm" imageUrl={assignee.profiles.avatar_url} />
+                          <span className="font-mono text-[10px] text-brutal-orange font-bold">
+                            Assigned to {assignee.profiles.display_name}
+                          </span>
+                        </div>
+                      )
+                    })()}
+                    {!chore.assigned_to && chore.is_persistent && suggestions.get(chore.id) && (
                       <div className="mt-1.5 flex items-center gap-1.5">
                         {suggestions.get(chore.id)!.avatar_url ? (
                           <img
@@ -1000,6 +1013,33 @@ export function ChoresPage() {
                   </div>
                 )}
               </div>
+              <div>
+                <label className="font-mono text-xs font-bold uppercase block mb-1">ASSIGN TO</label>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setEditingChore({ ...editingChore, assigned_to: null })}
+                    className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${
+                      !editingChore.assigned_to ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white'
+                    }`}
+                  >
+                    ANYONE
+                  </button>
+                  {members.map(m => (
+                    <button
+                      key={m.user_id}
+                      type="button"
+                      onClick={() => setEditingChore({ ...editingChore, assigned_to: editingChore.assigned_to === m.user_id ? null : m.user_id })}
+                      className={`flex items-center gap-1.5 px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${
+                        editingChore.assigned_to === m.user_id ? 'bg-brutal-orange text-brutal-white' : 'bg-brutal-white'
+                      }`}
+                    >
+                      <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" imageUrl={m.profiles.avatar_url} />
+                      {m.profiles.display_name}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <Button
                 onClick={async () => {
                   await editChore.mutateAsync({
@@ -1010,6 +1050,7 @@ export function ChoresPage() {
                       area: editingChore.area,
                       reminder_day: editingChore.reminder_day,
                       reminder_time: editingChore.reminder_day !== null ? (editingChore.reminder_time ?? '09:00') : null,
+                      assigned_to: editingChore.assigned_to,
                     },
                   })
                   toast('Chore updated!', 'bg-brutal-lime')
