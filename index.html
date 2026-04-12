@@ -15,7 +15,13 @@
     <title>Dirty Laundry</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#FFE500;font-family:'IBM Plex Mono',monospace;">
+        <img src="/logo.png" alt="" style="width:180px;height:auto;margin-bottom:16px;" />
+        <div style="width:28px;height:28px;border:4px solid #000;border-top-color:#BFFF00;animation:sp .6s linear infinite;"></div>
+      </div>
+      <style>@keyframes sp{to{transform:rotate(360deg)}}</style>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
