@@ -50,7 +50,7 @@ function groupByDate(activity: ActivityEntry[]): Map<string, ActivityEntry[]> {
 export function ActivityPage() {
   const { group, members } = useGroup()
   const { user } = useAuth()
-  const { activity, loading, hasMore, loadingMore, loadMore, toggleReaction, undoCompletion, updatePhotoUrl } = useActivity()
+  const { activity, loading, hasMore, loadingMore, loadMore, toggleReaction, undoCompletion, updateEntry } = useActivity()
   const [pickerOpen, setPickerOpen] = useState<string | null>(null)
   const [confirmUndo, setConfirmUndo] = useState<{ id: string; name: string } | null>(null)
   const [expandedPhoto, setExpandedPhoto] = useState<string | null>(null)
@@ -189,6 +189,18 @@ export function ActivityPage() {
                                 className="w-full h-28 object-cover border-2 border-brutal-black cursor-pointer active:opacity-80"
                               />
                               <span className="absolute top-1 left-1 font-mono text-[8px] font-bold bg-brutal-black text-brutal-white px-1">BEFORE</span>
+                              {entry.user_id === user?.id && (
+                                <button
+                                  onClick={async () => {
+                                    await supabase.from('completions').update({ photo_before_url: null }).eq('id', entry.id)
+                                    // Update local state
+                                    updateEntry(entry.id, { photo_before_url: null })
+                                  }}
+                                  className="absolute top-1 right-1 w-5 h-5 bg-brutal-black text-brutal-white flex items-center justify-center text-xs font-bold"
+                                >
+                                  ✕
+                                </button>
+                              )}
                             </div>
                           )}
                           {entry.photo_url && (
@@ -206,7 +218,7 @@ export function ActivityPage() {
                                 <button
                                   onClick={async () => {
                                     await supabase.from('completions').update({ photo_url: null }).eq('id', entry.id)
-                                    updatePhotoUrl(entry.id, '')
+                                    updateEntry(entry.id, { photo_url: null })
                                     toast('Photo removed', 'bg-brutal-white')
                                   }}
                                   className="absolute top-1 right-1 w-5 h-5 bg-brutal-black text-brutal-white flex items-center justify-center text-xs font-bold"
@@ -283,7 +295,7 @@ export function ActivityPage() {
                                       .from('completions')
                                       .update({ photo_url: urlData.publicUrl })
                                       .eq('id', entry.id)
-                                    updatePhotoUrl(entry.id, urlData.publicUrl)
+                                    updateEntry(entry.id, { photo_url: urlData.publicUrl })
                                     toast('Photo added!', 'bg-brutal-lime')
                                   }
                                   setUploadingPhotoId(null)
