@@ -53,6 +53,17 @@ export function CompletionOverlay({ points, totalPoints, choreName, onDone }: Co
           className="fixed inset-0 z-[100] bg-brutal-lime flex flex-col items-center justify-center"
           onClick={() => { setVisible(false); setTimeout(onDone, 400) }}
         >
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            onClick={() => { setVisible(false); setTimeout(onDone, 400) }}
+            className="absolute top-4 right-4 w-10 h-10 bg-brutal-black text-brutal-white flex items-center justify-center font-mono font-bold text-lg"
+            style={{ marginTop: 'env(safe-area-inset-top)' }}
+          >
+            ✕
+          </motion.button>
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -102,14 +113,6 @@ export function CompletionOverlay({ points, totalPoints, choreName, onDone }: Co
             )}
           </AnimatePresence>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.3 }}
-            transition={{ delay: 1.5 }}
-            className="absolute bottom-12 font-mono text-[10px] text-brutal-black"
-          >
-            TAP TO DISMISS
-          </motion.p>
         </motion.div>
       )}
     </AnimatePresence>
