@@ -2,12 +2,25 @@ import { Outlet } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { useRealtime } from '@/lib/hooks/useRealtime'
 import { useGroup } from '@/context/GroupContext'
+import { useAuth } from '@/context/AuthContext'
+import { Spinner } from '@/components/ui/Spinner'
 
 export function AppShell() {
   useRealtime()
-  const { group, loading } = useGroup()
+  const { loading: authLoading } = useAuth()
+  const { group, loading: groupLoading } = useGroup()
   const hadGroup = !!localStorage.getItem('dirtylaundry_group_id')
-  const showNav = group ? true : loading && hadGroup
+  const showNav = group ? true : groupLoading && hadGroup
+  const stillLoading = authLoading || groupLoading
+
+  if (stillLoading) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center bg-brutal-yellow">
+        <img src="/logo.png" alt="Dirty Laundry" className="w-48 h-auto mb-6" />
+        <Spinner size="lg" />
+      </div>
+    )
+  }
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
