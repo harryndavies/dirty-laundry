@@ -168,5 +168,9 @@ export function useActivity() {
     await refreshMembers()
   }
 
-  return { activity, loading, hasMore, loadingMore, loadMore, toggleReaction, undoCompletion, refetch: fetchActivity }
+  function updatePhotoUrl(completionId: string, photoUrl: string) {
+    setActivity(prev => prev.map(a => a.id === completionId ? { ...a, photo_url: photoUrl } : a))
+  }
+
+  return { activity, loading, hasMore, loadingMore, loadMore, toggleReaction, undoCompletion, refetch: fetchActivity, updatePhotoUrl }
 }
