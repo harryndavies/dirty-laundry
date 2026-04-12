@@ -30,11 +30,6 @@ export function CompletionOverlay({ points, totalPoints, choreName, onDone }: Co
         if (step >= steps) {
           clearInterval(interval)
           setTimeout(() => setShowBadge(true), 200)
-          // Auto dismiss
-          setTimeout(() => {
-            setVisible(false)
-            setTimeout(onDone, 400)
-          }, 2000)
         }
       }, duration / steps)
 
