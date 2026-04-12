@@ -6,15 +6,17 @@ import { useGroup } from '@/context/GroupContext'
 export function AppShell() {
   useRealtime()
   const { group, loading } = useGroup()
+  const hadGroup = !!localStorage.getItem('dirtylaundry_group_id')
+  const showNav = group ? true : loading && hadGroup
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <main
-        className={`flex-1 overflow-y-auto overscroll-contain ${group ? 'pb-36' : ''}`}
+        className={`flex-1 overflow-y-auto overscroll-contain ${showNav ? 'pb-36' : ''}`}
       >
         <Outlet />
       </main>
-      {group && !loading && <BottomNav />}
+      {showNav && <BottomNav />}
     </div>
   )
 }
