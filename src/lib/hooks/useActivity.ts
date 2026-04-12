@@ -168,5 +168,5 @@ export function useActivity() {
     await refreshMembers()
   }
 
-  return { activity, loading, hasMore, loadingMore, loadMore, toggleReaction, undoCompletion }
+  return { activity, loading, hasMore, loadingMore, loadMore, toggleReaction, undoCompletion, refetch: fetchActivity }
 }

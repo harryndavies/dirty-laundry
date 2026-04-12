@@ -50,7 +50,7 @@ function groupByDate(activity: ActivityEntry[]): Map<string, ActivityEntry[]> {
 export function ActivityPage() {
   const { group, members } = useGroup()
   const { user } = useAuth()
-  const { activity, loading, hasMore, loadingMore, loadMore, toggleReaction, undoCompletion } = useActivity()
+  const { activity, loading, hasMore, loadingMore, loadMore, toggleReaction, undoCompletion, refetch } = useActivity()
   const [pickerOpen, setPickerOpen] = useState<string | null>(null)
   const [confirmUndo, setConfirmUndo] = useState<{ id: string; name: string } | null>(null)
   const [expandedPhoto, setExpandedPhoto] = useState<string | null>(null)
@@ -252,6 +252,7 @@ export function ActivityPage() {
                                       .update({ photo_url: urlData.publicUrl })
                                       .eq('id', entry.id)
                                     toast('Photo added!', 'bg-brutal-lime')
+                                    await refetch()
                                   }
                                   setUploadingPhotoId(null)
                                 }}
