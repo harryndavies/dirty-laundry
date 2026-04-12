@@ -179,12 +179,29 @@ export function ActivityPage() {
 
                       {/* Photo proof */}
                       {entry.photo_url && (
-                        <img
-                          src={entry.photo_url}
-                          alt="Proof"
-                          onClick={() => setExpandedPhoto(entry.photo_url)}
-                          className="w-full h-40 object-cover border-2 border-brutal-black mt-2 cursor-pointer active:opacity-80"
-                        />
+                        <div className="relative mt-2">
+                          <img
+                            src={entry.photo_url}
+                            alt="Proof"
+                            onClick={() => setExpandedPhoto(entry.photo_url)}
+                            className="w-full h-40 object-cover border-2 border-brutal-black cursor-pointer active:opacity-80"
+                          />
+                          {entry.user_id === user?.id && (
+                            <button
+                              onClick={async () => {
+                                await supabase
+                                  .from('completions')
+                                  .update({ photo_url: null })
+                                  .eq('id', entry.id)
+                                updatePhotoUrl(entry.id, '')
+                                toast('Photo removed', 'bg-brutal-white')
+                              }}
+                              className="absolute top-1 right-1 w-6 h-6 bg-brutal-black text-brutal-white flex items-center justify-center text-xs font-bold"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
                       )}
 
                       {/* Reactions row — only on other people's completions */}

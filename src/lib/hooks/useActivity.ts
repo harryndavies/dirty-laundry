@@ -169,7 +169,7 @@ export function useActivity() {
   }
 
   function updatePhotoUrl(completionId: string, photoUrl: string) {
-    setActivity(prev => prev.map(a => a.id === completionId ? { ...a, photo_url: photoUrl } : a))
+    setActivity(prev => prev.map(a => a.id === completionId ? { ...a, photo_url: photoUrl || null } : a))
   }
 
   return { activity, loading, hasMore, loadingMore, loadMore, toggleReaction, undoCompletion, refetch: fetchActivity, updatePhotoUrl }
