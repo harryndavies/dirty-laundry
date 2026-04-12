@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
 import { useChores } from '@/lib/hooks/useChores'
+import { CompletionOverlay } from '@/components/CompletionOverlay'
 import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
 import { useFairTurn } from '@/lib/hooks/useFairTurn'
 import { useAuth } from '@/context/AuthContext'
@@ -101,6 +102,7 @@ export function ChoresPage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [showSavingsGoal, setShowSavingsGoal] = useState(false)
   const [addingPack, setAddingPack] = useState(false)
+  const [completionOverlay, setCompletionOverlay] = useState<{ points: number; totalPoints: number; choreName: string } | null>(null)
   const [editingChore, setEditingChore] = useState<{ id: string; name: string; points: number; is_persistent: boolean; area: string | null; reminder_day: number | null; reminder_time: string | null; assigned_to: string | null } | null>(null)
   const [assigningChore, setAssigningChore] = useState<{ id: string; name: string; assigned_to: string | null } | null>(null)
   const [goalName, setGoalName] = useState('')
@@ -170,14 +172,12 @@ export function ChoresPage() {
       photo: photo ?? undefined,
     })
     playComplete()
-    const partner = withUserId ? members.find(m => m.user_id === withUserId) : null
-    if (partner) {
-      toast(`Done! +${result.earnedPoints} pts each for you and ${partner.profiles.display_name}`, 'bg-brutal-lime')
-    } else if (result.earnedPoints < confirmComplete.points) {
-      toast(`Done! +${result.earnedPoints} pts (you boosted this one, no bonus for you)`, 'bg-brutal-yellow')
-    } else {
-      toast(`Done! +${result.earnedPoints} pts for ${confirmComplete.name}`, 'bg-brutal-lime')
-    }
+    const currentTotal = (userMember?.total_points ?? 0) + result.earnedPoints
+    setCompletionOverlay({
+      points: result.earnedPoints,
+      totalPoints: currentTotal,
+      choreName: confirmComplete.name,
+    })
     setConfirmComplete(null)
     setWithUserId(null)
     setPhoto(null)
@@ -1081,6 +1081,16 @@ export function ChoresPage() {
         onConfirm={doDelete}
         onCancel={() => setConfirmDelete(null)}
       />
+
+      {/* Completion overlay */}
+      {completionOverlay && (
+        <CompletionOverlay
+          points={completionOverlay.points}
+          totalPoints={completionOverlay.totalPoints}
+          choreName={completionOverlay.choreName}
+          onDone={() => setCompletionOverlay(null)}
+        />
+      )}
 
       {/* Just do one mode */}
       {justDoOne && (() => {
