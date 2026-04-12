@@ -100,6 +100,8 @@ export function ChoresPage() {
   const [withUserId, setWithUserId] = useState<string | null>(null)
   const [photo, setPhoto] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [photoBefore, setPhotoBefore] = useState<File | null>(null)
+  const [photoBeforePreview, setPhotoBeforePreview] = useState<string | null>(null)
   const [showSavingsGoal, setShowSavingsGoal] = useState(false)
   const [addingPack, setAddingPack] = useState(false)
   const [completionOverlay, setCompletionOverlay] = useState<{ points: number; totalPoints: number; choreName: string } | null>(null)
@@ -170,6 +172,7 @@ export function ChoresPage() {
       points: confirmComplete.points,
       withUserId: withUserId ?? undefined,
       photo: photo ?? undefined,
+      photoBefore: photoBefore ?? undefined,
     })
     playComplete()
     const currentTotal = (userMember?.total_points ?? 0) + result.earnedPoints
@@ -182,6 +185,8 @@ export function ChoresPage() {
     setWithUserId(null)
     setPhoto(null)
     setPhotoPreview(null)
+    setPhotoBefore(null)
+    setPhotoBeforePreview(null)
   }
 
   function handleDelete(choreId: string) {
@@ -843,34 +848,41 @@ export function ChoresPage() {
 
             {/* Photo proof */}
             <div className="mb-4">
-              <p className="font-mono text-[10px] font-bold text-brutal-black/40 tracking-widest mb-2">PHOTO PROOF (OPTIONAL)</p>
-              {photoPreview ? (
-                <div className="relative">
-                  <img src={photoPreview} alt="Proof" className="w-full h-32 object-cover border-2 border-brutal-black" />
-                  <button
-                    onClick={() => { setPhoto(null); setPhotoPreview(null) }}
-                    className="absolute top-1 right-1 w-6 h-6 bg-brutal-black text-brutal-white flex items-center justify-center"
-                  >
-                    <X size={14} />
-                  </button>
+              <p className="font-mono text-[10px] font-bold text-brutal-black/40 tracking-widest mb-2">BEFORE & AFTER (OPTIONAL)</p>
+              <div className="grid grid-cols-2 gap-2">
+                {/* Before photo */}
+                <div>
+                  {photoBeforePreview ? (
+                    <div className="relative">
+                      <img src={photoBeforePreview} alt="Before" className="w-full h-24 object-cover border-2 border-brutal-black" />
+                      <span className="absolute top-1 left-1 font-mono text-[8px] font-bold bg-brutal-black text-brutal-white px-1">BEFORE</span>
+                      <button onClick={() => { setPhotoBefore(null); setPhotoBeforePreview(null) }} className="absolute top-1 right-1 w-5 h-5 bg-brutal-black text-brutal-white flex items-center justify-center"><X size={10} /></button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center h-24 border-2 border-dashed border-brutal-black/30 bg-brutal-white font-mono text-[10px] font-bold text-brutal-black/40 active:bg-brutal-black/5 cursor-pointer gap-1">
+                      <Camera size={14} />
+                      BEFORE
+                      <input type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) { setPhotoBefore(f); setPhotoBeforePreview(URL.createObjectURL(f)) } }} />
+                    </label>
+                  )}
                 </div>
-              ) : (
-                <label className="flex items-center justify-center gap-2 h-12 border-2 border-dashed border-brutal-black/30 bg-brutal-white font-mono text-xs font-bold text-brutal-black/40 active:bg-brutal-black/5 cursor-pointer">
-                  <Camera size={16} /> ADD PHOTO
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={e => {
-                      const file = e.target.files?.[0]
-                      if (file) {
-                        setPhoto(file)
-                        setPhotoPreview(URL.createObjectURL(file))
-                      }
-                    }}
-                  />
-                </label>
-              )}
+                {/* After photo */}
+                <div>
+                  {photoPreview ? (
+                    <div className="relative">
+                      <img src={photoPreview} alt="After" className="w-full h-24 object-cover border-2 border-brutal-black" />
+                      <span className="absolute top-1 left-1 font-mono text-[8px] font-bold bg-brutal-lime text-brutal-black px-1">AFTER</span>
+                      <button onClick={() => { setPhoto(null); setPhotoPreview(null) }} className="absolute top-1 right-1 w-5 h-5 bg-brutal-black text-brutal-white flex items-center justify-center"><X size={10} /></button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center h-24 border-2 border-dashed border-brutal-black/30 bg-brutal-white font-mono text-[10px] font-bold text-brutal-black/40 active:bg-brutal-black/5 cursor-pointer gap-1">
+                      <Camera size={14} />
+                      AFTER
+                      <input type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) { setPhoto(f); setPhotoPreview(URL.createObjectURL(f)) } }} />
+                    </label>
+                  )}
+                </div>
+              </div>
             </div>
 
             <Button

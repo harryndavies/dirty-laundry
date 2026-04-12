@@ -126,6 +126,7 @@ export interface Database {
           completed_at: string
           chore_name: string | null
           photo_url: string | null
+          photo_before_url: string | null
           with_user_id: string | null
         }
         Insert: {
@@ -135,10 +136,12 @@ export interface Database {
           points_earned: number
           chore_name?: string | null
           photo_url?: string | null
+          photo_before_url?: string | null
           with_user_id?: string | null
         }
         Update: {
           photo_url?: string | null
+          photo_before_url?: string | null
         }
         Relationships: []
       }

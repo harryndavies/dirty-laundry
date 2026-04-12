@@ -177,29 +177,44 @@ export function ActivityPage() {
                         </div>
                       </div>
 
-                      {/* Photo proof */}
-                      {entry.photo_url && (
-                        <div className="relative mt-2">
-                          <img
-                            src={entry.photo_url}
-                            alt="Proof"
-                            onClick={() => setExpandedPhoto(entry.photo_url)}
-                            className="w-full h-40 object-cover border-2 border-brutal-black cursor-pointer active:opacity-80"
-                          />
-                          {entry.user_id === user?.id && (
-                            <button
-                              onClick={async () => {
-                                await supabase
-                                  .from('completions')
-                                  .update({ photo_url: null })
-                                  .eq('id', entry.id)
-                                updatePhotoUrl(entry.id, '')
-                                toast('Photo removed', 'bg-brutal-white')
-                              }}
-                              className="absolute top-1 right-1 w-6 h-6 bg-brutal-black text-brutal-white flex items-center justify-center text-xs font-bold"
-                            >
-                              ✕
-                            </button>
+                      {/* Photos */}
+                      {(entry.photo_before_url || entry.photo_url) && (
+                        <div className={`mt-2 ${entry.photo_before_url && entry.photo_url ? 'grid grid-cols-2 gap-1' : ''}`}>
+                          {entry.photo_before_url && (
+                            <div className="relative">
+                              <img
+                                src={entry.photo_before_url}
+                                alt="Before"
+                                onClick={() => setExpandedPhoto(entry.photo_before_url)}
+                                className="w-full h-28 object-cover border-2 border-brutal-black cursor-pointer active:opacity-80"
+                              />
+                              <span className="absolute top-1 left-1 font-mono text-[8px] font-bold bg-brutal-black text-brutal-white px-1">BEFORE</span>
+                            </div>
+                          )}
+                          {entry.photo_url && (
+                            <div className="relative">
+                              <img
+                                src={entry.photo_url}
+                                alt="After"
+                                onClick={() => setExpandedPhoto(entry.photo_url)}
+                                className="w-full h-28 object-cover border-2 border-brutal-black cursor-pointer active:opacity-80"
+                              />
+                              {entry.photo_before_url && (
+                                <span className="absolute top-1 left-1 font-mono text-[8px] font-bold bg-brutal-lime text-brutal-black px-1">AFTER</span>
+                              )}
+                              {entry.user_id === user?.id && (
+                                <button
+                                  onClick={async () => {
+                                    await supabase.from('completions').update({ photo_url: null }).eq('id', entry.id)
+                                    updatePhotoUrl(entry.id, '')
+                                    toast('Photo removed', 'bg-brutal-white')
+                                  }}
+                                  className="absolute top-1 right-1 w-5 h-5 bg-brutal-black text-brutal-white flex items-center justify-center text-xs font-bold"
+                                >
+                                  ✕
+                                </button>
+                              )}
+                            </div>
                           )}
                         </div>
                       )}

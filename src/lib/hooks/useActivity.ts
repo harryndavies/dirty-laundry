@@ -17,6 +17,7 @@ export interface ActivityEntry {
   completed_at: string
   chore_name: string | null
   photo_url: string | null
+  photo_before_url: string | null
   with_user_id: string | null
   profiles: { display_name: string; avatar_color: string; avatar_url: string | null }
   reactions: Reaction[]
@@ -35,7 +36,7 @@ export function useActivity() {
     if (!group) return
     const { data, error: fetchError } = await supabase
       .from('completions')
-      .select('id, user_id, points_earned, completed_at, chore_name, photo_url, with_user_id, profiles!completions_user_id_fkey(display_name, avatar_color, avatar_url), reactions(id, emoji, user_id)')
+      .select('id, user_id, points_earned, completed_at, chore_name, photo_url, photo_before_url, with_user_id, profiles!completions_user_id_fkey(display_name, avatar_color, avatar_url), reactions(id, emoji, user_id)')
       .eq('group_id', group.id)
       .order('completed_at', { ascending: false })
       .limit(PAGE_SIZE)
@@ -57,7 +58,7 @@ export function useActivity() {
     const lastItem = activity[activity.length - 1]
     const { data } = await supabase
       .from('completions')
-      .select('id, user_id, points_earned, completed_at, chore_name, photo_url, with_user_id, profiles!completions_user_id_fkey(display_name, avatar_color, avatar_url), reactions(id, emoji, user_id)')
+      .select('id, user_id, points_earned, completed_at, chore_name, photo_url, photo_before_url, with_user_id, profiles!completions_user_id_fkey(display_name, avatar_color, avatar_url), reactions(id, emoji, user_id)')
       .eq('group_id', group.id)
       .order('completed_at', { ascending: false })
       .lt('completed_at', lastItem.completed_at)
