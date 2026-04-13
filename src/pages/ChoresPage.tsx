@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
-import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Camera, X, Star, Focus } from 'lucide-react'
+import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Camera, X, Star, Focus, Search } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 type Filter = 'all' | 'persistent' | 'one-time' | 'mine'
@@ -83,6 +83,7 @@ export function ChoresPage() {
   const [showAdd, setShowAdd] = useState(false)
   const [filter, setFilter] = useState<Filter>('all')
   const [areaFilter, setAreaFilter] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
   const [newName, setNewName] = useState('')
   const [newPoints, setNewPoints] = useState(10)
   const [newPersistent, setNewPersistent] = useState(true)
@@ -126,7 +127,9 @@ export function ChoresPage() {
 
   const today = new Date().getDay()
 
+  const searchLower = search.toLowerCase().trim()
   const filtered = chores.filter(c => {
+    if (searchLower && !c.name.toLowerCase().includes(searchLower)) return false
     if (filter === 'mine') return c.assigned_to === user?.id || suggestions.get(c.id)?.user_id === user?.id
     if (filter === 'persistent') return c.is_persistent
     if (filter === 'one-time') return !c.is_persistent
@@ -405,8 +408,30 @@ export function ChoresPage() {
         </button>
       )}
 
+      {/* Search */}
+      <div className="px-4 pt-3">
+        <div className="relative">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-brutal-black/40" />
+          <input
+            type="text"
+            placeholder="Search chores..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full pl-9 pr-8 py-2 border-2 border-brutal-black font-mono text-xs bg-brutal-white placeholder:text-brutal-black/30 focus:outline-none focus:ring-0"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-brutal-black/40 active:text-brutal-black"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Filters */}
-      <div className="px-4 pt-3 pb-1 flex gap-1.5 overflow-x-auto">
+      <div className="px-4 pt-2 pb-1 flex gap-1.5 overflow-x-auto">
         {filters.map(f => (
           <button
             key={f.value}
