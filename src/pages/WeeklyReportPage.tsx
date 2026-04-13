@@ -227,8 +227,8 @@ export function WeeklyReportPage() {
             )}
 
             {/* Breakdown */}
-            <div className="space-y-2">
-              <h3 className="font-mono font-bold text-xs text-brutal-black/40 tracking-widest px-1">BREAKDOWN</h3>
+            <div className="space-y-2 md:space-y-0 md:grid md:grid-cols-2 md:gap-3">
+              <h3 className="font-mono font-bold text-xs text-brutal-black/40 tracking-widest px-1 md:col-span-2">BREAKDOWN</h3>
               {stats.map(member => {
                 const pct = totalPoints > 0 ? (member.points / totalPoints) * 100 : 0
                 const isMe = member.user_id === user?.id
@@ -292,8 +292,8 @@ export function WeeklyReportPage() {
 
             {/* Who does what */}
             {choreBreakdown.length > 0 && (
-              <div className="space-y-2">
-                <h3 className="font-mono font-bold text-xs text-brutal-black/40 tracking-widest px-1">WHO DOES WHAT</h3>
+              <div className="space-y-2 md:space-y-0 md:grid md:grid-cols-2 md:gap-3">
+                <h3 className="font-mono font-bold text-xs text-brutal-black/40 tracking-widest px-1 md:col-span-2">WHO DOES WHAT</h3>
                 {choreBreakdown.map(chore => (
                   <div key={chore.name} className="border-2 border-brutal-black p-3 bg-brutal-white">
                     <div className="flex items-center justify-between mb-2">

@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
+import { SideNav } from './SideNav'
 import { useRealtime } from '@/lib/hooks/useRealtime'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
@@ -23,13 +24,18 @@ export function AppShell() {
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
-      <main
-        className={`flex-1 overflow-y-auto overscroll-contain ${showNav ? 'pb-36' : ''}`}
-      >
-        <Outlet />
-      </main>
-      {showNav && <BottomNav />}
+    <div className="h-screen flex overflow-hidden">
+      {showNav && <SideNav />}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <main
+          className={`flex-1 overflow-y-auto overscroll-contain ${showNav ? 'pb-36 md:pb-0' : ''}`}
+        >
+          <div className="md:max-w-2xl md:mx-auto">
+            <Outlet />
+          </div>
+        </main>
+        {showNav && <BottomNav />}
+      </div>
     </div>
   )
 }

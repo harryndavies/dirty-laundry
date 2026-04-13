@@ -261,20 +261,20 @@ export function ChoresPage() {
               setJustDoOneIndex(Math.floor(Math.random() * persistent.length))
               setJustDoOne(true)
             }}
-            className="w-11 h-11 bg-brutal-yellow border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+            className="w-11 h-11 bg-brutal-yellow border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
           >
             <Focus size={20} strokeWidth={2.5} />
           </button>
           <button
             onClick={() => navigate('/roulette')}
-            className="w-11 h-11 bg-brutal-pink text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+            className="w-11 h-11 bg-brutal-pink text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
           >
             <Dices size={20} strokeWidth={2.5} />
           </button>
           {!isKid && (
             <button
               onClick={() => setShowAdd(true)}
-              className="w-11 h-11 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+              className="w-11 h-11 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
               <Plus size={20} strokeWidth={3} />
             </button>
@@ -513,9 +513,9 @@ export function ChoresPage() {
             const showAssign = offset < -40 && !isKid
 
             return (
-              <div key={chore.id} className="relative overflow-hidden">
+              <div key={chore.id} className="relative overflow-hidden group/chore">
                 {/* Swipe backgrounds */}
-                <div className="absolute inset-0 flex">
+                <div className="absolute inset-0 flex md:hidden">
                   <div className={`flex-1 bg-brutal-blue flex items-center px-4 font-mono font-bold text-sm text-brutal-white transition-opacity ${showEdit ? 'opacity-100' : 'opacity-0'}`}>
                     EDIT ✎
                   </div>
@@ -525,7 +525,7 @@ export function ChoresPage() {
                 </div>
 
                 <div
-                  className="relative bg-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 flex items-center gap-3 touch-pan-y"
+                  className="relative bg-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 flex items-center gap-3 touch-pan-y md:hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] md:hover:translate-x-[2px] md:hover:translate-y-[2px] md:transition-all"
                   style={{ transform: isSwiping ? `translateX(${offset}px)` : 'translateX(0)', transition: isSwiping ? 'none' : 'transform 0.2s' }}
                   onTouchStart={e => onTouchStart(e, chore.id)}
                   onTouchMove={onTouchMove}
@@ -605,9 +605,37 @@ export function ChoresPage() {
                     )}
                   </div>
 
+                  {/* Desktop action buttons — hidden on mobile, shown on hover */}
+                  {!isKid && (
+                    <div className="hidden md:flex gap-1 opacity-0 group-hover/chore:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => setEditingChore({
+                          id: chore.id,
+                          name: chore.name,
+                          points: chore.points,
+                          is_persistent: chore.is_persistent,
+                          area: chore.area,
+                          reminder_day: chore.reminder_day,
+                          reminder_time: chore.reminder_time,
+                          assigned_to: chore.assigned_to,
+                        })}
+                        className="w-10 h-10 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono text-xs font-bold hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                        title="Edit"
+                      >
+                        ✎
+                      </button>
+                      <button
+                        onClick={() => setAssigningChore({ id: chore.id, name: chore.name, assigned_to: chore.assigned_to })}
+                        className="w-10 h-10 bg-brutal-orange text-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono text-xs font-bold hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                        title="Assign"
+                      >
+                        📋
+                      </button>
+                    </div>
+                  )}
                   <button
                     onClick={() => handleComplete(chore.id, chore.points, chore.name)}
-                    className="w-12 h-12 bg-brutal-lime border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono font-bold text-sm active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+                    className="w-12 h-12 bg-brutal-lime border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono font-bold text-sm active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                   >
                     ✓
                   </button>

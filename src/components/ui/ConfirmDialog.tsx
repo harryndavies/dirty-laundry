@@ -44,13 +44,13 @@ export function ConfirmDialog({
         <div className="flex gap-2">
           <button
             onClick={onCancel}
-            className="flex-1 h-11 bg-brutal-white border-2 border-brutal-black font-mono font-bold text-xs uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+            className="flex-1 h-11 bg-brutal-white border-2 border-brutal-black font-mono font-bold text-xs uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
           >
             CANCEL
           </button>
           <button
             onClick={onConfirm}
-            className={`flex-1 h-11 ${confirmColor} border-2 border-brutal-black font-mono font-bold text-xs uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all`}
+            className={`flex-1 h-11 ${confirmColor} border-2 border-brutal-black font-mono font-bold text-xs uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all`}
           >
             {confirmLabel}
           </button>

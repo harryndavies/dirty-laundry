@@ -79,7 +79,7 @@ export function RoulettePage() {
         </button>
       </div>
 
-      <div className="flex flex-col items-center px-4 py-6">
+      <div className="flex flex-col items-center px-4 py-6 md:py-10">
         {items.length === 0 ? (
           <div className="py-12 text-center">
             <div className="text-4xl mb-3">🎰</div>
@@ -175,7 +175,7 @@ export function RoulettePage() {
             <button
               onClick={spin}
               disabled={spinning}
-              className={`mt-6 w-full max-w-[320px] h-14 font-mono font-bold uppercase text-sm border-3 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[6px] active:translate-y-[6px] transition-all ${
+              className={`mt-6 w-full max-w-[320px] h-14 font-mono font-bold uppercase text-sm border-3 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[6px] active:translate-y-[6px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all ${
                 spinning
                   ? 'bg-brutal-black/20 text-brutal-black/40 cursor-not-allowed'
                   : 'bg-brutal-black text-brutal-yellow'

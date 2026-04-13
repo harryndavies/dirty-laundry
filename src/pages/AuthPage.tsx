@@ -69,7 +69,7 @@ export function AuthPage() {
 
   return (
     <div className="min-h-screen bg-brutal-yellow flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-brutal-white border-4 border-brutal-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6">
+      <div className="w-full max-w-sm md:max-w-md bg-brutal-white border-4 border-brutal-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 md:p-8">
         <div className="flex justify-center mb-6">
           <img src="/logo.png" alt="Dirty Laundry" className="w-48 h-auto" />
         </div>

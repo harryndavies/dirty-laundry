@@ -56,7 +56,7 @@ export function GroupPage() {
   if (!group) {
     return (
       <div className="min-h-full flex items-center justify-center p-4">
-        <div className="w-full max-w-sm space-y-6">
+        <div className="w-full max-w-sm md:max-w-lg space-y-6">
           <div className="text-center mb-8">
             <div className="text-5xl mb-3">👥</div>
             <h1 className="font-mono font-bold text-2xl">JOIN OR CREATE</h1>
@@ -183,7 +183,7 @@ export function GroupPage() {
           <h2 className="font-mono font-bold text-sm">MEMBERS ({members.length})</h2>
           <button
             onClick={shareGroup}
-            className="flex items-center gap-1.5 font-mono text-xs font-bold px-3 py-2 bg-brutal-pink text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+            className="flex items-center gap-1.5 font-mono text-xs font-bold px-3 py-2 bg-brutal-pink text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
           >
             <Share2 size={14} /> INVITE
           </button>
@@ -328,7 +328,7 @@ export function GroupPage() {
         <div className="px-4 mt-4">
           <button
             onClick={() => setShowSettings(true)}
-            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
           >
             <div className="flex items-center gap-2">
               <Settings size={16} strokeWidth={3} />

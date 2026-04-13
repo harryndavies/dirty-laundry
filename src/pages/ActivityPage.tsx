@@ -137,7 +137,7 @@ export function ActivityPage() {
                   const isMine = entry.user_id === user?.id
 
                   return (
-                    <div key={entry.id} className="relative overflow-hidden">
+                    <div key={entry.id} className="relative overflow-hidden group/chore">
                       {/* Undo background */}
                       {isMine && (
                         <div className={`absolute inset-0 bg-brutal-pink flex items-center justify-end px-4 font-mono font-bold text-sm text-brutal-white transition-opacity ${showUndo ? 'opacity-100' : 'opacity-0'}`}>
@@ -145,7 +145,7 @@ export function ActivityPage() {
                         </div>
                       )}
                     <div
-                      className="relative bg-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 touch-pan-y"
+                      className="relative bg-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 touch-pan-y md:hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] md:hover:translate-x-[2px] md:hover:translate-y-[2px] md:transition-all"
                       style={{ transform: isSwiping ? `translateX(${offset}px)` : 'translateX(0)', transition: isSwiping ? 'none' : 'transform 0.2s' }}
                       onTouchStart={isMine ? e => onTouchStart(e, entry.id) : undefined}
                       onTouchMove={isMine ? onTouchMove : undefined}
@@ -172,8 +172,19 @@ export function ActivityPage() {
                             {timeAgo(entry.completed_at)}
                           </p>
                         </div>
-                        <div className="font-mono font-bold text-sm bg-brutal-yellow border border-brutal-black px-2 py-0.5">
-                          +{entry.points_earned}
+                        <div className="flex items-center gap-2">
+                          <div className="font-mono font-bold text-sm bg-brutal-yellow border border-brutal-black px-2 py-0.5">
+                            +{entry.points_earned}
+                          </div>
+                          {isMine && (
+                            <button
+                              onClick={() => setConfirmUndo({ id: entry.id, name: entry.chore_name ?? 'a chore' })}
+                              className="hidden md:flex w-7 h-7 items-center justify-center border border-brutal-pink/30 text-brutal-pink font-mono text-xs font-bold opacity-0 group-hover/chore:opacity-100 hover:bg-brutal-pink/10 transition-all"
+                              title="Undo"
+                            >
+                              ↩
+                            </button>
+                          )}
                         </div>
                       </div>
 
@@ -186,7 +197,7 @@ export function ActivityPage() {
                                 src={entry.photo_before_url}
                                 alt="Before"
                                 onClick={() => setExpandedPhoto(entry.photo_before_url)}
-                                className="w-full h-28 object-cover border-2 border-brutal-black cursor-pointer active:opacity-80"
+                                className="w-full h-28 md:h-40 object-cover border-2 border-brutal-black cursor-pointer active:opacity-80 hover:opacity-90"
                               />
                               <span className="absolute top-1 left-1 font-mono text-[8px] font-bold bg-brutal-black text-brutal-white px-1">BEFORE</span>
                               {entry.user_id === user?.id && (
@@ -209,7 +220,7 @@ export function ActivityPage() {
                                 src={entry.photo_url}
                                 alt="After"
                                 onClick={() => setExpandedPhoto(entry.photo_url)}
-                                className="w-full h-28 object-cover border-2 border-brutal-black cursor-pointer active:opacity-80"
+                                className="w-full h-28 md:h-40 object-cover border-2 border-brutal-black cursor-pointer active:opacity-80 hover:opacity-90"
                               />
                               {entry.photo_before_url && (
                                 <span className="absolute top-1 left-1 font-mono text-[8px] font-bold bg-brutal-lime text-brutal-black px-1">AFTER</span>
@@ -240,10 +251,10 @@ export function ActivityPage() {
                               <button
                                 key={emoji}
                                 onClick={() => toggleReaction(entry.id, emoji)}
-                                className={`flex items-center gap-1 px-2 py-0.5 border font-mono text-xs transition-all active:scale-95 ${
+                                className={`flex items-center gap-1 px-2 py-0.5 border font-mono text-xs transition-all active:scale-95 hover:scale-105 cursor-pointer ${
                                   iMine
                                     ? 'border-brutal-black bg-brutal-yellow/40'
-                                    : 'border-brutal-black/20 bg-brutal-white'
+                                    : 'border-brutal-black/20 bg-brutal-white hover:border-brutal-black/40'
                                 }`}
                               >
                                 <span>{emoji}</span>

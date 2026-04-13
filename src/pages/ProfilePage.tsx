@@ -54,7 +54,7 @@ export function ProfilePage() {
         <h1 className="font-mono font-bold text-lg tracking-tight">PROFILE</h1>
       </div>
 
-      <div className="p-4 space-y-6">
+      <div className="p-4 space-y-6 md:max-w-md md:mx-auto">
         {/* Avatar + name */}
         <div className="flex flex-col items-center pt-4">
           <label className="relative cursor-pointer group">
@@ -64,7 +64,7 @@ export function ProfilePage() {
               size="lg"
               imageUrl={profile?.avatar_url}
             />
-            <div className="absolute inset-0 bg-brutal-black/40 flex items-center justify-center opacity-0 group-active:opacity-100 transition-opacity border-2 border-brutal-black">
+            <div className="absolute inset-0 bg-brutal-black/40 flex items-center justify-center opacity-0 group-active:opacity-100 md:group-hover:opacity-100 transition-opacity border-2 border-brutal-black">
               <span className="text-brutal-white text-xs font-bold font-mono">EDIT</span>
             </div>
             <input
@@ -140,7 +140,7 @@ export function ProfilePage() {
                 className={`w-10 h-10 border-2 transition-all ${
                   c === profile?.avatar_color
                     ? 'border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] scale-110'
-                    : 'border-brutal-black/30 active:scale-95'
+                    : 'border-brutal-black/30 active:scale-95 hover:scale-105 hover:border-brutal-black/60'
                 }`}
                 style={{ backgroundColor: c }}
               />
@@ -213,7 +213,7 @@ export function ProfilePage() {
           <h3 className="font-mono text-xs font-bold uppercase mb-2">THEME</h3>
           <button
             onClick={toggle}
-            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
           >
             <div className="flex items-center gap-3">
               {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
@@ -249,7 +249,7 @@ export function ProfilePage() {
                 }
               }}
               disabled={pushLoading}
-              className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-50"
+              className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
             >
               <div className="flex items-center gap-3">
                 {pushEnabled ? <Bell size={20} /> : <BellOff size={20} />}

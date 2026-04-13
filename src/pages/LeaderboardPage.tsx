@@ -36,7 +36,7 @@ export function LeaderboardPage() {
           </div>
           <button
             onClick={() => navigate('/report')}
-            className="w-9 h-9 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+            className="w-9 h-9 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[2px] active:translate-y-[2px] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
           >
             <BarChart3 size={16} strokeWidth={2.5} />
           </button>
@@ -146,7 +146,7 @@ export function LeaderboardPage() {
                           setNudgingId(null)
                         }}
                         disabled={nudgingId === member.user_id}
-                        className="w-7 h-7 bg-brutal-pink/10 border border-brutal-pink flex items-center justify-center active:bg-brutal-pink/30 transition-colors"
+                        className="w-7 h-7 bg-brutal-pink/10 border border-brutal-pink flex items-center justify-center active:bg-brutal-pink/30 hover:bg-brutal-pink/20 transition-colors"
                       >
                         <Eye size={12} className="text-brutal-pink" />
                       </button>
