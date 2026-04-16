@@ -163,6 +163,7 @@ export function ChoresPage() {
     setNewArea(null)
     setShowAdd(false)
     toast(`${addedName} added!`, 'bg-brutal-lime')
+    advanceTour('chore-add')
   }
 
   function handleComplete(choreId: string, points: number, name: string) {

@@ -33,9 +33,16 @@ export const TOUR_STEPS: TourStep[] = [
     action: 'tap',
   },
   {
+    target: 'chore-add',
+    title: 'ADD YOUR OWN',
+    description: 'Tap the + button to create a custom chore. Set a name, points, area, and reminders.',
+    color: 'bg-brutal-blue',
+    action: 'tap',
+  },
+  {
     target: 'header-actions',
     title: 'QUICK ACTIONS',
-    description: 'Use Focus mode to tackle one chore at a time, or spin the Roulette to pick randomly. The + button adds new chores.',
+    description: 'Use Focus mode to tackle one chore at a time, or spin the Roulette to pick a random one.',
     color: 'bg-brutal-pink',
     action: 'next',
   },
