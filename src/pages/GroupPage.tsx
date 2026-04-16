@@ -534,27 +534,29 @@ export function GroupPage() {
         <p className="font-mono text-xs text-brutal-black/50 mb-4">
           Set how much each point is worth. Mark members as "kid" to enable their balance.
         </p>
-        <div className="flex items-center gap-3 mb-4">
-          <button
-            type="button"
-            onClick={() => setPocketRate(Math.max(0, pocketRate - 1))}
-            className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
-          >
-            <Minus size={18} />
-          </button>
-          <div className="flex-1 h-12 bg-brutal-yellow border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-xl">
+        <div className="mb-4">
+          <div className="h-12 bg-brutal-yellow border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-xl mb-3">
             {pocketRate}p per point
           </div>
-          <button
-            type="button"
-            onClick={() => setPocketRate(pocketRate + 1)}
-            className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
-          >
-            <Plus size={18} />
-          </button>
+          <input
+            type="range"
+            min={0}
+            max={10}
+            step={1}
+            value={pocketRate}
+            onChange={e => setPocketRate(Number(e.target.value))}
+            className="w-full h-3 appearance-none bg-brutal-black/10 border-2 border-brutal-black cursor-pointer accent-brutal-yellow [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-brutal-yellow [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-brutal-black [&::-webkit-slider-thumb]:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+          />
+          <div className="flex justify-between font-mono text-[10px] text-brutal-black/30 mt-1">
+            <span>OFF</span>
+            <span>10p</span>
+          </div>
         </div>
         <p className="font-mono text-[10px] text-brutal-black/40 text-center mb-4">
-          Example: a 15pt chore = {formatMoney(15 * pocketRate)}
+          {pocketRate > 0
+            ? `Example: a 15pt chore = ${formatMoney(15 * pocketRate)}`
+            : 'Pocket money is disabled'
+          }
         </p>
         <Button
           onClick={async () => {
