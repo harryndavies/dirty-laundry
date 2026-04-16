@@ -32,10 +32,12 @@ export function usePointsHistory(start: Date, end: Date) {
 
       if (error) throw error
 
-      // Build date range
+      // Build date range (cap at today so we don't chart future dates)
+      const today = new Date()
+      today.setHours(23, 59, 59, 999)
       const dates: string[] = []
       const d = new Date(start)
-      const endDay = new Date(end)
+      const endDay = end > today ? today : new Date(end)
       while (d <= endDay) {
         dates.push(d.toISOString().slice(0, 10))
         d.setDate(d.getDate() + 1)
