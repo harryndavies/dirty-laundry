@@ -7,7 +7,8 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
-import { Check, Pencil, Moon, Sun, Bell, BellOff, HelpCircle, ChevronDown, Sparkles, Smartphone, TrendingUp, Dices, Users, Focus } from 'lucide-react'
+import { Check, Pencil, Moon, Sun, Bell, BellOff, HelpCircle, Sparkles, Smartphone, TrendingUp, Dices, Users, Focus } from 'lucide-react'
+import { BottomSheet } from '@/components/ui/BottomSheet'
 import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '@/lib/pushNotifications'
 import { supabase } from '@/lib/supabase'
 import { useNavigate } from 'react-router-dom'
@@ -317,31 +318,31 @@ export function ProfilePage() {
             </button>
 
             <button
-              onClick={() => setShowTips(t => !t)}
+              onClick={() => setShowTips(true)}
               className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
               <div className="flex items-center gap-3">
                 <Sparkles size={20} />
                 <span className="font-mono font-bold text-sm">TIPS & TRICKS</span>
               </div>
-              <ChevronDown size={18} className={`transition-transform ${showTips ? 'rotate-180' : ''}`} />
             </button>
-
-            {showTips && (
-              <div className="space-y-2 pt-1">
-                {TIPS.map(tip => (
-                  <div key={tip.title} className="border-2 border-brutal-black bg-brutal-white p-4">
-                    <div className="flex items-center gap-2.5 mb-1.5">
-                      <tip.icon size={16} strokeWidth={2.5} className="text-brutal-black/60 shrink-0" />
-                      <span className="font-mono font-bold text-xs">{tip.title}</span>
-                    </div>
-                    <p className="font-mono text-[11px] leading-relaxed text-brutal-black/50">{tip.description}</p>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
+
+        <BottomSheet open={showTips} onClose={() => setShowTips(false)}>
+          <h2 className="font-mono font-bold text-lg mb-4">TIPS & TRICKS</h2>
+          <div className="space-y-3">
+            {TIPS.map(tip => (
+              <div key={tip.title} className="border-2 border-brutal-black bg-brutal-white p-4">
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <tip.icon size={16} strokeWidth={2.5} className="text-brutal-black/60 shrink-0" />
+                  <span className="font-mono font-bold text-xs">{tip.title}</span>
+                </div>
+                <p className="font-mono text-[11px] leading-relaxed text-brutal-black/50">{tip.description}</p>
+              </div>
+            ))}
+          </div>
+        </BottomSheet>
 
         {/* Sign out */}
         <Button
