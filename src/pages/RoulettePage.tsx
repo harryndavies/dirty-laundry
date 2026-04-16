@@ -99,7 +99,7 @@ export function RoulettePage() {
                 width="320"
                 height="320"
                 viewBox="0 0 320 320"
-                className="border-4 border-brutal-black rounded-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
+                className="rounded-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
                 style={{
                   transform: `rotate(${rotation}deg)`,
                   transition: spinning ? 'transform 3.5s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
