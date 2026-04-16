@@ -21,6 +21,14 @@ type Filter = 'all' | 'persistent' | 'one-time' | 'mine'
 
 const AREAS = ['Kitchen', 'Bathroom', 'Bedroom', 'Living Room', 'Garden', 'Laundry', 'General']
 
+function stepPoints(current: number, direction: 'up' | 'down'): number {
+  if (direction === 'up') {
+    return current < 5 ? current + 1 : current + 5
+  }
+  if (current <= 1) return 1
+  return current <= 5 ? current - 1 : current - 5
+}
+
 const CHORE_PACKS: { name: string; emoji: string; chores: { name: string; points: number; area: string }[] }[] = [
   {
     name: 'STUDENT FLAT',
@@ -701,7 +709,7 @@ export function ChoresPage() {
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setNewPoints(Math.max(1, newPoints - 5))}
+                onClick={() => setNewPoints(stepPoints(newPoints, 'down'))}
                 className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
               >
                 <Minus size={18} />
@@ -711,7 +719,7 @@ export function ChoresPage() {
               </div>
               <button
                 type="button"
-                onClick={() => setNewPoints(newPoints + 5)}
+                onClick={() => setNewPoints(stepPoints(newPoints, 'up'))}
                 className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
               >
                 <Plus size={18} />
@@ -1013,14 +1021,14 @@ export function ChoresPage() {
               <div>
                 <label className="font-mono text-xs font-bold uppercase block mb-1">POINTS</label>
                 <div className="flex items-center gap-3">
-                  <button type="button" onClick={() => setEditingChore({ ...editingChore, points: Math.max(1, editingChore.points - 5) })}
+                  <button type="button" onClick={() => setEditingChore({ ...editingChore, points: stepPoints(editingChore.points, 'down') })}
                     className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all">
                     <Minus size={18} />
                   </button>
                   <div className="flex-1 h-12 bg-brutal-yellow border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-xl">
                     {editingChore.points}
                   </div>
-                  <button type="button" onClick={() => setEditingChore({ ...editingChore, points: editingChore.points + 5 })}
+                  <button type="button" onClick={() => setEditingChore({ ...editingChore, points: stepPoints(editingChore.points, 'up') })}
                     className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all">
                     <Plus size={18} />
                   </button>
