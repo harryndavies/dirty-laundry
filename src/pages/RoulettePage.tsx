@@ -49,7 +49,7 @@ export function RoulettePage() {
   }
 
   const sliceAngle = items.length > 0 ? 360 / items.length : 360
-  const radius = 140
+  const radius = 158
   const center = 160
 
   return (
