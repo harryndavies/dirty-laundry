@@ -7,12 +7,45 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
-import { Check, Pencil, Moon, Sun, Bell, BellOff, HelpCircle } from 'lucide-react'
+import { Check, Pencil, Moon, Sun, Bell, BellOff, HelpCircle, ChevronDown, Sparkles, Smartphone, TrendingUp, Dices, Users, Focus } from 'lucide-react'
 import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '@/lib/pushNotifications'
 import { supabase } from '@/lib/supabase'
 import { useNavigate } from 'react-router-dom'
 
 const COLORS = ['#FF2D9B', '#0066FF', '#FFE500', '#BFFF00', '#FF6B00', '#8B5CF6', '#06B6D4']
+
+const TIPS = [
+  {
+    icon: Smartphone,
+    title: 'SWIPE CHORES',
+    description: 'On mobile, swipe a chore right to edit it or left to assign it to someone.',
+  },
+  {
+    icon: TrendingUp,
+    title: 'BOOST BOUNTIES',
+    description: 'Tap the points badge on any chore to increase its value. Great for motivating others to tackle tough jobs.',
+  },
+  {
+    icon: Focus,
+    title: 'FOCUS MODE',
+    description: 'Tap the crosshair button on the chores page to enter "Just Do One" mode — it picks a random chore so you can stop overthinking.',
+  },
+  {
+    icon: Dices,
+    title: 'CHORE ROULETTE',
+    description: 'Can\u2019t agree on who does what? Spin the roulette to randomly assign chores. Fair and square.',
+  },
+  {
+    icon: Users,
+    title: 'INVITE HOUSEMATES',
+    description: 'Go to the Group tab to get an invite code. Share it with your housemates so they can join and start earning points.',
+  },
+  {
+    icon: Bell,
+    title: 'REMINDERS',
+    description: 'When creating or editing a chore, set a reminder day and time. You\u2019ll see a "DUE TODAY" badge when it\u2019s time.',
+  },
+]
 
 export function ProfilePage() {
   const { user, profile, signOut, updateProfile } = useAuth()
@@ -31,6 +64,7 @@ export function ProfilePage() {
   const isAnonymous = user?.is_anonymous ?? false
   const [pushEnabled, setPushEnabled] = useState(false)
   const [pushLoading, setPushLoading] = useState(false)
+  const [showTips, setShowTips] = useState(false)
   const pushSupported = 'serviceWorker' in navigator && 'PushManager' in window
   const navigate = useNavigate()
 
@@ -264,23 +298,49 @@ export function ProfilePage() {
           </div>
         )}
 
-        {/* App tour */}
+        {/* Help */}
         <div>
           <h3 className="font-mono text-xs font-bold uppercase mb-2">HELP</h3>
-          <button
-            onClick={() => {
-              localStorage.removeItem('dirtylaundry_tour_completed')
-              navigate('/chores')
-              // Small delay so the chores page mounts before tour starts
-              setTimeout(() => window.dispatchEvent(new Event('start-tour')), 300)
-            }}
-            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-          >
-            <div className="flex items-center gap-3">
-              <HelpCircle size={20} />
-              <span className="font-mono font-bold text-sm">REPLAY APP TOUR</span>
-            </div>
-          </button>
+          <div className="space-y-2">
+            <button
+              onClick={() => {
+                localStorage.removeItem('dirtylaundry_tour_completed')
+                navigate('/chores')
+                setTimeout(() => window.dispatchEvent(new Event('start-tour')), 300)
+              }}
+              className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <HelpCircle size={20} />
+                <span className="font-mono font-bold text-sm">REPLAY APP TOUR</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setShowTips(t => !t)}
+              className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <Sparkles size={20} />
+                <span className="font-mono font-bold text-sm">TIPS & TRICKS</span>
+              </div>
+              <ChevronDown size={18} className={`transition-transform ${showTips ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showTips && (
+              <div className="space-y-2 pt-1">
+                {TIPS.map(tip => (
+                  <div key={tip.title} className="border-2 border-brutal-black bg-brutal-white p-4">
+                    <div className="flex items-center gap-2.5 mb-1.5">
+                      <tip.icon size={16} strokeWidth={2.5} className="text-brutal-black/60 shrink-0" />
+                      <span className="font-mono font-bold text-xs">{tip.title}</span>
+                    </div>
+                    <p className="font-mono text-[11px] leading-relaxed text-brutal-black/50">{tip.description}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Sign out */}
