@@ -62,11 +62,6 @@ export function ProPaywall({ open, onClose, groupId }: ProPaywallProps) {
         ))}
       </div>
 
-      <div className="bg-brutal-yellow border-3 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 text-center mb-5">
-        <span className="font-mono font-bold text-2xl block">£4.99</span>
-        <span className="font-mono text-xs text-brutal-black/60 font-bold tracking-wide">ONE-TIME — PER GROUP, FOREVER</span>
-      </div>
-
       <button
         onClick={handleUnlock}
         disabled={loading}
