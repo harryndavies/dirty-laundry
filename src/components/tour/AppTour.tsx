@@ -125,43 +125,44 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss }: A
 
   // Position tooltip relative to target
   function getTooltipStyle(): React.CSSProperties {
+    const margin = 20
+    const viewportH = window.innerHeight
+
+    // No target — full-width centered card
     if (!targetRect) {
-      // Center on screen
       return {
         top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
+        left: margin,
+        right: margin,
+        transform: 'translateY(-50%)',
       }
     }
 
-    const tooltipWidth = 300
-    const margin = 16
-    const viewportH = window.innerHeight
     const spaceBelow = viewportH - (targetRect.top + targetRect.height)
     const spaceAbove = targetRect.top
 
-    // Horizontal: center on target, but clamp to viewport
-    let left = targetRect.left + targetRect.width / 2 - tooltipWidth / 2
-    left = Math.max(margin, Math.min(left, window.innerWidth - tooltipWidth - margin))
+    // Anchored steps: stretch across the screen with margins
+    const base: React.CSSProperties = {
+      left: margin,
+      right: margin,
+    }
 
-    if (spaceBelow > 200) {
+    if (spaceBelow > 180) {
       return {
-        top: targetRect.top + targetRect.height + padding + 12,
-        left,
-        width: tooltipWidth,
+        ...base,
+        top: targetRect.top + targetRect.height + padding + 16,
       }
-    } else if (spaceAbove > 200) {
+    } else if (spaceAbove > 180) {
       return {
-        bottom: viewportH - targetRect.top + padding + 12,
-        left,
-        width: tooltipWidth,
+        ...base,
+        bottom: viewportH - targetRect.top + padding + 16,
       }
     }
-    // Fallback: center
+    // Fallback: center vertically
     return {
+      ...base,
       top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
+      transform: 'translateY(-50%)',
     }
   }
 
@@ -209,20 +210,20 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss }: A
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute z-[101]"
+            className="fixed z-[101]"
             style={getTooltipStyle()}
           >
-            <div className={`${currentStep.color} border-3 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-5`}>
+            <div className={`${currentStep.color} border-3 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6`}>
               {/* Skip button */}
               <button
                 onClick={onDismiss}
-                className="absolute top-2 right-2 w-7 h-7 bg-brutal-black/10 flex items-center justify-center active:bg-brutal-black/20"
+                className="absolute top-3 right-3 w-8 h-8 bg-brutal-black/10 flex items-center justify-center active:bg-brutal-black/20"
               >
-                <X size={14} strokeWidth={3} />
+                <X size={16} strokeWidth={3} />
               </button>
 
-              <h3 className="font-mono font-bold text-base mb-2 pr-6">{currentStep.title}</h3>
-              <p className="font-mono text-xs leading-relaxed text-brutal-black/70 mb-4">
+              <h3 className="font-mono font-bold text-lg mb-2 pr-8">{currentStep.title}</h3>
+              <p className="font-mono text-sm leading-relaxed text-brutal-black/70 mb-5">
                 {currentStep.description}
               </p>
 
@@ -232,7 +233,7 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss }: A
                   {STEPS.map((_, i) => (
                     <div
                       key={i}
-                      className={`w-2 h-2 border border-brutal-black transition-colors ${
+                      className={`w-2.5 h-2.5 border border-brutal-black transition-colors ${
                         i === step ? 'bg-brutal-black' : 'bg-brutal-black/20'
                       }`}
                     />
@@ -243,17 +244,17 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss }: A
                   {!isFirst && (
                     <button
                       onClick={onPrev}
-                      className="w-9 h-9 bg-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+                      className="w-10 h-10 bg-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
                     >
-                      <ChevronLeft size={16} strokeWidth={3} />
+                      <ChevronLeft size={18} strokeWidth={3} />
                     </button>
                   )}
                   <button
                     onClick={isLast ? onFinish : onNext}
-                    className="h-9 px-4 bg-brutal-black text-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono font-bold text-xs active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all gap-1"
+                    className="h-10 px-5 bg-brutal-black text-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono font-bold text-sm active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all gap-1"
                   >
                     {isLast ? 'LET\u2019S GO' : 'NEXT'}
-                    {!isLast && <ChevronRight size={14} strokeWidth={3} />}
+                    {!isLast && <ChevronRight size={16} strokeWidth={3} />}
                   </button>
                 </div>
               </div>
