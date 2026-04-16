@@ -191,7 +191,6 @@ export function ChoresPage() {
     setPhotoPreview(null)
     setPhotoBefore(null)
     setPhotoBeforePreview(null)
-    advanceTour('chore-complete')
   }
 
   function handleDelete(choreId: string) {
@@ -1158,7 +1157,7 @@ export function ChoresPage() {
           points={completionOverlay.points}
           totalPoints={completionOverlay.totalPoints}
           choreName={completionOverlay.choreName}
-          onDone={() => setCompletionOverlay(null)}
+          onDone={() => { setCompletionOverlay(null); advanceTour('chore-complete') }}
         />
       )}
 
