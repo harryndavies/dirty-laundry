@@ -26,17 +26,17 @@ export const TOUR_STEPS: TourStep[] = [
     action: 'tap',
   },
   {
-    target: 'chore-complete',
-    title: 'COMPLETE A CHORE',
-    description: 'Nice! Now tap the green tick on a chore to mark it as done and earn your first points.',
-    color: 'bg-brutal-lime',
-    action: 'tap',
-  },
-  {
     target: 'chore-add',
     title: 'ADD YOUR OWN',
     description: 'Tap the + button to create a custom chore. Set a name, points, area, and reminders.',
     color: 'bg-brutal-blue',
+    action: 'tap',
+  },
+  {
+    target: 'chore-complete',
+    title: 'COMPLETE A CHORE',
+    description: 'Nice! Now tap the green tick on a chore to mark it as done and earn your first points.',
+    color: 'bg-brutal-lime',
     action: 'tap',
   },
   {
