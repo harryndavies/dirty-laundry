@@ -12,6 +12,7 @@ const tabs = [
 export function BottomNav() {
   return (
     <nav
+      data-tour="bottom-nav"
       className="fixed bottom-0 left-0 right-0 bg-brutal-white border-t-4 border-brutal-black flex z-50 md:hidden"
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 4px)', minHeight: '64px' }}
     >

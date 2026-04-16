@@ -253,7 +253,7 @@ export function ChoresPage() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-brutal-white border-b-4 border-brutal-black px-4 py-3 flex items-center justify-between">
         <h1 className="font-mono font-bold text-lg tracking-tight">{group.name}</h1>
-        <div className="flex gap-2">
+        <div className="flex gap-2" data-tour="header-actions">
           <button
             onClick={() => {
               const persistent = chores.filter(c => c.is_persistent)
@@ -277,6 +277,7 @@ export function ChoresPage() {
           {!isKid && (
             <button
               onClick={() => setShowAdd(true)}
+              data-tour="chore-add"
               className="w-11 h-11 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
               <Plus size={20} strokeWidth={3} />
@@ -660,6 +661,7 @@ export function ChoresPage() {
                   )}
                   <button
                     onClick={() => handleComplete(chore.id, chore.points, chore.name)}
+                    {...(filtered.indexOf(chore) === 0 ? { 'data-tour': 'chore-complete' } : {})}
                     className="w-12 h-12 bg-brutal-lime border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono font-bold text-sm active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                   >
                     ✓

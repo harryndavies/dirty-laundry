@@ -7,9 +7,10 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
-import { Check, Pencil, Moon, Sun, Bell, BellOff } from 'lucide-react'
+import { Check, Pencil, Moon, Sun, Bell, BellOff, HelpCircle } from 'lucide-react'
 import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '@/lib/pushNotifications'
 import { supabase } from '@/lib/supabase'
+import { useNavigate } from 'react-router-dom'
 
 const COLORS = ['#FF2D9B', '#0066FF', '#FFE500', '#BFFF00', '#FF6B00', '#8B5CF6', '#06B6D4']
 
@@ -31,6 +32,7 @@ export function ProfilePage() {
   const [pushEnabled, setPushEnabled] = useState(false)
   const [pushLoading, setPushLoading] = useState(false)
   const pushSupported = 'serviceWorker' in navigator && 'PushManager' in window
+  const navigate = useNavigate()
 
   useEffect(() => {
     isPushSubscribed().then(setPushEnabled)
@@ -261,6 +263,25 @@ export function ProfilePage() {
             </button>
           </div>
         )}
+
+        {/* App tour */}
+        <div>
+          <h3 className="font-mono text-xs font-bold uppercase mb-2">HELP</h3>
+          <button
+            onClick={() => {
+              localStorage.removeItem('dirtylaundry_tour_completed')
+              navigate('/chores')
+              // Small delay so the chores page mounts before tour starts
+              setTimeout(() => window.dispatchEvent(new Event('start-tour')), 300)
+            }}
+            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <HelpCircle size={20} />
+              <span className="font-mono font-bold text-sm">REPLAY APP TOUR</span>
+            </div>
+          </button>
+        </div>
 
         {/* Sign out */}
         <Button
