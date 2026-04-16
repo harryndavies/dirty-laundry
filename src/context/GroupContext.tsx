@@ -321,6 +321,10 @@ export function GroupProvider({ children }: { children: ReactNode }) {
 
   async function updatePocketMoneyRate(rate: number | null) {
     if (!group) return
+    if (rate !== null && !group.is_pro) {
+      toast('Upgrade to Pro to enable pocket money', 'bg-brutal-yellow')
+      return
+    }
     try {
       const { error } = await supabase.from('groups').update({ pocket_money_rate: rate }).eq('id', group.id)
       if (error) throw error

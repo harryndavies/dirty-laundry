@@ -31,15 +31,21 @@ export interface Database {
           created_at: string
           weekly_goal: number | null
           pocket_money_rate: number | null
+          is_pro: boolean
+          stripe_payment_id: string | null
         }
         Insert: {
           name: string
           created_by: string
+          is_pro?: boolean
+          stripe_payment_id?: string | null
         }
         Update: {
           name?: string
           weekly_goal?: number | null
           pocket_money_rate?: number | null
+          is_pro?: boolean
+          stripe_payment_id?: string | null
         }
         Relationships: []
       }

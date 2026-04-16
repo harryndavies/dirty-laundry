@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Share2, Percent, Trophy, LogOut, Target, Minus, Plus, Coins, Settings } from 'lucide-react'
 import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
+import { ProPaywall } from '@/components/ProPaywall'
 
 export function GroupPage() {
   const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid, leaveGroup, loading: groupLoading } = useGroup()
@@ -40,8 +41,18 @@ export function GroupPage() {
   const [savingRate, setSavingRate] = useState(false)
   const { balances, formatMoney } = usePocketMoney()
   const [confirmPaid, setConfirmPaid] = useState<{ memberId: string; userId: string; name: string; amount: number; points: number } | null>(null)
+  const [showPaywall, setShowPaywall] = useState(false)
 
   const isOwner = members.find(m => m.user_id === user?.id)?.role === 'owner'
+
+  // Handle Stripe checkout redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('pro') === 'success') {
+      toast('Pocket money unlocked!', 'bg-brutal-lime')
+      window.history.replaceState({}, '', '/group')
+    }
+  }, [])
   const shareTotal = Object.values(shares).reduce((sum, v) => sum + v, 0)
 
   if (groupLoading) {
@@ -382,17 +393,24 @@ export function GroupPage() {
           <button
             onClick={() => {
               setShowSettings(false)
-              setPocketRate(group.pocket_money_rate ?? 1)
-              setShowPocketMoney(true)
+              if (group.is_pro) {
+                setPocketRate(group.pocket_money_rate ?? 1)
+                setShowPocketMoney(true)
+              } else {
+                setShowPaywall(true)
+              }
             }}
             className="w-full flex items-center justify-between p-4 border-2 border-brutal-black bg-brutal-white active:bg-brutal-black/5"
           >
             <div className="flex items-center gap-2">
               <Coins size={16} />
               <span className="font-mono font-bold text-sm">POCKET MONEY</span>
+              {!group.is_pro && (
+                <span className="bg-brutal-yellow font-mono text-[10px] font-bold px-1.5 py-0.5 border border-brutal-black">PRO</span>
+              )}
             </div>
             <span className="font-mono text-xs text-brutal-black/40">
-              {group.pocket_money_rate ? `${group.pocket_money_rate}p PER PT` : 'OFF'}
+              {group.is_pro && group.pocket_money_rate ? `${group.pocket_money_rate}p PER PT` : group.is_pro ? 'OFF' : '£4.99'}
             </span>
           </button>
         </div>
@@ -591,6 +609,9 @@ export function GroupPage() {
           </button>
         )}
       </BottomSheet>
+
+      {/* Pro paywall */}
+      {group && <ProPaywall open={showPaywall} onClose={() => setShowPaywall(false)} groupId={group.id} />}
 
       {/* Leave group */}
       <div className="px-4 mt-6 mb-6">
