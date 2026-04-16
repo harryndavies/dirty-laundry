@@ -50,7 +50,7 @@ const TIPS = [
 
 export function ProfilePage() {
   const { user, profile, signOut, updateProfile } = useAuth()
-  const { userMember, leaveGroup, group } = useGroup()
+  const { userMember, leaveGroup, group, members } = useGroup()
   const { balances, formatMoney } = usePocketMoney()
   const { theme, toggle } = useTheme()
   const isKid = userMember?.role === 'kid'
@@ -170,18 +170,34 @@ export function ProfilePage() {
         <div>
           <h3 className="font-mono text-xs font-bold uppercase mb-2">AVATAR COLOR</h3>
           <div className="flex gap-2 flex-wrap">
-            {COLORS.map(c => (
-              <button
-                key={c}
-                onClick={() => handleColorChange(c)}
-                className={`w-10 h-10 border-2 transition-all ${
-                  c === profile?.avatar_color
-                    ? 'border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] scale-110'
-                    : 'border-brutal-black/30 active:scale-95 hover:scale-105 hover:border-brutal-black/60'
-                }`}
-                style={{ backgroundColor: c }}
-              />
-            ))}
+            {COLORS.map(c => {
+              const isOwn = c === profile?.avatar_color
+              const takenBy = members.find(m => m.user_id !== user?.id && m.profiles.avatar_color === c)
+              const isTaken = !!takenBy && !isOwn
+
+              return (
+                <button
+                  key={c}
+                  onClick={() => !isTaken && handleColorChange(c)}
+                  disabled={isTaken}
+                  className={`w-10 h-10 border-2 transition-all relative ${
+                    isOwn
+                      ? 'border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] scale-110'
+                      : isTaken
+                        ? 'border-brutal-black/15 opacity-35 cursor-not-allowed'
+                        : 'border-brutal-black/30 active:scale-95 hover:scale-105 hover:border-brutal-black/60'
+                  }`}
+                  style={{ backgroundColor: c }}
+                  title={isTaken ? `Taken by ${takenBy.profiles.display_name}` : undefined}
+                >
+                  {isTaken && (
+                    <span className="absolute inset-0 flex items-center justify-center text-brutal-black/60 font-mono font-bold text-lg">
+                      ×
+                    </span>
+                  )}
+                </button>
+              )
+            })}
           </div>
         </div>
 

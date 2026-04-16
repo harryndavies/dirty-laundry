@@ -113,8 +113,8 @@ export function LeaderboardPage() {
                     {/* Points bar */}
                     <div className="mt-2 h-2 bg-brutal-black/10 border border-brutal-black/20">
                       <div
-                        className={`h-full ${rankColors[i] ?? 'bg-brutal-black/30'} transition-all duration-500`}
-                        style={{ width: `${barWidth}%` }}
+                        className="h-full transition-all duration-500"
+                        style={{ width: `${barWidth}%`, backgroundColor: member.profiles.avatar_color }}
                       />
                     </div>
                   </div>

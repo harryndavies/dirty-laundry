@@ -4,9 +4,10 @@ import { supabase } from '@/lib/supabase'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
+import { PointsChart } from '@/components/PointsChart'
+import { usePointsHistory } from '@/lib/hooks/usePointsHistory'
 import { Navigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-// import { ShareCard } from '@/components/ShareCard'
 
 interface MemberStats {
   user_id: string
@@ -71,6 +72,7 @@ export function WeeklyReportPage() {
   const [loading, setLoading] = useState(true)
 
   const { start, end, label } = getRange(period, offset)
+  const { data: pointsHistory } = usePointsHistory(start, end)
   const totalPoints = stats.reduce((sum, s) => sum + s.points, 0)
   const hasShares = members.some(m => m.chore_share > 0)
 
@@ -226,6 +228,11 @@ export function WeeklyReportPage() {
               </div>
             )}
 
+            {/* Points over time chart */}
+            {pointsHistory && pointsHistory.length > 0 && (
+              <PointsChart data={pointsHistory} />
+            )}
+
             {/* Breakdown */}
             <div className="space-y-2 md:space-y-0 md:grid md:grid-cols-2 md:gap-3">
               <h3 className="font-mono font-bold text-xs text-brutal-black/40 tracking-widest px-1 md:col-span-2">BREAKDOWN</h3>
@@ -264,8 +271,8 @@ export function WeeklyReportPage() {
                     {/* Percentage bar */}
                     <div className="h-3 bg-brutal-black/10 border border-brutal-black/20 mb-2">
                       <div
-                        className="h-full bg-brutal-blue transition-all duration-500"
-                        style={{ width: `${pct}%` }}
+                        className="h-full transition-all duration-500"
+                        style={{ width: `${pct}%`, backgroundColor: member.avatar_color }}
                       />
                     </div>
 

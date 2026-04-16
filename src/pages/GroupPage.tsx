@@ -212,7 +212,7 @@ export function GroupPage() {
               <div className="flex-1 min-w-0">
                 <p className="font-mono font-bold text-sm truncate">{m.profiles.display_name}</p>
                 <div className="flex items-center gap-2">
-                  {isOwner && m.role !== 'owner' ? (
+                  {isOwner && m.role !== 'owner' && group.is_pro ? (
                     <button
                       onClick={async () => {
                         const newRole = m.role === 'kid' ? 'member' : 'kid'
