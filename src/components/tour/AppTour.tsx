@@ -2,49 +2,56 @@ import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, ChevronLeft, X } from 'lucide-react'
 
-interface TourStep {
-  target: string | null // data-tour attribute value, null = no spotlight
+export interface TourStep {
+  target: string | null   // data-tour attribute value, null = no spotlight
   title: string
   description: string
   color: string
+  action: 'next' | 'tap' // 'next' = manual button, 'tap' = user taps the element
 }
 
-const STEPS: TourStep[] = [
+export const TOUR_STEPS: TourStep[] = [
   {
     target: null,
     title: 'WELCOME TO DIRTY LAUNDRY',
-    description: 'Your group chore tracker. Complete chores, earn points, and climb the leaderboard. Let\u2019s show you around!',
+    description: 'Your group chore tracker. Complete chores, earn points, and climb the leaderboard. Let\u2019s get you set up!',
     color: 'bg-brutal-yellow',
+    action: 'next',
+  },
+  {
+    target: 'chore-packs',
+    title: 'PICK A STARTER PACK',
+    description: 'Tap a pack below to add a set of chores for your household. You can always edit them later.',
+    color: 'bg-brutal-lime',
+    action: 'tap',
   },
   {
     target: 'chore-complete',
-    title: 'COMPLETE CHORES',
-    description: 'Tap the green tick to mark a chore as done and earn points. You can even add before & after photos!',
+    title: 'COMPLETE A CHORE',
+    description: 'Nice! Now tap the green tick on a chore to mark it as done and earn your first points.',
     color: 'bg-brutal-lime',
-  },
-  {
-    target: 'chore-add',
-    title: 'ADD CHORES',
-    description: 'Tap here to create new chores. Set points, pick an area, and add reminders.',
-    color: 'bg-brutal-blue',
+    action: 'tap',
   },
   {
     target: 'header-actions',
     title: 'QUICK ACTIONS',
-    description: 'Use Focus mode to tackle one chore at a time, or spin the Roulette to pick randomly.',
+    description: 'Use Focus mode to tackle one chore at a time, or spin the Roulette to pick randomly. The + button adds new chores.',
     color: 'bg-brutal-pink',
+    action: 'next',
   },
   {
     target: 'bottom-nav',
-    title: 'EXPLORE',
-    description: 'Check the Scores tab for the leaderboard, Log for recent activity, and Group to invite housemates.',
+    title: 'EXPLORE THE APP',
+    description: 'Check Scores for the leaderboard, Log for recent activity, and Group to invite your housemates.',
     color: 'bg-brutal-orange',
+    action: 'next',
   },
   {
     target: null,
     title: 'YOU\u2019RE ALL SET!',
-    description: 'Time to get cleaning. Add some chores and start earning points!',
+    description: 'You\u2019re ready to go. Get cleaning and start climbing the leaderboard!',
     color: 'bg-brutal-yellow',
+    action: 'next',
   },
 ]
 
@@ -62,14 +69,16 @@ interface AppTourProps {
   onPrev: () => void
   onFinish: () => void
   onDismiss: () => void
+  onTapTarget: () => void
 }
 
-export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss }: AppTourProps) {
+export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss, onTapTarget }: AppTourProps) {
   const [targetRect, setTargetRect] = useState<Rect | null>(null)
 
-  const currentStep = STEPS[step]
+  const currentStep = TOUR_STEPS[step]
   const isFirst = step === 0
-  const isLast = step === STEPS.length - 1
+  const isLast = step === TOUR_STEPS.length - 1
+  const isTapStep = currentStep?.action === 'tap'
 
   const measureTarget = useCallback(() => {
     if (!currentStep?.target) {
@@ -95,6 +104,16 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss }: A
     measureTarget()
     window.addEventListener('resize', measureTarget)
     window.addEventListener('scroll', measureTarget, true)
+
+    // If this is a tap step and the target doesn't exist, skip it
+    if (currentStep?.action === 'tap' && currentStep?.target) {
+      const el = document.querySelector(`[data-tour="${currentStep.target}"]`)
+      if (!el) {
+        onNext()
+        return
+      }
+    }
+
     return () => {
       window.removeEventListener('resize', measureTarget)
       window.removeEventListener('scroll', measureTarget, true)
@@ -103,7 +122,7 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss }: A
 
   if (!active || !currentStep) return null
 
-  const padding = 6
+  const padding = 8
 
   // Build clip path to create spotlight cutout
   function buildClipPath() {
@@ -183,22 +202,28 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss }: A
             style={{
               clipPath: buildClipPath(),
             }}
-            onClick={onDismiss}
+            onClick={isTapStep ? undefined : onDismiss}
           />
 
-          {/* Spotlight border ring */}
-          {targetRect && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2 }}
-              className="absolute border-3 border-brutal-yellow pointer-events-none"
+          {/* Clickable spotlight area for tap steps — hides tour so user can interact */}
+          {isTapStep && targetRect && (
+            <div
+              className="absolute cursor-pointer"
               style={{
                 top: targetRect.top - padding,
                 left: targetRect.left - padding,
                 width: targetRect.width + padding * 2,
                 height: targetRect.height + padding * 2,
-                boxShadow: '0 0 0 3px rgba(0,0,0,1), 0 0 20px rgba(255,229,0,0.4)',
+              }}
+              onClick={(e) => {
+                onTapTarget()
+                // Re-dispatch click to the element underneath after tour hides
+                const x = e.clientX
+                const y = e.clientY
+                requestAnimationFrame(() => {
+                  const el = document.elementFromPoint(x, y)
+                  if (el instanceof HTMLElement) el.click()
+                })
               }}
             />
           )}
@@ -227,10 +252,10 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss }: A
                 {currentStep.description}
               </p>
 
-              {/* Step indicator */}
+              {/* Step indicator + controls */}
               <div className="flex items-center justify-between">
                 <div className="flex gap-1.5">
-                  {STEPS.map((_, i) => (
+                  {TOUR_STEPS.map((_, i) => (
                     <div
                       key={i}
                       className={`w-2.5 h-2.5 border border-brutal-black transition-colors ${
@@ -241,7 +266,7 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss }: A
                 </div>
 
                 <div className="flex gap-2">
-                  {!isFirst && (
+                  {!isFirst && !isTapStep && (
                     <button
                       onClick={onPrev}
                       className="w-10 h-10 bg-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
@@ -249,13 +274,19 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss }: A
                       <ChevronLeft size={18} strokeWidth={3} />
                     </button>
                   )}
-                  <button
-                    onClick={isLast ? onFinish : onNext}
-                    className="h-10 px-5 bg-brutal-black text-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono font-bold text-sm active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all gap-1"
-                  >
-                    {isLast ? 'LET\u2019S GO' : 'NEXT'}
-                    {!isLast && <ChevronRight size={16} strokeWidth={3} />}
-                  </button>
+                  {isTapStep ? (
+                    <div className="h-10 px-4 flex items-center font-mono font-bold text-xs text-brutal-black/50 tracking-wide">
+                      TAP TO CONTINUE
+                    </div>
+                  ) : (
+                    <button
+                      onClick={isLast ? onFinish : onNext}
+                      className="h-10 px-5 bg-brutal-black text-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono font-bold text-sm active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all gap-1"
+                    >
+                      {isLast ? 'LET\u2019S GO' : 'NEXT'}
+                      {!isLast && <ChevronRight size={16} strokeWidth={3} />}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

@@ -57,12 +57,13 @@ export function AppShell() {
         {showNav && <BottomNav />}
       </div>
       <AppTour
-        active={tour.active}
+        active={tour.visible}
         step={tour.step}
         onNext={tour.next}
         onPrev={tour.prev}
         onFinish={tour.finish}
         onDismiss={tour.dismiss}
+        onTapTarget={tour.beginWait}
       />
     </div>
   )

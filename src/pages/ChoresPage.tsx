@@ -15,6 +15,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
 import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Camera, X, Star, Focus, Search } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import { advanceTour } from '@/lib/hooks/useTour'
 
 type Filter = 'all' | 'persistent' | 'one-time' | 'mine'
 
@@ -190,6 +191,7 @@ export function ChoresPage() {
     setPhotoPreview(null)
     setPhotoBefore(null)
     setPhotoBeforePreview(null)
+    advanceTour('chore-complete')
   }
 
   function handleDelete(choreId: string) {
@@ -474,7 +476,7 @@ export function ChoresPage() {
                 <p className="font-mono font-bold text-brutal-black/40 text-sm">NO CHORES YET</p>
                 <p className="font-mono text-brutal-black/30 text-xs mt-1">Pick a starter pack or add your own</p>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-tour="chore-packs">
                 {CHORE_PACKS.map(pack => (
                   <button
                     key={pack.name}
@@ -491,6 +493,7 @@ export function ChoresPage() {
                       }
                       setAddingPack(false)
                       toast(`${pack.chores.length} chores added!`, 'bg-brutal-lime')
+                      advanceTour('chore-packs')
                     }}
                     className="w-full border-2 border-brutal-black bg-brutal-white p-4 flex items-center gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-50"
                   >
