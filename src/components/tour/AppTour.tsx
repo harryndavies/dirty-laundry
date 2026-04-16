@@ -101,19 +101,35 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss, onT
 
   useEffect(() => {
     if (!active) return
-    measureTarget()
-    window.addEventListener('resize', measureTarget)
-    window.addEventListener('scroll', measureTarget, true)
 
-    // If this is a tap step and the target doesn't exist, skip it
-    if (currentStep?.action === 'tap' && currentStep?.target) {
+    // Scroll target into view before measuring
+    if (currentStep?.target) {
       const el = document.querySelector(`[data-tour="${currentStep.target}"]`)
       if (!el) {
-        onNext()
-        return
+        // If this is a tap step and the target doesn't exist, skip it
+        if (currentStep.action === 'tap') {
+          onNext()
+          return
+        }
+      } else {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        // Re-measure after scroll settles
+        const t = setTimeout(measureTarget, 400)
+        // Also measure immediately for elements already in view
+        measureTarget()
+        window.addEventListener('resize', measureTarget)
+        window.addEventListener('scroll', measureTarget, true)
+        return () => {
+          clearTimeout(t)
+          window.removeEventListener('resize', measureTarget)
+          window.removeEventListener('scroll', measureTarget, true)
+        }
       }
     }
 
+    measureTarget()
+    window.addEventListener('resize', measureTarget)
+    window.addEventListener('scroll', measureTarget, true)
     return () => {
       window.removeEventListener('resize', measureTarget)
       window.removeEventListener('scroll', measureTarget, true)
