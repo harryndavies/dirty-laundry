@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { type MemberPointsHistory } from '@/lib/hooks/usePointsHistory'
 
 interface PointsChartProps {
@@ -8,15 +8,30 @@ interface PointsChartProps {
 const CHART_H = 180
 const CHART_PAD = { top: 12, right: 12, bottom: 28, left: 40 }
 
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
 export function PointsChart({ data }: PointsChartProps) {
   const [hoveredUser, setHoveredUser] = useState<string | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [containerW, setContainerW] = useState(320)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const observer = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setContainerW(entry.contentRect.width)
+      }
+    })
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [])
 
   if (data.length === 0 || data[0].daily.length === 0) return null
 
   const dates = data[0].daily.map(d => d.date)
   const maxPts = Math.max(1, ...data.map(m => m.daily[m.daily.length - 1]?.cumulative ?? 0))
 
-  const innerW = Math.max(dates.length * 20, 300)
+  const innerW = Math.max(containerW - CHART_PAD.left - CHART_PAD.right - 8, 100)
   const svgW = innerW + CHART_PAD.left + CHART_PAD.right
   const innerH = CHART_H - CHART_PAD.top - CHART_PAD.bottom
 
@@ -34,11 +49,8 @@ export function PointsChart({ data }: PointsChartProps) {
     Math.round((maxPts / gridCount) * i)
   )
 
-  // X-axis labels — show ~5 evenly spaced dates
-  const labelCount = Math.min(5, dates.length)
-  const labelIndices = Array.from({ length: labelCount }, (_, i) =>
-    Math.round((i / Math.max(1, labelCount - 1)) * (dates.length - 1))
-  )
+  // X-axis labels — pick strategy based on date range length
+  const xLabels = buildXLabels(dates)
 
   return (
     <div className="border-2 border-brutal-black bg-brutal-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
@@ -46,7 +58,7 @@ export function PointsChart({ data }: PointsChartProps) {
         <h3 className="font-mono font-bold text-xs uppercase">Points Over Time</h3>
       </div>
 
-      <div className="overflow-x-auto px-1">
+      <div ref={containerRef} className="px-1">
         <svg
           width={svgW}
           height={CHART_H}
@@ -78,16 +90,16 @@ export function PointsChart({ data }: PointsChartProps) {
           ))}
 
           {/* X-axis labels */}
-          {labelIndices.map(i => (
+          {xLabels.map(({ index, label }) => (
             <text
-              key={i}
-              x={x(i)}
+              key={index}
+              x={x(index)}
               y={CHART_H - 4}
               textAnchor="middle"
               className="fill-brutal-black/40"
               style={{ fontSize: 9, fontFamily: 'var(--font-mono)' }}
             >
-              {formatDateLabel(dates[i])}
+              {label}
             </text>
           ))}
 
@@ -161,7 +173,44 @@ export function PointsChart({ data }: PointsChartProps) {
   )
 }
 
-function formatDateLabel(dateStr: string): string {
+function buildXLabels(dates: string[]): { index: number; label: string }[] {
+  if (dates.length <= 1) {
+    return dates.map((d, i) => ({ index: i, label: formatDay(d) }))
+  }
+
+  // For longer ranges (>60 days), show month labels
+  if (dates.length > 60) {
+    const labels: { index: number; label: string }[] = []
+    let lastMonth = -1
+    for (let i = 0; i < dates.length; i++) {
+      const d = new Date(dates[i] + 'T00:00:00')
+      const month = d.getMonth()
+      if (month !== lastMonth) {
+        labels.push({ index: i, label: MONTH_NAMES[month] })
+        lastMonth = month
+      }
+    }
+    return labels
+  }
+
+  // For medium ranges (>14 days), show ~5 evenly spaced day/month labels
+  if (dates.length > 14) {
+    const count = 5
+    return Array.from({ length: count }, (_, i) => {
+      const idx = Math.round((i / (count - 1)) * (dates.length - 1))
+      return { index: idx, label: formatDay(dates[idx]) }
+    })
+  }
+
+  // For short ranges, show ~5 evenly spaced day/month labels
+  const count = Math.min(5, dates.length)
+  return Array.from({ length: count }, (_, i) => {
+    const idx = Math.round((i / Math.max(1, count - 1)) * (dates.length - 1))
+    return { index: idx, label: formatDay(dates[idx]) }
+  })
+}
+
+function formatDay(dateStr: string): string {
   const d = new Date(dateStr + 'T00:00:00')
   return `${d.getDate()}/${d.getMonth() + 1}`
 }
