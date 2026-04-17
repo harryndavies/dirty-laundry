@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useGroup } from '@/context/GroupContext'
-import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
 import { useTheme } from '@/context/ThemeContext'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/button'
@@ -51,11 +50,8 @@ const TIPS = [
 
 export function ProfilePage() {
   const { user, profile, signOut, updateProfile } = useAuth()
-  const { userMember, leaveGroup, group, members } = useGroup()
-  const { balances, formatMoney } = usePocketMoney()
+  const { userMember, leaveGroup, members } = useGroup()
   const { theme, toggle } = useTheme()
-  const isKid = userMember?.role === 'kid'
-  const myBalance = user ? balances.get(user.id) : null
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(profile?.display_name ?? '')
   const [linkEmail, setLinkEmail] = useState('')
@@ -178,10 +174,7 @@ export function ProfilePage() {
             <p className="font-mono text-xs text-brutal-black/40 mt-1">Guest account</p>
           )}
           <div className="mt-2 px-3 py-1 bg-brutal-yellow border-2 border-brutal-black font-mono font-bold text-sm">
-            {isKid && myBalance && group?.pocket_money_rate
-              ? `${formatMoney(myBalance.unpaidAmount)} earned`
-              : `${userMember?.total_points ?? 0} PTS`
-            }
+            {userMember?.total_points ?? 0} PTS
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
@@ -9,13 +9,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Share2, Percent, Trophy, LogOut, Target, Minus, Plus, Coins, Settings } from 'lucide-react'
-import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
-import { ProPaywall } from '@/components/ProPaywall'
-import { isNativeIOS } from '@/lib/platform'
+import { Share2, Percent, Trophy, LogOut, Target, Minus, Plus, Settings } from 'lucide-react'
 
 export function GroupPage() {
-  const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid, leaveGroup, loading: groupLoading } = useGroup()
+  const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, setMemberRole, leaveGroup, loading: groupLoading } = useGroup()
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const [groupName, setGroupName] = useState('')
@@ -37,23 +34,8 @@ export function GroupPage() {
   const [showGoal, setShowGoal] = useState(false)
   const [goalAmount, setGoalAmount] = useState(0)
   const [savingGoal, setSavingGoal] = useState(false)
-  const [showPocketMoney, setShowPocketMoney] = useState(false)
-  const [pocketRate, setPocketRate] = useState(0)
-  const [savingRate, setSavingRate] = useState(false)
-  const { balances, formatMoney } = usePocketMoney()
-  const [confirmPaid, setConfirmPaid] = useState<{ memberId: string; userId: string; name: string; amount: number; points: number } | null>(null)
-  const [showPaywall, setShowPaywall] = useState(false)
 
   const isOwner = members.find(m => m.user_id === user?.id)?.role === 'owner'
-
-  // Handle Stripe checkout redirect
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('pro') === 'success') {
-      toast('Pocket money unlocked!', 'bg-brutal-lime')
-      window.history.replaceState({}, '', '/group')
-    }
-  }, [])
   const shareTotal = Object.values(shares).reduce((sum, v) => sum + v, 0)
 
   if (groupLoading) {
@@ -202,9 +184,7 @@ export function GroupPage() {
         </div>
 
         <div className="space-y-2">
-          {members.map(m => {
-            const kidBalance = balances.get(m.user_id)
-            return (
+          {members.map(m => (
             <div
               key={m.id}
               className="border-2 border-brutal-black p-3 flex items-center gap-3 bg-brutal-white"
@@ -213,21 +193,9 @@ export function GroupPage() {
               <div className="flex-1 min-w-0">
                 <p className="font-mono font-bold text-sm truncate">{m.profiles.display_name}</p>
                 <div className="flex items-center gap-2">
-                  {isOwner && m.role !== 'owner' && group.is_pro ? (
+                  {isOwner && m.role !== 'owner' ? (
                     <button
-                      onClick={async () => {
-                        const newRole = m.role === 'kid' ? 'member' : 'kid'
-                        await setMemberRole(m.id, newRole)
-                        if (newRole === 'kid' && !group.pocket_money_rate) {
-                          toast('Set a pocket money rate in Group Settings', 'bg-brutal-yellow')
-                          setShowSettings(true)
-                          setTimeout(() => {
-                            setPocketRate(1)
-                            setShowSettings(false)
-                            setShowPocketMoney(true)
-                          }, 300)
-                        }
-                      }}
+                      onClick={() => setMemberRole(m.id, m.role === 'kid' ? 'member' : 'kid')}
                       className="flex items-center gap-1.5"
                     >
                       <div className={`w-10 h-6 border-2 border-brutal-black flex items-center p-0.5 transition-colors ${m.role === 'kid' ? 'bg-brutal-yellow justify-end' : 'bg-brutal-white justify-start'}`}>
@@ -240,29 +208,13 @@ export function GroupPage() {
                   ) : (
                     <span className="font-mono text-[10px] text-brutal-black/40 uppercase">{m.role === 'kid' ? '👶 KID' : m.role}</span>
                   )}
-                  {m.role === 'kid' && kidBalance && group?.pocket_money_rate && (
-                    <span className="font-mono text-[10px] font-bold text-green-600">
-                      {formatMoney(kidBalance.unpaidAmount)} unpaid
-                    </span>
-                  )}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="font-mono font-bold text-sm">
-                  {m.total_points} <span className="text-[10px] text-brutal-black/40">PTS</span>
-                </div>
-                {isOwner && m.role === 'kid' && kidBalance && group?.pocket_money_rate && kidBalance.unpaidAmount > 0 && (
-                  <button
-                    onClick={() => setConfirmPaid({ memberId: m.id, userId: m.user_id, name: m.profiles.display_name, amount: kidBalance.unpaidAmount, points: kidBalance.unpaidPoints })}
-                    className="font-mono text-[10px] font-bold px-2 py-1 bg-brutal-lime border border-brutal-black active:bg-brutal-lime/60"
-                  >
-                    PAID
-                  </button>
-                )}
+              <div className="font-mono font-bold text-sm">
+                {m.total_points} <span className="text-[10px] text-brutal-black/40">PTS</span>
               </div>
             </div>
-            )
-          })}
+          ))}
         </div>
       </div>
 
@@ -389,35 +341,6 @@ export function GroupPage() {
             </div>
             <span className="font-mono text-xs text-brutal-black/40">
               {group.weekly_goal ? `${group.weekly_goal} PTS` : 'NOT SET'}
-            </span>
-          </button>
-          <button
-            onClick={() => {
-              setShowSettings(false)
-              if (group.is_pro) {
-                setPocketRate(group.pocket_money_rate ?? 1)
-                setShowPocketMoney(true)
-              } else {
-                setShowPaywall(true)
-              }
-            }}
-            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black bg-brutal-white active:bg-brutal-black/5"
-          >
-            <div className="flex items-center gap-2">
-              <Coins size={16} />
-              <span className="font-mono font-bold text-sm">POCKET MONEY</span>
-              {!group.is_pro && (
-                <span className="bg-brutal-yellow font-mono text-[10px] font-bold px-1.5 py-0.5 border border-brutal-black">PRO</span>
-              )}
-            </div>
-            <span className="font-mono text-xs text-brutal-black/40">
-              {group.is_pro && group.pocket_money_rate
-                ? `${group.pocket_money_rate}p PER PT`
-                : group.is_pro
-                  ? 'OFF'
-                  : isNativeIOS
-                    ? 'WEB'
-                    : '£4.99'}
             </span>
           </button>
         </div>
@@ -553,73 +476,6 @@ export function GroupPage() {
         )}
       </BottomSheet>
 
-      {/* Pocket money sheet */}
-      <BottomSheet open={showPocketMoney} onClose={() => setShowPocketMoney(false)}>
-        <h2 className="font-mono font-bold text-lg mb-1">POCKET MONEY</h2>
-        <p className="font-mono text-xs text-brutal-black/50 mb-4">
-          Set how much each point is worth. Mark members as "kid" to enable their balance.
-        </p>
-        <div className="mb-4">
-          <div className="h-12 bg-brutal-yellow border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-xl mb-3">
-            {pocketRate}p per point
-          </div>
-          <input
-            type="range"
-            min={0}
-            max={10}
-            step={1}
-            value={pocketRate}
-            onChange={e => setPocketRate(Number(e.target.value))}
-            className="w-full h-3 appearance-none bg-brutal-black/10 border-2 border-brutal-black cursor-pointer accent-brutal-yellow [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-brutal-yellow [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-brutal-black [&::-webkit-slider-thumb]:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-          />
-          <div className="flex justify-between font-mono text-[10px] text-brutal-black/30 mt-1">
-            <span>OFF</span>
-            <span>10p</span>
-          </div>
-        </div>
-        <p className="font-mono text-[10px] text-brutal-black/40 text-center mb-4">
-          {pocketRate > 0
-            ? `Example: a 15pt chore = ${formatMoney(15 * pocketRate)}`
-            : 'Pocket money is disabled'
-          }
-        </p>
-        <Button
-          onClick={async () => {
-            setSavingRate(true)
-            await updatePocketMoneyRate(pocketRate > 0 ? pocketRate : null)
-            setSavingRate(false)
-            setShowPocketMoney(false)
-            const hasKids = members.some(m => m.role === 'kid')
-            if (pocketRate > 0 && !hasKids) {
-              toast('Rate set! Now toggle a member to Kid on the group page', 'bg-brutal-yellow')
-            } else {
-              toast(pocketRate > 0 ? `Rate set to ${pocketRate}p per point!` : 'Pocket money disabled', 'bg-brutal-yellow')
-            }
-          }}
-          disabled={savingRate}
-          className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-40"
-        >
-          {savingRate ? 'SAVING...' : 'SAVE RATE'}
-        </Button>
-        {group.pocket_money_rate && (
-          <button
-            onClick={async () => {
-              setSavingRate(true)
-              await updatePocketMoneyRate(null)
-              setSavingRate(false)
-              setShowPocketMoney(false)
-              toast('Pocket money disabled', 'bg-brutal-white')
-            }}
-            className="w-full mt-2 font-mono text-xs text-brutal-black/40 font-bold py-2 active:text-brutal-black/60"
-          >
-            DISABLE POCKET MONEY
-          </button>
-        )}
-      </BottomSheet>
-
-      {/* Pro paywall */}
-      {group && <ProPaywall open={showPaywall} onClose={() => setShowPaywall(false)} groupId={group.id} />}
-
       {/* Leave group */}
       <div className="px-4 mt-6 mb-6">
         <button
@@ -641,22 +497,6 @@ export function GroupPage() {
           setConfirmLeave(false)
         }}
         onCancel={() => setConfirmLeave(false)}
-      />
-
-      <ConfirmDialog
-        open={!!confirmPaid}
-        title="MARK AS PAID"
-        message={confirmPaid ? `Confirm you've paid ${confirmPaid.name} ${formatMoney(confirmPaid.amount)}?` : ''}
-        confirmLabel="PAID ✓"
-        confirmColor="bg-brutal-lime"
-        onConfirm={async () => {
-          if (confirmPaid) {
-            await markAsPaid(confirmPaid.memberId, confirmPaid.userId, confirmPaid.amount, confirmPaid.points)
-            toast(`Marked ${confirmPaid.name} as paid!`, 'bg-brutal-lime')
-          }
-          setConfirmPaid(null)
-        }}
-        onCancel={() => setConfirmPaid(null)}
       />
 
     </div>
