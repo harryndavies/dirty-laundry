@@ -12,6 +12,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Share2, Percent, Trophy, LogOut, Target, Minus, Plus, Coins, Settings } from 'lucide-react'
 import { usePocketMoney } from '@/lib/hooks/usePocketMoney'
 import { ProPaywall } from '@/components/ProPaywall'
+import { isNativeIOS } from '@/lib/platform'
 
 export function GroupPage() {
   const { group, members, createGroup, joinGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid, leaveGroup, loading: groupLoading } = useGroup()
@@ -410,7 +411,13 @@ export function GroupPage() {
               )}
             </div>
             <span className="font-mono text-xs text-brutal-black/40">
-              {group.is_pro && group.pocket_money_rate ? `${group.pocket_money_rate}p PER PT` : group.is_pro ? 'OFF' : '£4.99'}
+              {group.is_pro && group.pocket_money_rate
+                ? `${group.pocket_money_rate}p PER PT`
+                : group.is_pro
+                  ? 'OFF'
+                  : isNativeIOS
+                    ? 'WEB'
+                    : '£4.99'}
             </span>
           </button>
         </div>

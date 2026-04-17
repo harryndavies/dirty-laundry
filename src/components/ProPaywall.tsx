@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { toast } from '@/components/ui/Toast'
 import { supabase } from '@/lib/supabase'
+import { isNativeIOS } from '@/lib/platform'
 import { Coins, PiggyBank, CheckCircle, Star } from 'lucide-react'
 
 const FEATURES = [
@@ -62,17 +63,28 @@ export function ProPaywall({ open, onClose, groupId }: ProPaywallProps) {
         ))}
       </div>
 
-      <button
-        onClick={handleUnlock}
-        disabled={loading}
-        className="w-full h-14 bg-brutal-lime font-mono font-bold uppercase text-base border-3 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[6px] active:translate-y-[6px] transition-all disabled:opacity-50"
-      >
-        {loading ? 'REDIRECTING...' : 'UNLOCK NOW — £4.99'}
-      </button>
+      {isNativeIOS ? (
+        <div className="w-full p-4 bg-brutal-white border-3 border-brutal-black font-mono text-center">
+          <p className="font-bold text-xs uppercase mb-1">UNLOCK ON THE WEB</p>
+          <p className="text-[11px] text-brutal-black/60 leading-relaxed">
+            Visit dirtylaundry.club on any browser to unlock Pro for your group. Once unlocked, it works here too.
+          </p>
+        </div>
+      ) : (
+        <>
+          <button
+            onClick={handleUnlock}
+            disabled={loading}
+            className="w-full h-14 bg-brutal-lime font-mono font-bold uppercase text-base border-3 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[6px] active:translate-y-[6px] transition-all disabled:opacity-50"
+          >
+            {loading ? 'REDIRECTING...' : 'UNLOCK NOW — £4.99'}
+          </button>
 
-      <p className="font-mono text-[10px] text-brutal-black/30 text-center mt-3">
-        One-time purchase. No subscription. Works for your whole group.
-      </p>
+          <p className="font-mono text-[10px] text-brutal-black/30 text-center mt-3">
+            One-time purchase. No subscription. Works for your whole group.
+          </p>
+        </>
+      )}
     </BottomSheet>
   )
 }
