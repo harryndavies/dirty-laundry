@@ -4,9 +4,11 @@ const config: CapacitorConfig = {
   appId: 'club.dirtylaundry.app',
   appName: 'Dirty Laundry',
   webDir: 'dist',
+  backgroundColor: '#FFFFFF',
   ios: {
     preferredContentMode: 'mobile',
-    contentInset: 'always',
+    contentInset: 'never',
+    backgroundColor: '#FFFFFF',
   },
 };
 
