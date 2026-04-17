@@ -149,6 +149,62 @@ export function AuthPage() {
               We sent you a confirmation link. Click it to activate your account.
             </p>
           </div>
+        ) : isNativeIOS ? (
+          <div className="space-y-3">
+            {error && (
+              <div className="bg-brutal-pink/20 border-2 border-brutal-pink p-3 font-mono text-xs font-bold">
+                {error}
+              </div>
+            )}
+            {appleButton}
+            {orDivider}
+            {showAnon ? (
+              <form
+                onSubmit={async e => {
+                  e.preventDefault()
+                  if (!anonName.trim()) return
+                  setLoading(true)
+                  setError('')
+                  const { error } = await signInAnonymously(anonName.trim())
+                  if (error) setError(error)
+                  setLoading(false)
+                }}
+                className="space-y-3"
+              >
+                <p className="font-mono text-xs text-brutal-black/50 text-center">Just enter your name to get started</p>
+                <Input
+                  value={anonName}
+                  onChange={e => setAnonName(e.target.value)}
+                  placeholder="Your name"
+                  className="border-2 border-brutal-black font-mono h-12 text-center"
+                  autoFocus
+                  required
+                />
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-12 bg-brutal-lime font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+                >
+                  {loading ? 'JOINING...' : 'JOIN WITHOUT ACCOUNT'}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => { setShowAnon(false); setError('') }}
+                  className="w-full font-mono text-xs font-bold text-brutal-black/40 py-2 active:text-brutal-black/60"
+                >
+                  ← BACK
+                </button>
+              </form>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowAnon(true)}
+                className="w-full font-mono text-xs font-bold text-brutal-black/40 py-2 active:text-brutal-black/60"
+              >
+                NO APPLE ID? JOIN AS A GUEST
+              </button>
+            )}
+          </div>
         ) : (
           <Tabs defaultValue="signup">
             <TabsList className="w-full bg-brutal-black/5 border-2 border-brutal-black p-0 h-auto">
@@ -221,10 +277,7 @@ export function AuthPage() {
                   </form>
                 )
               ) : (
-                <div className="mt-4">
-                {appleButton}
-                {orDivider}
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-4 mt-4">
                   <div>
                     <label className="font-mono text-xs font-bold uppercase block mb-1">EMAIL</label>
                     <Input
@@ -260,7 +313,6 @@ export function AuthPage() {
                     FORGOT PASSWORD?
                   </button>
                 </form>
-                </div>
               )}
             </TabsContent>
 
@@ -305,10 +357,6 @@ export function AuthPage() {
                 </div>
               ) : (
               <>
-              <div className="mt-4">
-                {appleButton}
-                {orDivider}
-              </div>
               <form onSubmit={handleSignup} className="space-y-4 mt-4">
                 <div>
                   <label className="font-mono text-xs font-bold uppercase block mb-1">DISPLAY NAME</label>
