@@ -29,12 +29,19 @@ Supabase Dashboard → **Authentication** → **Providers** → **Apple** → En
 
 Save.
 
-## 4. Xcode — verify the capability
+## 4. Xcode — re-enable the capability
 
-After you set your signing team in Xcode:
-- App target → **Signing & Capabilities**
-- Confirm **Sign in with Apple** capability is listed (we added it via the entitlements file — Xcode should pick it up automatically)
-- If it's missing, click **+ Capability** → Sign in with Apple
+The entitlement is currently blank in `ios/App/App/App.entitlements` because free/personal Apple teams can't use Sign in with Apple (Xcode fails to generate a provisioning profile). Once your paid membership is active:
+
+- App target → **Signing & Capabilities** → **+ Capability** → **Sign in with Apple**
+- Xcode will write the entry into `App.entitlements` automatically. You should end up with:
+
+```xml
+<key>com.apple.developer.applesignin</key>
+<array>
+    <string>Default</string>
+</array>
+```
 
 ## 5. Test
 

@@ -2,9 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>com.apple.developer.applesignin</key>
-	<array>
-		<string>Default</string>
-	</array>
+	<!--
+	    Sign in with Apple capability will be added here once Apple
+	    Developer Program enrollment clears. Free/personal teams do not
+	    support the applesignin entitlement, which makes local builds
+	    fail. See TODO-apple-signin-setup.md step 4.
+	-->
 </dict>
 </plist>
