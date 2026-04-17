@@ -4,9 +4,10 @@ import { useAuth } from '@/context/AuthContext'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { isNativeIOS } from '@/lib/platform'
 
 export function AuthPage() {
-  const { session, signIn, signUp, signInAnonymously, resetPassword } = useAuth()
+  const { session, signIn, signUp, signInAnonymously, signInWithApple, resetPassword } = useAuth()
   const [searchParams] = useSearchParams()
   const inviteCode = searchParams.get('code')
 
@@ -66,6 +67,36 @@ export function AuthPage() {
     }
     setLoading(false)
   }
+
+  async function handleAppleSignIn() {
+    setError('')
+    setLoading(true)
+    const { error } = await signInWithApple()
+    if (error) setError(error)
+    setLoading(false)
+  }
+
+  const appleButton = isNativeIOS && (
+    <button
+      type="button"
+      onClick={handleAppleSignIn}
+      disabled={loading}
+      className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+    >
+      <svg width="16" height="18" viewBox="0 0 16 18" fill="currentColor" aria-hidden="true">
+        <path d="M13.2 9.6c0-2.3 1.9-3.4 2-3.4-1-1.6-2.7-1.8-3.3-1.8-1.4-.1-2.7.8-3.4.8-.7 0-1.8-.8-3-.8-1.5 0-2.9.9-3.7 2.3-1.6 2.7-.4 6.8 1.1 9 .7 1.1 1.6 2.3 2.8 2.3 1.1 0 1.6-.7 2.9-.7 1.4 0 1.8.7 3 .7 1.3 0 2.1-1.1 2.8-2.2.9-1.3 1.3-2.5 1.3-2.6-.1 0-2.5-1-2.5-3.6zM11 2.9c.6-.7 1-1.7 1-2.7-.9 0-2 .6-2.6 1.3-.6.6-1.1 1.6-1 2.6 1.1.1 2-.5 2.6-1.2z"/>
+      </svg>
+      {loading ? 'SIGNING IN...' : 'CONTINUE WITH APPLE'}
+    </button>
+  )
+
+  const orDivider = isNativeIOS && (
+    <div className="flex items-center gap-3 my-3">
+      <div className="flex-1 h-px bg-brutal-black/20" />
+      <span className="font-mono text-[10px] font-bold text-brutal-black/40">OR</span>
+      <div className="flex-1 h-px bg-brutal-black/20" />
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-brutal-yellow flex items-center justify-center p-4">
@@ -190,7 +221,10 @@ export function AuthPage() {
                   </form>
                 )
               ) : (
-                <form onSubmit={handleLogin} className="space-y-4 mt-4">
+                <div className="mt-4">
+                {appleButton}
+                {orDivider}
+                <form onSubmit={handleLogin} className="space-y-4">
                   <div>
                     <label className="font-mono text-xs font-bold uppercase block mb-1">EMAIL</label>
                     <Input
@@ -226,6 +260,7 @@ export function AuthPage() {
                     FORGOT PASSWORD?
                   </button>
                 </form>
+                </div>
               )}
             </TabsContent>
 
@@ -270,6 +305,10 @@ export function AuthPage() {
                 </div>
               ) : (
               <>
+              <div className="mt-4">
+                {appleButton}
+                {orDivider}
+              </div>
               <form onSubmit={handleSignup} className="space-y-4 mt-4">
                 <div>
                   <label className="font-mono text-xs font-bold uppercase block mb-1">DISPLAY NAME</label>

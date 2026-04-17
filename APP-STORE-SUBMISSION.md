@@ -66,7 +66,7 @@ chores,household,family,flatmate,tasks,kids,gamified,adhd,leaderboard,roommate,t
 - Price: Free (no IAP on iOS — Pro is web-only)
 - Age rating: 4+
 - Third-party content: No
-- Sign in with Apple required: No (no third-party social sign-in offered)
+- Sign in with Apple: Yes, offered as the primary auth method on iOS (email/password and guest accounts also available)
 - Copyright: `© 2026 Harry Davies`
 
 ## 2. Privacy nutrition label
@@ -89,7 +89,7 @@ Tracking: **No**. Everything else: **Not collected**.
 
 **Notes to reviewer**:
 ```
-Sign-in: tap "Sign up" → "Just use a name" to enter as a guest. No email or password required. Create a group, add a few chores, and tap a chore to complete it.
+Sign-in: three options on the auth screen. Easiest for review is Sign in with Apple. Alternatively tap "Sign up" → "Just use a name" for an anonymous guest account, or use email/password. Create a group, add a few chores, and tap a chore to complete it.
 
 Account deletion (Guideline 5.1.1(v)): Profile tab → DELETE ACCOUNT at the bottom. Permanently deletes the account, profile, points, completions, and uploaded photos via a Supabase edge function using the service role key.
 
