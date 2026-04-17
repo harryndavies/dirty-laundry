@@ -7,8 +7,9 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
-import { Check, Pencil, Moon, Sun, Bell, BellOff, HelpCircle, Sparkles, Smartphone, TrendingUp, Dices, Users, Focus } from 'lucide-react'
+import { Check, Pencil, Moon, Sun, Bell, BellOff, HelpCircle, Sparkles, Smartphone, TrendingUp, Dices, Users, Focus, Trash2, Shield, FileText } from 'lucide-react'
 import { BottomSheet } from '@/components/ui/BottomSheet'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '@/lib/pushNotifications'
 import { supabase } from '@/lib/supabase'
 import { useNavigate } from 'react-router-dom'
@@ -66,8 +67,26 @@ export function ProfilePage() {
   const [pushEnabled, setPushEnabled] = useState(false)
   const [pushLoading, setPushLoading] = useState(false)
   const [showTips, setShowTips] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const pushSupported = 'serviceWorker' in navigator && 'PushManager' in window
   const navigate = useNavigate()
+
+  async function handleDeleteAccount() {
+    if (deleting) return
+    setDeleting(true)
+    try {
+      const { error } = await supabase.functions.invoke('delete-account')
+      if (error) throw error
+      leaveGroup()
+      await supabase.auth.signOut()
+      toast('Account deleted', 'bg-brutal-lime')
+    } catch {
+      toast('Failed to delete account. Try again.', 'bg-red-500')
+      setDeleting(false)
+      setShowDeleteConfirm(false)
+    }
+  }
 
   useEffect(() => {
     isPushSubscribed().then(setPushEnabled)
@@ -360,6 +379,35 @@ export function ProfilePage() {
           </div>
         </BottomSheet>
 
+        {/* Legal */}
+        <div>
+          <h3 className="font-mono text-xs font-bold uppercase mb-2">LEGAL</h3>
+          <div className="space-y-2">
+            <a
+              href="https://dirtylaundry.club/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <Shield size={20} />
+                <span className="font-mono font-bold text-sm">PRIVACY POLICY</span>
+              </div>
+            </a>
+            <a
+              href="https://dirtylaundry.club/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <FileText size={20} />
+                <span className="font-mono font-bold text-sm">TERMS OF SERVICE</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
         {/* Sign out */}
         <Button
           onClick={async () => {
@@ -370,7 +418,26 @@ export function ProfilePage() {
         >
           SIGN OUT
         </Button>
+
+        {/* Delete account */}
+        <button
+          onClick={() => setShowDeleteConfirm(true)}
+          className="w-full flex items-center justify-center gap-2 h-12 bg-brutal-white text-red-600 font-mono font-bold uppercase text-xs border-2 border-red-500 active:bg-red-500/10 transition-colors"
+        >
+          <Trash2 size={16} />
+          DELETE ACCOUNT
+        </button>
       </div>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title="Delete account?"
+        message={deleting ? 'Deleting your account and all associated data...' : 'This permanently deletes your profile, points, and chore history. This cannot be undone.'}
+        confirmLabel={deleting ? 'DELETING...' : 'DELETE FOREVER'}
+        confirmColor="bg-red-500 text-brutal-white"
+        onConfirm={handleDeleteAccount}
+        onCancel={() => !deleting && setShowDeleteConfirm(false)}
+      />
     </div>
   )
 }
