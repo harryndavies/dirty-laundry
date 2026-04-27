@@ -26,7 +26,10 @@ export function ToastContainer() {
   }, [])
 
   return (
-    <div className="fixed top-4 left-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
+    <div
+      className="fixed left-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"
+      style={{ top: 'calc(env(safe-area-inset-top) + 1rem)' }}
+    >
       {toasts.map(t => (
         <div
           key={t.id}

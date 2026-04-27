@@ -49,7 +49,13 @@ export function GroupPage() {
   // No group — show create/join
   if (!group) {
     return (
-      <div className="min-h-full flex items-center justify-center p-4">
+      <div
+        className="min-h-full flex items-center justify-center px-4"
+        style={{
+          paddingTop: 'max(1rem, env(safe-area-inset-top))',
+          paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+        }}
+      >
         <div className="w-full max-w-sm md:max-w-lg space-y-6">
           <div className="text-center mb-8">
             <div className="text-5xl mb-3">👥</div>
