@@ -15,6 +15,13 @@ export interface MemberPointsHistory {
   daily: DailyPoints[]
 }
 
+function localDateStr(d: Date): string {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
 export function usePointsHistory(start: Date, end: Date) {
   const { group, members } = useGroup()
 
@@ -32,21 +39,24 @@ export function usePointsHistory(start: Date, end: Date) {
 
       if (error) throw error
 
-      // Build date range (cap at today so we don't chart future dates)
+      // Build date range (cap at today so we don't chart future dates).
+      // Use local date strings so the x-axis matches the user's calendar day,
+      // and so today's completions land in today's bucket regardless of timezone.
       const today = new Date()
       today.setHours(23, 59, 59, 999)
       const dates: string[] = []
       const d = new Date(start)
+      d.setHours(0, 0, 0, 0)
       const endDay = end > today ? today : new Date(end)
       while (d <= endDay) {
-        dates.push(d.toISOString().slice(0, 10))
+        dates.push(localDateStr(d))
         d.setDate(d.getDate() + 1)
       }
 
-      // Group completions by user + date
+      // Group completions by user + local date
       const byUserDate = new Map<string, Map<string, number>>()
       for (const c of completions ?? []) {
-        const date = c.completed_at.slice(0, 10)
+        const date = localDateStr(new Date(c.completed_at))
         if (!byUserDate.has(c.user_id)) byUserDate.set(c.user_id, new Map())
         const userMap = byUserDate.get(c.user_id)!
         userMap.set(date, (userMap.get(date) ?? 0) + c.points_earned)
