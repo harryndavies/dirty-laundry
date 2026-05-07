@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { useLeaderboard } from '@/lib/hooks/useLeaderboard'
 import { useStats, formatLastActive } from '@/lib/hooks/useStats'
 import { useNudges } from '@/lib/hooks/useNudges'
+import { useChampions } from '@/lib/hooks/useChampions'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { toast } from '@/components/ui/Toast'
-import { Flame, Eye, BarChart3 } from 'lucide-react'
+import { Flame, Eye, BarChart3, Trophy } from 'lucide-react'
 import { playNudge } from '@/lib/sounds'
 
 const rankColors = ['bg-brutal-yellow', 'bg-brutal-pink', 'bg-brutal-lime']
@@ -18,6 +19,7 @@ export function LeaderboardPage() {
   const { leaderboard } = useLeaderboard()
   const { stats } = useStats()
   const { nudges, unseenCount, sendNudge, markSeen } = useNudges()
+  const { lastMonth, winCounts } = useChampions()
   const [nudgingId, setNudgingId] = useState<string | null>(null)
   const navigate = useNavigate()
 
@@ -57,6 +59,39 @@ export function LeaderboardPage() {
           </span>
           <span className="font-mono text-[10px] text-brutal-pink/60">TAP TO DISMISS</span>
         </button>
+      )}
+
+      {/* Last month's champion */}
+      {lastMonth && (
+        <div className="px-4 mt-3">
+          <div className="border-2 border-brutal-black bg-brutal-yellow shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="px-3 py-2 border-b-2 border-brutal-black flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Trophy size={12} strokeWidth={3} />
+                <span className="font-mono font-bold text-[10px] tracking-widest">MONTHLY CHAMPION</span>
+              </div>
+              <span className="font-mono text-[10px] text-brutal-black/50 font-bold">{lastMonth.monthLabel}</span>
+            </div>
+            <div className="flex items-center gap-3 p-3">
+              <Avatar
+                name={lastMonth.display_name}
+                color={lastMonth.avatar_color}
+                size="md"
+                imageUrl={lastMonth.avatar_url}
+              />
+              <div className="flex-1 min-w-0">
+                <span className="font-mono font-bold text-sm block truncate">{lastMonth.display_name}</span>
+                <span className="font-mono text-[10px] text-brutal-black/60 block truncate">
+                  {lastMonth.prize ?? 'No prize claimed'}
+                </span>
+              </div>
+              <div className="font-mono font-bold text-xl text-right">
+                {lastMonth.points}
+                <div className="text-[10px] text-brutal-black/40 font-bold">PTS</div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="px-4 py-4 space-y-3">
@@ -107,6 +142,14 @@ export function LeaderboardPage() {
                       {streak >= 2 && (
                         <span className="inline-flex items-center gap-0.5 bg-brutal-orange/15 border border-brutal-orange px-1.5 py-0.5 font-mono text-[10px] font-bold text-brutal-orange">
                           <Flame size={10} /> {streak}
+                        </span>
+                      )}
+                      {(winCounts.get(member.user_id) ?? 0) > 0 && (
+                        <span
+                          className="inline-flex items-center gap-0.5 bg-brutal-yellow border border-brutal-black px-1.5 py-0.5 font-mono text-[10px] font-bold"
+                          title={`${winCounts.get(member.user_id)} monthly ${winCounts.get(member.user_id) === 1 ? 'win' : 'wins'}`}
+                        >
+                          <Trophy size={10} strokeWidth={2.5} /> {winCounts.get(member.user_id)}
                         </span>
                       )}
                     </div>

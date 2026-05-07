@@ -1,103 +1,99 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { useGroup } from '@/context/GroupContext'
 
-interface MonthlyChampion {
-  month: string // "Apr 2026"
+export interface MonthlyChampion {
   monthKey: string // "2026-04"
+  monthLabel: string // "APR 2026"
   user_id: string
   display_name: string
   avatar_color: string
+  avatar_url: string | null
   points: number
   prize: string | null
-  isCurrent: boolean
 }
 
-export function useChampions() {
+interface UseChampionsResult {
+  lastMonth: MonthlyChampion | null
+  history: MonthlyChampion[]
+  winCounts: Map<string, number>
+}
+
+const MONTH_NAMES = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+
+const EMPTY: UseChampionsResult = { lastMonth: null, history: [], winCounts: new Map() }
+
+export function useChampions(): UseChampionsResult {
   const { group, members } = useGroup()
-  const [champions, setChampions] = useState<MonthlyChampion[]>([])
-  const [currentLeader, setCurrentLeader] = useState<MonthlyChampion | null>(null)
 
-  const calculate = useCallback(async () => {
-    if (!group || members.length < 2) return
+  const { data } = useQuery({
+    queryKey: ['champions', group?.id, members.map(m => `${m.user_id}:${m.monthly_prize ?? ''}`).join(',')],
+    enabled: !!group && members.length >= 2,
+    queryFn: async (): Promise<UseChampionsResult> => {
+      const { data: completions } = await supabase
+        .from('completions')
+        .select('user_id, points_earned, completed_at')
+        .eq('group_id', group!.id)
+        .order('completed_at', { ascending: true })
 
-    // Fetch all completions for the group
-    const { data: completions } = await supabase
-      .from('completions')
-      .select('user_id, points_earned, completed_at')
-      .eq('group_id', group.id)
-      .order('completed_at', { ascending: true })
+      if (!completions || completions.length === 0) return EMPTY
 
-    if (!completions || completions.length === 0) return
-
-    // Group by month
-    const monthlyPoints = new Map<string, Map<string, number>>()
-
-    for (const c of completions) {
-      const date = new Date(c.completed_at)
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-
-      if (!monthlyPoints.has(key)) {
-        monthlyPoints.set(key, new Map())
+      // Sum points by month and user (using local-time month so champions match
+      // the user's calendar, not UTC).
+      const monthlyPoints = new Map<string, Map<string, number>>()
+      for (const c of completions) {
+        const date = new Date(c.completed_at)
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+        if (!monthlyPoints.has(key)) monthlyPoints.set(key, new Map())
+        const userMap = monthlyPoints.get(key)!
+        userMap.set(c.user_id, (userMap.get(c.user_id) ?? 0) + c.points_earned)
       }
-      const monthMap = monthlyPoints.get(key)!
-      monthMap.set(c.user_id, (monthMap.get(c.user_id) ?? 0) + c.points_earned)
-    }
 
-    const now = new Date()
-    const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+      const now = new Date()
+      const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 
-    const result: MonthlyChampion[] = []
+      const history: MonthlyChampion[] = []
+      const winCounts = new Map<string, number>()
 
-    // Sort months chronologically (newest first)
-    const sortedMonths = [...monthlyPoints.keys()].sort().reverse()
+      // Newest first, current month excluded (it's still in progress)
+      const pastMonths = [...monthlyPoints.keys()].filter(k => k !== currentKey).sort().reverse()
 
-    for (const monthKey of sortedMonths) {
-      const scores = monthlyPoints.get(monthKey)!
-      const isCurrent = monthKey === currentKey
+      for (const monthKey of pastMonths) {
+        const scores = monthlyPoints.get(monthKey)!
 
-      // Find winner
-      let topUserId = ''
-      let topPoints = 0
-
-      for (const [userId, points] of scores) {
-        if (points > topPoints) {
-          topPoints = points
-          topUserId = userId
+        let topUserId = ''
+        let topPoints = 0
+        for (const [userId, points] of scores) {
+          if (points > topPoints) {
+            topPoints = points
+            topUserId = userId
+          }
         }
+        if (topPoints === 0) continue
+
+        const member = members.find(m => m.user_id === topUserId)
+        if (!member) continue // winner is no longer in the group
+
+        const [year, monthNum] = monthKey.split('-')
+        const monthLabel = `${MONTH_NAMES[parseInt(monthNum) - 1]} ${year}`
+
+        history.push({
+          monthKey,
+          monthLabel,
+          user_id: topUserId,
+          display_name: member.profiles.display_name,
+          avatar_color: member.profiles.avatar_color,
+          avatar_url: member.profiles.avatar_url,
+          points: topPoints,
+          prize: member.monthly_prize ?? null,
+        })
+
+        winCounts.set(topUserId, (winCounts.get(topUserId) ?? 0) + 1)
       }
 
-      const member = members.find(m => m.user_id === topUserId)
-      if (!member || topPoints === 0) continue
+      return { lastMonth: history[0] ?? null, history, winCounts }
+    },
+  })
 
-      const [year, monthNum] = monthKey.split('-')
-      const monthDate = new Date(parseInt(year), parseInt(monthNum) - 1)
-      const monthLabel = monthDate.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }).toUpperCase()
-
-      const champion: MonthlyChampion = {
-        month: monthLabel,
-        monthKey,
-        user_id: topUserId,
-        display_name: member.profiles.display_name,
-        avatar_color: member.profiles.avatar_color,
-        points: topPoints,
-        prize: member.monthly_prize ?? null,
-        isCurrent,
-      }
-
-      if (isCurrent) {
-        setCurrentLeader(champion)
-      } else {
-        result.push(champion)
-      }
-    }
-
-    setChampions(result)
-  }, [group, members])
-
-  useEffect(() => {
-    calculate()
-  }, [calculate])
-
-  return { champions, currentLeader }
+  return data ?? EMPTY
 }
