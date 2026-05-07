@@ -194,21 +194,27 @@ export interface Database {
         Row: {
           id: string
           user_id: string
-          endpoint: string
-          keys_p256dh: string
-          keys_auth: string
+          endpoint: string | null
+          keys_p256dh: string | null
+          keys_auth: string | null
+          platform: 'web' | 'ios'
+          device_token: string | null
           created_at: string
         }
         Insert: {
           user_id: string
-          endpoint: string
-          keys_p256dh: string
-          keys_auth: string
+          platform?: 'web' | 'ios'
+          endpoint?: string | null
+          keys_p256dh?: string | null
+          keys_auth?: string | null
+          device_token?: string | null
         }
         Update: {
-          endpoint?: string
-          keys_p256dh?: string
-          keys_auth?: string
+          platform?: 'web' | 'ios'
+          endpoint?: string | null
+          keys_p256dh?: string | null
+          keys_auth?: string | null
+          device_token?: string | null
         }
         Relationships: []
       }

@@ -10,6 +10,7 @@ import { Check, Pencil, Moon, Sun, Bell, BellOff, HelpCircle, Sparkles, Smartpho
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '@/lib/pushNotifications'
+import { isNativeIOS } from '@/lib/platform'
 import { supabase } from '@/lib/supabase'
 import { useNavigate } from 'react-router-dom'
 
@@ -65,7 +66,7 @@ export function ProfilePage() {
   const [showTips, setShowTips] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const pushSupported = 'serviceWorker' in navigator && 'PushManager' in window
+  const pushSupported = isNativeIOS || ('serviceWorker' in navigator && 'PushManager' in window)
   const navigate = useNavigate()
 
   async function handleDeleteAccount() {
