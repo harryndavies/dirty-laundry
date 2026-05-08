@@ -13,6 +13,7 @@ import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
 import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Camera, X, Focus, Search } from 'lucide-react'
+import { PetTile } from '@/components/PetTile'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { advanceTour } from '@/lib/hooks/useTour'
 
@@ -299,6 +300,9 @@ export function ChoresPage() {
           Guest account — tap to save your progress with an email
         </button>
       )}
+
+      {/* Pet tile */}
+      <PetTile />
 
       {/* Search */}
       <div className="px-4 pt-3">
