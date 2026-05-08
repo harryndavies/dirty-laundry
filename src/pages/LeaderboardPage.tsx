@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { toast } from '@/components/ui/Toast'
-import { Flame, Eye, BarChart3, Trophy, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Flame, Eye, BarChart3, Trophy } from 'lucide-react'
 import { playNudge } from '@/lib/sounds'
 
 const rankColors = ['bg-brutal-yellow', 'bg-brutal-pink', 'bg-brutal-lime']
@@ -116,15 +116,7 @@ export function LeaderboardPage() {
               </div>
               <span className="font-mono text-[10px] text-brutal-black/50 font-bold shrink-0">{activeChampion.monthLabel}</span>
             </div>
-            <div className="flex items-center gap-2 p-3">
-              <button
-                onClick={() => activeChampionIdx > 0 && setChampionIdx(activeChampionIdx - 1)}
-                disabled={activeChampionIdx === 0}
-                className="w-7 h-7 shrink-0 border-2 border-brutal-black bg-brutal-white flex items-center justify-center disabled:opacity-20 active:bg-brutal-black/10"
-                aria-label="Previous month"
-              >
-                <ChevronLeft size={14} strokeWidth={3} />
-              </button>
+            <div className="flex items-center gap-3 p-3">
               <Avatar
                 name={activeChampion.display_name}
                 color={activeChampion.avatar_color}
@@ -143,15 +135,19 @@ export function LeaderboardPage() {
                 {activeChampion.points}
                 <div className="text-[10px] text-brutal-black/40 font-bold">PTS</div>
               </div>
-              <button
-                onClick={() => activeChampionIdx < championEntries.length - 1 && setChampionIdx(activeChampionIdx + 1)}
-                disabled={activeChampionIdx >= championEntries.length - 1}
-                className="w-7 h-7 shrink-0 border-2 border-brutal-black bg-brutal-white flex items-center justify-center disabled:opacity-20 active:bg-brutal-black/10"
-                aria-label="Next month"
-              >
-                <ChevronRight size={14} strokeWidth={3} />
-              </button>
             </div>
+            {championEntries.length > 1 && (
+              <div className="flex justify-center gap-1.5 pb-2">
+                {championEntries.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`h-1.5 transition-all ${
+                      i === activeChampionIdx ? 'w-4 bg-brutal-black' : 'w-1.5 bg-brutal-black/25'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
