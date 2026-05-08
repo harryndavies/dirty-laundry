@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDailyPoints } from '@/lib/hooks/useDailyPoints'
 import { useAuth } from '@/context/AuthContext'
 
@@ -24,6 +24,13 @@ export function HeatMap() {
   const { profile } = useAuth()
   const daily = useDailyPoints(WEEKS * 7)
   const [hover, setHover] = useState<Cell | null>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Snap to the right edge so today's activity is in view by default.
+  useEffect(() => {
+    const el = scrollRef.current
+    if (el) el.scrollLeft = el.scrollWidth
+  }, [daily])
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -88,7 +95,7 @@ export function HeatMap() {
         </span>
       </div>
 
-      <div className="px-3 pb-1 overflow-x-auto">
+      <div ref={scrollRef} className="px-3 pb-1 overflow-x-auto">
         <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="block">
           {/* Month labels */}
           {monthLabels.map(m => (
