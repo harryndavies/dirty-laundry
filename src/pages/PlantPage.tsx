@@ -1,31 +1,31 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useGroup } from '@/context/GroupContext'
-import { Pet } from '@/components/Pet'
-import { usePetState, petLabel, petHint, type PetMood } from '@/lib/hooks/usePetState'
+import { Plant } from '@/components/Plant'
+import { usePlantState, plantLabel, plantHint, type PlantMood } from '@/lib/hooks/usePlantState'
 import { ArrowLeft, Pencil, Check } from 'lucide-react'
 
-const NAME_KEY_PREFIX = 'dirtylaundry_pet_name_'
-const DEFAULT_NAME = 'PIP'
+const NAME_KEY_PREFIX = 'dirtylaundry_plant_name_'
+const DEFAULT_NAME = 'FERN'
 
-const MOOD_BG: Record<PetMood, string> = {
-  happy: 'bg-brutal-lime',
-  content: 'bg-brutal-yellow',
-  bored: 'bg-brutal-yellow/60',
-  sad: 'bg-brutal-blue/15',
-  filthy: 'bg-brutal-pink/20',
+const MOOD_BG: Record<PlantMood, string> = {
+  flowering: 'bg-brutal-lime',
+  thriving: 'bg-brutal-yellow',
+  dry: 'bg-brutal-yellow/60',
+  wilting: 'bg-brutal-blue/15',
+  dying: 'bg-brutal-pink/20',
 }
 
 function formatHours(h: number | null): string {
-  if (h === null) return 'EVER'
+  if (h === null) return 'NEVER'
   if (h < 1) return `${Math.round(h * 60)} MIN AGO`
   if (h < 24) return `${Math.round(h)}H AGO`
   return `${Math.round(h / 24)}D AGO`
 }
 
-export function PetPage() {
+export function PlantPage() {
   const { group } = useGroup()
-  const { state } = usePetState()
+  const { state } = usePlantState()
   const navigate = useNavigate()
 
   const nameKey = group ? `${NAME_KEY_PREFIX}${group.id}` : ''
@@ -49,7 +49,6 @@ export function PetPage() {
 
   return (
     <div className={`min-h-[100dvh] ${MOOD_BG[state.mood]} transition-colors`}>
-      {/* Header */}
       <div className="sticky top-0 z-10 bg-brutal-black text-brutal-white border-b-4 border-brutal-black px-4 py-4 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
@@ -58,14 +57,12 @@ export function PetPage() {
         >
           <ArrowLeft size={16} strokeWidth={3} />
         </button>
-        <h1 className="font-mono font-bold text-lg tracking-tight">YOUR PET</h1>
+        <h1 className="font-mono font-bold text-lg tracking-tight">HOUSEPLANT</h1>
       </div>
 
-      {/* Pet stage */}
       <div className="flex flex-col items-center pt-8 pb-4 px-4">
-        <Pet mood={state.mood} size={220} />
+        <Plant mood={state.mood} size={220} />
 
-        {/* Name */}
         <div className="mt-6 flex items-center gap-2">
           {editing ? (
             <>
@@ -90,7 +87,7 @@ export function PetPage() {
               <button
                 onClick={() => { setDraft(name); setEditing(true) }}
                 className="text-brutal-black/50 active:text-brutal-black"
-                aria-label="Rename pet"
+                aria-label="Rename plant"
               >
                 <Pencil size={14} />
               </button>
@@ -98,29 +95,26 @@ export function PetPage() {
           )}
         </div>
 
-        {/* Mood */}
         <div className="mt-2 px-4 py-1.5 bg-brutal-black text-brutal-white border-2 border-brutal-black font-mono font-bold text-xs tracking-widest">
-          IS {petLabel(state.mood)}
+          IS {plantLabel(state.mood)}
         </div>
         <p className="mt-3 font-mono text-sm text-brutal-black/70 max-w-xs text-center">
-          {petHint(state.mood)}
+          {plantHint(state.mood)}
         </p>
       </div>
 
-      {/* Stats */}
       <div className="px-4 pb-4 grid grid-cols-3 gap-2">
-        <Stat label="LAST FED" value={formatHours(state.hoursSinceLast)} />
+        <Stat label="LAST WATERED" value={formatHours(state.hoursSinceLast)} />
         <Stat label="TODAY" value={`${state.completionsToday}`} />
         <Stat label="48H" value={`${state.completionsLast48h}`} />
       </div>
 
-      {/* CTA */}
       <div className="px-4 pb-8">
         <button
           onClick={() => navigate('/chores')}
           className="w-full bg-brutal-black text-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] py-4 font-mono font-bold text-base tracking-wider transition-all"
         >
-          FEED {name} → DO A CHORE
+          WATER {name} → DO A CHORE
         </button>
       </div>
     </div>

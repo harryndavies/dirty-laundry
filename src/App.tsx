@@ -17,7 +17,7 @@ import { ActivityPage } from '@/pages/ActivityPage'
 import { RoulettePage } from '@/pages/RoulettePage'
 import { WeeklyReportPage } from '@/pages/WeeklyReportPage'
 import { WrappedPage } from '@/pages/WrappedPage'
-import { PetPage } from '@/pages/PetPage'
+import { PlantPage } from '@/pages/PlantPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,7 +62,7 @@ function App() {
                 <Route path="/report" element={<WeeklyReportPage />} />
                 <Route path="/group" element={<GroupPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/pet" element={<PetPage />} />
+                <Route path="/plant" element={<PlantPage />} />
               </Route>
               <Route path="*" element={<Navigate to="/chores" replace />} />
             </Routes>

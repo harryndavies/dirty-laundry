@@ -2,51 +2,48 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { useGroup } from '@/context/GroupContext'
 
-export type PetMood = 'happy' | 'content' | 'bored' | 'sad' | 'filthy'
+export type PlantMood = 'flowering' | 'thriving' | 'dry' | 'wilting' | 'dying'
 
-export interface PetState {
-  mood: PetMood
-  hoursSinceLast: number | null // null = never
+export interface PlantState {
+  mood: PlantMood
+  hoursSinceLast: number | null
   completionsToday: number
   completionsLast48h: number
-  expectedPerDay: number // members.length, ~1 chore/person/day
+  expectedPerDay: number
 }
 
-const MOOD_LABEL: Record<PetMood, string> = {
-  happy: 'BUZZING',
-  content: 'CHEERFUL',
-  bored: 'BORED',
-  sad: 'SAD',
-  filthy: 'FILTHY',
+const MOOD_LABEL: Record<PlantMood, string> = {
+  flowering: 'FLOWERING',
+  thriving: 'THRIVING',
+  dry: 'DRY',
+  wilting: 'WILTING',
+  dying: 'DYING',
 }
 
-const MOOD_HINT: Record<PetMood, string> = {
-  happy: "The house is humming. Don't stop.",
-  content: 'Keeping up nicely. Keep it going.',
-  bored: 'Could use a little action.',
-  sad: "Feeling neglected. It's been a while.",
-  filthy: 'Disgusted. Do literally anything.',
+const MOOD_HINT: Record<PlantMood, string> = {
+  flowering: 'Lush and blooming. Keep going.',
+  thriving: 'Healthy and upright. Nice work.',
+  dry: 'Could use some water. Knock one off the list.',
+  wilting: "Drooping. It's been a while.",
+  dying: 'Critical. Do anything.',
 }
 
-export function petLabel(mood: PetMood): string {
+export function plantLabel(mood: PlantMood): string {
   return MOOD_LABEL[mood]
 }
 
-export function petHint(mood: PetMood): string {
+export function plantHint(mood: PlantMood): string {
   return MOOD_HINT[mood]
 }
 
-export function usePetState(): { state: PetState; loading: boolean } {
+export function usePlantState(): { state: PlantState; loading: boolean } {
   const { group, members } = useGroup()
-
-  // Re-fetch whenever any total_points changes — that's the realtime signal
-  // already firing on completion inserts.
   const totalsKey = members.map(m => `${m.user_id}:${m.total_points}`).join(',')
 
   const { data, isLoading } = useQuery({
-    queryKey: ['pet', group?.id, totalsKey],
+    queryKey: ['plant', group?.id, totalsKey],
     enabled: !!group,
-    queryFn: async (): Promise<PetState> => {
+    queryFn: async (): Promise<PlantState> => {
       const since = new Date()
       since.setHours(since.getHours() - 48)
 
@@ -64,7 +61,6 @@ export function usePetState(): { state: PetState; loading: boolean } {
       if (list.length > 0) {
         hoursSinceLast = (now - new Date(list[0].completed_at).getTime()) / 3_600_000
       } else {
-        // Look further back to know "filthy vs never"
         const { data: anyRows } = await supabase
           .from('completions')
           .select('completed_at')
@@ -84,20 +80,19 @@ export function usePetState(): { state: PetState; loading: boolean } {
 
       const expectedPerDay = Math.max(1, members.length)
 
-      // Mood logic (in order: happy beats content beats bored, etc.)
-      let mood: PetMood
+      let mood: PlantMood
       if (hoursSinceLast === null) {
-        mood = 'filthy'
+        mood = 'dying'
       } else if (hoursSinceLast > 72) {
-        mood = 'filthy'
+        mood = 'dying'
       } else if (hoursSinceLast > 36) {
-        mood = 'sad'
+        mood = 'wilting'
       } else if (completionsLast48h >= expectedPerDay * 3 && hoursSinceLast < 12) {
-        mood = 'happy'
+        mood = 'flowering'
       } else if (completionsLast48h >= expectedPerDay && hoursSinceLast < 24) {
-        mood = 'content'
+        mood = 'thriving'
       } else {
-        mood = 'bored'
+        mood = 'dry'
       }
 
       return { mood, hoursSinceLast, completionsToday, completionsLast48h, expectedPerDay }
@@ -106,7 +101,7 @@ export function usePetState(): { state: PetState; loading: boolean } {
 
   return {
     state: data ?? {
-      mood: 'bored',
+      mood: 'dry',
       hoursSinceLast: null,
       completionsToday: 0,
       completionsLast48h: 0,

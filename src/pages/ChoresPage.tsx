@@ -13,7 +13,7 @@ import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
 import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Camera, X, Focus, Search } from 'lucide-react'
-import { PetTile } from '@/components/PetTile'
+import { PlantTile } from '@/components/PlantTile'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { advanceTour } from '@/lib/hooks/useTour'
 
@@ -301,8 +301,8 @@ export function ChoresPage() {
         </button>
       )}
 
-      {/* Pet tile */}
-      <PetTile />
+      {/* Houseplant tile */}
+      <PlantTile />
 
       {/* Search */}
       <div className="px-4 pt-3">
