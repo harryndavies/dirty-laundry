@@ -48,7 +48,12 @@ export function PlantPage() {
   }
 
   return (
-    <div className={`min-h-[calc(100dvh-9rem)] flex flex-col ${MOOD_BG[state.mood]} transition-colors`}>
+    <div className="relative min-h-[calc(100dvh-9rem)] flex flex-col">
+      <div
+        aria-hidden
+        className={`fixed inset-0 ${MOOD_BG[state.mood]} pointer-events-none transition-colors`}
+        style={{ zIndex: -1 }}
+      />
       <div className="sticky top-0 z-10 bg-brutal-black text-brutal-white border-b-4 border-brutal-black px-4 py-4 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
