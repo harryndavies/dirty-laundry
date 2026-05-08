@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useLeaderboard } from '@/lib/hooks/useLeaderboard'
 import { useStats, formatLastActive } from '@/lib/hooks/useStats'
 import { useNudges } from '@/lib/hooks/useNudges'
@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { toast } from '@/components/ui/Toast'
-import { Flame, Eye, BarChart3, Trophy } from 'lucide-react'
+import { Flame, Eye, BarChart3, Trophy, ChevronLeft, ChevronRight } from 'lucide-react'
 import { playNudge } from '@/lib/sounds'
 
 const rankColors = ['bg-brutal-yellow', 'bg-brutal-pink', 'bg-brutal-lime']
@@ -20,11 +20,27 @@ export function LeaderboardPage() {
   const { leaderboard } = useLeaderboard()
   const { stats } = useStats()
   const { nudges, unseenCount, sendNudge, markSeen } = useNudges()
-  const { lastMonth, winCounts } = useChampions()
+  const { history, currentMonth, winCounts } = useChampions()
   const monthlyPoints = useMonthlyPoints()
   const [nudgingId, setNudgingId] = useState<string | null>(null)
   const [filter, setFilter] = useState<'month' | 'all'>('month')
   const navigate = useNavigate()
+
+  // Champion carousel: chronological order (oldest → newest), with the
+  // current in-progress month appended last when it has data.
+  const championEntries = useMemo(() => {
+    const past = [...history].reverse()
+    return currentMonth ? [...past, currentMonth] : past
+  }, [history, currentMonth])
+  const isInProgress = (idx: number) =>
+    !!currentMonth && idx === championEntries.length - 1
+  const defaultChampionIdx = currentMonth
+    ? Math.max(0, championEntries.length - 2)
+    : championEntries.length - 1
+  const [championIdx, setChampionIdx] = useState<number | null>(null)
+  const activeChampionIdx = championIdx ?? defaultChampionIdx
+  const activeChampion = championEntries[activeChampionIdx] ?? null
+  const touchStartX = useRef<number | null>(null)
 
   const sorted = useMemo(() => {
     if (filter === 'all') return leaderboard
@@ -73,34 +89,68 @@ export function LeaderboardPage() {
         </button>
       )}
 
-      {/* Last month's champion */}
-      {lastMonth && (
+      {/* Monthly champion — swipeable carousel */}
+      {activeChampion && (
         <div className="px-4 mt-3">
-          <div className="border-2 border-brutal-black bg-brutal-yellow shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <div className="px-3 py-2 border-b-2 border-brutal-black flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
+          <div
+            className="border-2 border-brutal-black bg-brutal-yellow shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] select-none"
+            onTouchStart={e => { touchStartX.current = e.touches[0].clientX }}
+            onTouchEnd={e => {
+              if (touchStartX.current === null) return
+              const dx = e.changedTouches[0].clientX - touchStartX.current
+              touchStartX.current = null
+              if (Math.abs(dx) < 40) return
+              if (dx < 0 && activeChampionIdx < championEntries.length - 1) {
+                setChampionIdx(activeChampionIdx + 1)
+              } else if (dx > 0 && activeChampionIdx > 0) {
+                setChampionIdx(activeChampionIdx - 1)
+              }
+            }}
+          >
+            <div className="px-3 py-2 border-b-2 border-brutal-black flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 min-w-0">
                 <Trophy size={12} strokeWidth={3} />
-                <span className="font-mono font-bold text-[10px] tracking-widest">MONTHLY CHAMPION</span>
+                <span className="font-mono font-bold text-[10px] tracking-widest truncate">
+                  {isInProgress(activeChampionIdx) ? 'THIS MONTH · IN PROGRESS' : 'MONTHLY CHAMPION'}
+                </span>
               </div>
-              <span className="font-mono text-[10px] text-brutal-black/50 font-bold">{lastMonth.monthLabel}</span>
+              <span className="font-mono text-[10px] text-brutal-black/50 font-bold shrink-0">{activeChampion.monthLabel}</span>
             </div>
-            <div className="flex items-center gap-3 p-3">
+            <div className="flex items-center gap-2 p-3">
+              <button
+                onClick={() => activeChampionIdx > 0 && setChampionIdx(activeChampionIdx - 1)}
+                disabled={activeChampionIdx === 0}
+                className="w-7 h-7 shrink-0 border-2 border-brutal-black bg-brutal-white flex items-center justify-center disabled:opacity-20 active:bg-brutal-black/10"
+                aria-label="Previous month"
+              >
+                <ChevronLeft size={14} strokeWidth={3} />
+              </button>
               <Avatar
-                name={lastMonth.display_name}
-                color={lastMonth.avatar_color}
+                name={activeChampion.display_name}
+                color={activeChampion.avatar_color}
                 size="md"
-                imageUrl={lastMonth.avatar_url}
+                imageUrl={activeChampion.avatar_url}
               />
               <div className="flex-1 min-w-0">
-                <span className="font-mono font-bold text-sm block truncate">{lastMonth.display_name}</span>
+                <span className="font-mono font-bold text-sm block truncate">{activeChampion.display_name}</span>
                 <span className="font-mono text-[10px] text-brutal-black/60 block truncate">
-                  {lastMonth.prize ?? 'No prize claimed'}
+                  {isInProgress(activeChampionIdx)
+                    ? (activeChampion.prize ?? 'Still up for grabs')
+                    : (activeChampion.prize ?? 'No prize claimed')}
                 </span>
               </div>
               <div className="font-mono font-bold text-xl text-right">
-                {lastMonth.points}
+                {activeChampion.points}
                 <div className="text-[10px] text-brutal-black/40 font-bold">PTS</div>
               </div>
+              <button
+                onClick={() => activeChampionIdx < championEntries.length - 1 && setChampionIdx(activeChampionIdx + 1)}
+                disabled={activeChampionIdx >= championEntries.length - 1}
+                className="w-7 h-7 shrink-0 border-2 border-brutal-black bg-brutal-white flex items-center justify-center disabled:opacity-20 active:bg-brutal-black/10"
+                aria-label="Next month"
+              >
+                <ChevronRight size={14} strokeWidth={3} />
+              </button>
             </div>
           </div>
         </div>

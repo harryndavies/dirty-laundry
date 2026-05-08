@@ -15,13 +15,14 @@ export interface MonthlyChampion {
 
 interface UseChampionsResult {
   lastMonth: MonthlyChampion | null
+  currentMonth: MonthlyChampion | null
   history: MonthlyChampion[]
   winCounts: Map<string, number>
 }
 
 const MONTH_NAMES = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
 
-const EMPTY: UseChampionsResult = { lastMonth: null, history: [], winCounts: new Map() }
+const EMPTY: UseChampionsResult = { lastMonth: null, currentMonth: null, history: [], winCounts: new Map() }
 
 export function useChampions(): UseChampionsResult {
   const { group, members } = useGroup()
@@ -55,11 +56,9 @@ export function useChampions(): UseChampionsResult {
       const history: MonthlyChampion[] = []
       const winCounts = new Map<string, number>()
 
-      // Newest first, current month excluded (it's still in progress)
-      const pastMonths = [...monthlyPoints.keys()].filter(k => k !== currentKey).sort().reverse()
-
-      for (const monthKey of pastMonths) {
-        const scores = monthlyPoints.get(monthKey)!
+      const buildChampion = (monthKey: string): MonthlyChampion | null => {
+        const scores = monthlyPoints.get(monthKey)
+        if (!scores) return null
 
         let topUserId = ''
         let topPoints = 0
@@ -69,29 +68,36 @@ export function useChampions(): UseChampionsResult {
             topUserId = userId
           }
         }
-        if (topPoints === 0) continue
+        if (topPoints === 0) return null
 
         const member = members.find(m => m.user_id === topUserId)
-        if (!member) continue // winner is no longer in the group
+        if (!member) return null
 
         const [year, monthNum] = monthKey.split('-')
-        const monthLabel = `${MONTH_NAMES[parseInt(monthNum) - 1]} ${year}`
-
-        history.push({
+        return {
           monthKey,
-          monthLabel,
+          monthLabel: `${MONTH_NAMES[parseInt(monthNum) - 1]} ${year}`,
           user_id: topUserId,
           display_name: member.profiles.display_name,
           avatar_color: member.profiles.avatar_color,
           avatar_url: member.profiles.avatar_url,
           points: topPoints,
           prize: member.monthly_prize ?? null,
-        })
-
-        winCounts.set(topUserId, (winCounts.get(topUserId) ?? 0) + 1)
+        }
       }
 
-      return { lastMonth: history[0] ?? null, history, winCounts }
+      // Newest first, current month excluded (it's still in progress)
+      const pastMonths = [...monthlyPoints.keys()].filter(k => k !== currentKey).sort().reverse()
+      for (const monthKey of pastMonths) {
+        const champion = buildChampion(monthKey)
+        if (!champion) continue
+        history.push(champion)
+        winCounts.set(champion.user_id, (winCounts.get(champion.user_id) ?? 0) + 1)
+      }
+
+      const currentMonth = buildChampion(currentKey)
+
+      return { lastMonth: history[0] ?? null, currentMonth, history, winCounts }
     },
   })
 
