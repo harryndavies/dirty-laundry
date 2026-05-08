@@ -3,6 +3,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useGroup } from '@/context/GroupContext'
 import { useTheme } from '@/context/ThemeContext'
 import { Avatar } from '@/components/ui/Avatar'
+import { HeatMap } from '@/components/HeatMap'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
@@ -178,6 +179,9 @@ export function ProfilePage() {
             {userMember?.total_points ?? 0} PTS
           </div>
         </div>
+
+        {/* Activity heat map */}
+        <HeatMap />
 
         {/* Color picker */}
         <div>
