@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLeaderboard } from '@/lib/hooks/useLeaderboard'
 import { useStats, formatLastActive } from '@/lib/hooks/useStats'
 import { useNudges } from '@/lib/hooks/useNudges'
 import { useChampions } from '@/lib/hooks/useChampions'
+import { useMonthlyPoints } from '@/lib/hooks/useMonthlyPoints'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
@@ -20,12 +21,23 @@ export function LeaderboardPage() {
   const { stats } = useStats()
   const { nudges, unseenCount, sendNudge, markSeen } = useNudges()
   const { lastMonth, winCounts } = useChampions()
+  const monthlyPoints = useMonthlyPoints()
   const [nudgingId, setNudgingId] = useState<string | null>(null)
+  const [filter, setFilter] = useState<'month' | 'all'>('month')
   const navigate = useNavigate()
+
+  const sorted = useMemo(() => {
+    if (filter === 'all') return leaderboard
+    return [...leaderboard].sort(
+      (a, b) => (monthlyPoints.get(b.user_id) ?? 0) - (monthlyPoints.get(a.user_id) ?? 0),
+    )
+  }, [filter, leaderboard, monthlyPoints])
 
   if (!group) return <Navigate to="/group" replace />
 
-  const maxPoints = leaderboard[0]?.total_points || 1
+  const pointsFor = (userId: string, allTime: number) =>
+    filter === 'month' ? (monthlyPoints.get(userId) ?? 0) : allTime
+  const maxPoints = sorted.length > 0 ? pointsFor(sorted[0].user_id, sorted[0].total_points) || 1 : 1
 
   return (
     <div className="min-h-full">
@@ -94,17 +106,35 @@ export function LeaderboardPage() {
         </div>
       )}
 
+      {/* Month / All-time toggle */}
+      <div className="px-4 mt-3">
+        <div className="grid grid-cols-2 border-2 border-brutal-black bg-brutal-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+          {(['month', 'all'] as const).map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`py-2 font-mono font-bold text-xs tracking-widest transition-colors ${
+                filter === f ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white text-brutal-black/60 active:bg-brutal-black/5'
+              }`}
+            >
+              {f === 'month' ? 'THIS MONTH' : 'ALL TIME'}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="px-4 py-4 space-y-3">
-        {leaderboard.length === 0 ? (
+        {sorted.length === 0 ? (
           <div className="py-12 text-center">
             <div className="text-4xl mb-3">🏆</div>
             <p className="font-mono font-bold text-brutal-black/40 text-sm">NO SCORES YET</p>
             <p className="font-mono text-brutal-black/30 text-xs mt-1">Complete chores to earn points</p>
           </div>
         ) : (
-          leaderboard.map((member, i) => {
+          sorted.map((member, i) => {
             const isMe = member.user_id === user?.id
-            const barWidth = maxPoints > 0 ? (member.total_points / maxPoints) * 100 : 0
+            const points = pointsFor(member.user_id, member.total_points)
+            const barWidth = maxPoints > 0 ? (points / maxPoints) * 100 : 0
             const memberStats = stats.get(member.user_id)
             const lastActive = formatLastActive(memberStats?.last_completion ?? null)
             const streak = memberStats?.current_streak ?? 0
@@ -164,7 +194,7 @@ export function LeaderboardPage() {
 
                   {/* Points */}
                   <div className="font-mono font-bold text-xl text-right min-w-[60px]">
-                    {member.total_points}
+                    {points}
                     <div className="text-[10px] text-brutal-black/40 font-bold">PTS</div>
                   </div>
                 </div>
