@@ -5,6 +5,7 @@ import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
 import { PointsChart } from '@/components/PointsChart'
+import { TimeOfDayHeatmap } from '@/components/TimeOfDayHeatmap'
 import { usePointsHistory } from '@/lib/hooks/usePointsHistory'
 import { Navigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -69,6 +70,7 @@ export function WeeklyReportPage() {
   const [offset, setOffset] = useState(0)
   const [stats, setStats] = useState<MemberStats[]>([])
   const [choreBreakdown, setChoreBreakdown] = useState<ChoreBreakdown[]>([])
+  const [timeMatrix, setTimeMatrix] = useState<number[][]>(() => Array.from({ length: 7 }, () => new Array(24).fill(0)))
   const [loading, setLoading] = useState(true)
 
   const { start, end, label } = getRange(period, offset)
@@ -82,14 +84,15 @@ export function WeeklyReportPage() {
 
     const { data: completions } = await supabase
       .from('completions')
-      .select('user_id, points_earned, chore_name')
+      .select('user_id, points_earned, chore_name, completed_at')
       .eq('group_id', group.id)
       .gte('completed_at', start.toISOString())
       .lte('completed_at', end.toISOString())
 
     const memberMap = new Map<string, { points: number; completions: number; choreCounts: Map<string, number> }>()
+    const matrix: number[][] = Array.from({ length: 7 }, () => new Array(24).fill(0))
 
-    for (const c of (completions ?? []) as unknown as { user_id: string; points_earned: number; chore_name: string | null }[]) {
+    for (const c of (completions ?? []) as unknown as { user_id: string; points_earned: number; chore_name: string | null; completed_at: string }[]) {
       if (!memberMap.has(c.user_id)) {
         memberMap.set(c.user_id, { points: 0, completions: 0, choreCounts: new Map() })
       }
@@ -98,6 +101,10 @@ export function WeeklyReportPage() {
       entry.completions += 1
       const choreName = c.chore_name ?? 'Unknown'
       entry.choreCounts.set(choreName, (entry.choreCounts.get(choreName) ?? 0) + 1)
+      const d = new Date(c.completed_at)
+      const row = (d.getDay() + 6) % 7 // Mon = 0, Sun = 6
+      const col = d.getHours()
+      matrix[row][col]++
     }
 
     const result: MemberStats[] = members.map(m => {
@@ -147,6 +154,7 @@ export function WeeklyReportPage() {
 
     setChoreBreakdown(breakdown)
     setStats(result)
+    setTimeMatrix(matrix)
     setLoading(false)
   }, [group, members, start.getTime(), end.getTime()])
 
@@ -228,10 +236,65 @@ export function WeeklyReportPage() {
               </div>
             )}
 
+            {/* Fair share summary */}
+            {stats.length >= 2 && totalPoints > 0 && (() => {
+              const enriched = stats.map(m => {
+                const md = members.find(x => x.user_id === m.user_id)
+                const expected = hasShares && md ? md.chore_share : 100 / members.length
+                const actual = (m.points / totalPoints) * 100
+                return { ...m, expected, actual, delta: actual - expected }
+              })
+              const totalDeviation = enriched.reduce((s, m) => s + Math.max(0, m.delta), 0)
+              const balance = Math.max(0, Math.round(100 - totalDeviation))
+              const over = enriched.reduce((a, b) => (b.delta > a.delta ? b : a))
+              const under = enriched.reduce((a, b) => (b.delta < a.delta ? b : a))
+              const balanceColor = balance >= 80 ? 'bg-brutal-lime' : balance >= 60 ? 'bg-brutal-yellow' : 'bg-brutal-pink'
+              const balanceLabel = balance >= 80 ? 'BALANCED' : balance >= 60 ? 'UNEVEN' : 'IMBALANCED'
+              return (
+                <div className="border-2 border-brutal-black bg-brutal-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="px-3 pt-3 pb-1 flex items-baseline justify-between">
+                    <h3 className="font-mono font-bold text-xs uppercase">Fair Share</h3>
+                    <span className={`font-mono text-[10px] font-bold tracking-widest px-2 py-0.5 border border-brutal-black ${balanceColor}`}>
+                      {balanceLabel}
+                    </span>
+                  </div>
+                  <div className="px-3 py-2 flex items-baseline gap-2">
+                    <span className="font-mono font-bold text-4xl">{balance}</span>
+                    <span className="font-mono text-[10px] text-brutal-black/40 font-bold">/ 100</span>
+                  </div>
+                  <div className="px-3 pb-3 grid grid-cols-2 gap-2">
+                    <div className="border border-brutal-black/30 p-2">
+                      <div className="font-mono text-[9px] text-brutal-black/40 font-bold tracking-widest mb-1">CARRYING</div>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <Avatar name={over.display_name} color={over.avatar_color} size="sm" />
+                        <span className="font-mono font-bold text-xs truncate">{over.display_name}</span>
+                      </div>
+                      <div className="font-mono text-[10px] text-brutal-black/60 mt-1">
+                        {Math.round(over.actual)}%{hasShares ? ` (share: ${Math.round(over.expected)}%)` : ''}
+                      </div>
+                    </div>
+                    <div className="border border-brutal-black/30 p-2">
+                      <div className="font-mono text-[9px] text-brutal-black/40 font-bold tracking-widest mb-1">SLACKING</div>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <Avatar name={under.display_name} color={under.avatar_color} size="sm" />
+                        <span className="font-mono font-bold text-xs truncate">{under.display_name}</span>
+                      </div>
+                      <div className="font-mono text-[10px] text-brutal-black/60 mt-1">
+                        {Math.round(under.actual)}%{hasShares ? ` (share: ${Math.round(under.expected)}%)` : ''}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+
             {/* Points over time chart */}
             {pointsHistory && pointsHistory.length > 0 && (
               <PointsChart data={pointsHistory} />
             )}
+
+            {/* Time-of-day heatmap */}
+            <TimeOfDayHeatmap matrix={timeMatrix} />
 
             {/* Breakdown */}
             <div className="space-y-2 md:space-y-0 md:grid md:grid-cols-2 md:gap-3">
