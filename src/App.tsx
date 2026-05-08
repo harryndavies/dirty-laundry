@@ -16,6 +16,7 @@ import { ProfilePage } from '@/pages/ProfilePage'
 import { ActivityPage } from '@/pages/ActivityPage'
 import { RoulettePage } from '@/pages/RoulettePage'
 import { WeeklyReportPage } from '@/pages/WeeklyReportPage'
+import { WrappedPage } from '@/pages/WrappedPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +39,14 @@ function App() {
             <Routes>
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route
+                path="/wrapped"
+                element={
+                  <ProtectedRoute>
+                    <WrappedPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 element={
                   <ProtectedRoute>

@@ -180,6 +180,18 @@ export function ProfilePage() {
           </div>
         </div>
 
+        {/* Year in Review entry */}
+        <button
+          onClick={() => navigate('/wrapped')}
+          className="w-full bg-brutal-black text-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] px-4 py-3 flex items-center justify-between transition-all"
+        >
+          <div className="text-left">
+            <div className="font-mono text-[10px] tracking-widest font-bold opacity-60">YOUR {new Date().getFullYear()} WRAPPED</div>
+            <div className="font-mono font-bold text-base mt-0.5">SEE YOUR YEAR ➝</div>
+          </div>
+          <Sparkles size={20} strokeWidth={2.5} />
+        </button>
+
         {/* Activity heat map */}
         <HeatMap />
 
