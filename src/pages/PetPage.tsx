@@ -48,7 +48,7 @@ export function PetPage() {
   }
 
   return (
-    <div className={`min-h-full ${MOOD_BG[state.mood]} transition-colors`}>
+    <div className={`min-h-[100dvh] ${MOOD_BG[state.mood]} transition-colors`}>
       {/* Header */}
       <div className="sticky top-0 z-10 bg-brutal-black text-brutal-white border-b-4 border-brutal-black px-4 py-4 flex items-center gap-3">
         <button
