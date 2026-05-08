@@ -48,7 +48,7 @@ export function PlantPage() {
   }
 
   return (
-    <div className={`min-h-[100dvh] ${MOOD_BG[state.mood]} transition-colors`}>
+    <div className={`min-h-[calc(100dvh-9rem)] flex flex-col ${MOOD_BG[state.mood]} transition-colors`}>
       <div className="sticky top-0 z-10 bg-brutal-black text-brutal-white border-b-4 border-brutal-black px-4 py-4 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
@@ -60,7 +60,7 @@ export function PlantPage() {
         <h1 className="font-mono font-bold text-lg tracking-tight">HOUSEPLANT</h1>
       </div>
 
-      <div className="flex flex-col items-center pt-8 pb-4 px-4">
+      <div className="flex-1 flex flex-col items-center justify-center pt-4 pb-4 px-4">
         <Plant mood={state.mood} size={220} />
 
         <div className="mt-6 flex items-center gap-2">
