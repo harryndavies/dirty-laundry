@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { toast } from '@/components/ui/Toast'
-import { Flame, Eye, BarChart3, Trophy } from 'lucide-react'
+import { Flame, Eye, BarChart3, Trophy, TrendingUp } from 'lucide-react'
 import { playNudge } from '@/lib/sounds'
 
 const rankColors = ['bg-brutal-yellow', 'bg-brutal-pink', 'bg-brutal-lime']
@@ -47,6 +47,36 @@ export function LeaderboardPage() {
     return [...leaderboard].sort(
       (a, b) => (monthlyPoints.get(b.user_id) ?? 0) - (monthlyPoints.get(a.user_id) ?? 0),
     )
+  }, [filter, leaderboard, monthlyPoints])
+
+  // Forecast for current month — projects each member's points to end-of-month
+  // based on their current pace.
+  const forecast = useMemo(() => {
+    if (filter !== 'month') return null
+    const now = new Date()
+    const daysElapsed = now.getDate()
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+    if (daysElapsed < 3 || daysElapsed >= daysInMonth) return null
+
+    const projected = leaderboard
+      .map(m => ({
+        member: m,
+        current: monthlyPoints.get(m.user_id) ?? 0,
+        projected: Math.round(((monthlyPoints.get(m.user_id) ?? 0) * daysInMonth) / daysElapsed),
+      }))
+      .filter(p => p.current > 0)
+      .sort((a, b) => b.projected - a.projected)
+
+    if (projected.length === 0) return null
+    const top = projected[0]
+
+    // If the projected leader differs from the current leader, frame it as an upset.
+    const currentLeader = [...leaderboard].sort(
+      (a, b) => (monthlyPoints.get(b.user_id) ?? 0) - (monthlyPoints.get(a.user_id) ?? 0),
+    )[0]
+    const isUpset = currentLeader && currentLeader.user_id !== top.member.user_id
+
+    return { top, isUpset, currentLeader }
   }, [filter, leaderboard, monthlyPoints])
 
   if (!group) return <Navigate to="/group" replace />
@@ -148,6 +178,20 @@ export function LeaderboardPage() {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Forecast banner */}
+      {forecast && (
+        <div className="px-4 mt-3">
+          <div className="border-2 border-brutal-black bg-brutal-blue text-brutal-white px-3 py-2 flex items-center gap-2">
+            <TrendingUp size={14} strokeWidth={3} />
+            <span className="font-mono text-[11px] font-bold flex-1 truncate">
+              {forecast.isUpset && forecast.currentLeader
+                ? `${forecast.top.member.profiles.display_name.toUpperCase()} ON PACE TO OVERTAKE ${forecast.currentLeader.profiles.display_name.toUpperCase()}`
+                : `${forecast.top.member.profiles.display_name.toUpperCase()} ON PACE FOR ${forecast.top.projected} PTS`}
+            </span>
           </div>
         </div>
       )}
