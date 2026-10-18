@@ -1,43 +1,68 @@
-# Astro Starter Kit: Minimal
+# Dirty Laundry: marketing site
 
-```sh
-npm create astro@latest -- --template minimal
+The landing site for [Dirty Laundry](https://dirtylaundry.club), the app that turns housework
+into a game for flatshares, couples and families.
+
+**Live:** [dirtylaundry.club](https://dirtylaundry.club) ·
+**The app:** [app.dirtylaundry.club](https://app.dirtylaundry.club) ·
+**App source:** [dirtylaundry-app](https://github.com/harryndavies/dirtylaundry-app)
+
+It's a static [Astro](https://astro.build) site with no framework JavaScript and no tracking. It
+uses the same playful brutalist look as the app: chunky borders, hard shadows and IBM Plex Mono.
+
+## Pages
+
+| Page           | What's on it                                                              |
+| -------------- | ------------------------------------------------------------------------- |
+| `/`            | the pitch, in sections (see below)                                       |
+| `/faq`         | common questions                                                          |
+| `/privacy`     | privacy policy                                                            |
+| `/terms`       | terms of use                                                              |
+
+The home page runs in order:
+
+1. **Why housework sucks:** boring, invisible, overwhelming.
+2. **How it works:** create a group, add chores, set the split, do the thing, watch the
+   leaderboard.
+3. **See it in action:** mock-ups of the chores list, leaderboard and activity log.
+4. **What people are saying.**
+5. **Features:** scores, streaks, nudges, roulette, reports, bounties, photo proof, push
+   notifications and more.
+6. **Not everyone has the same free time:** the fair-share split.
+7. **Works for families too:** the kid role, prizes and photo proof.
+8. **Built for brains that struggle with chores:** decision fatigue, getting started, dopamine.
+9. **Ready to make housework fun?:** the final call to action, linking into the app.
+
+## Run it locally
+
+You need Node 20+.
+
+```bash
+npm install
+npm run dev       # http://localhost:4321
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+| Script            | What it does                         |
+| ----------------- | ------------------------------------ |
+| `npm run dev`     | dev server with hot reload           |
+| `npm run build`   | build the static site into `dist/`   |
+| `npm run preview` | serve the built site                 |
 
-## 🚀 Project Structure
+## Structure
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```
+src/pages/
+  index.astro     the landing page (markup, styles and a little inline script)
+  faq.astro
+  privacy.astro
+  terms.astro
+public/           favicon and logo
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Each page is self-contained, with styles in the page itself, so there's no shared component
+library to learn.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Deploy
 
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Hosted on Vercel as a static Astro project: framework preset **Astro**, output `dist/`. The
+custom domain `dirtylaundry.club` points at it. There are no environment variables.
