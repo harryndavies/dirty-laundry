@@ -6,7 +6,7 @@ families.
 
 **Use it:** [app.dirtylaundry.club](https://app.dirtylaundry.club) ·
 **About:** [dirtylaundry.club](https://dirtylaundry.club) ·
-**Marketing site source:** [dirtylaundry-site](https://github.com/harryndavies/dirtylaundry-site)
+**Marketing site:** [`site/`](site)
 
 1. Create a group and invite your housemates with a share link.
 2. Add chores and give each one points. Scrubbing the oven is worth more than wiping a counter.
@@ -120,6 +120,7 @@ src/
     database.types.ts  generated types
 supabase/functions/    Edge Functions (Deno)
 ios/                   Capacitor iOS project (bundle id club.dirtylaundry.app)
+site/                  the dirtylaundry.club marketing site (Astro), see site/README.md
 ```
 
 - **Data:** custom hooks wrap TanStack Query. Query keys follow `['resource', group?.id]`, and
@@ -168,6 +169,16 @@ Then build and run from Xcode. App Store Connect copy and reviewer notes are in
 `APP-STORE-SUBMISSION.md`.
 
 ## Deploy
+
+This one repo feeds two Vercel projects:
+
+| Vercel project      | Root directory | Serves                  |
+| ------------------- | -------------- | ----------------------- |
+| `chorequest`        | `/`            | `app.dirtylaundry.club` |
+| `whoseturn-landing` | `site`         | `dirtylaundry.club`     |
+
+Each one only rebuilds when its own files change. The app skips builds that only touch `site/`,
+and the site skips builds that touch nothing in `site/`.
 
 The web app is a static SPA on Vercel. `vercel.json` rewrites every route to `index.html`.
 Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in Vercel, deploy the Edge Functions with

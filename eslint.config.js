@@ -6,7 +6,8 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // site/ is the Astro marketing site, linted and built on its own.
+  globalIgnores(['dist', 'site']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

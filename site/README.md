@@ -5,7 +5,7 @@ into a game for flatshares, couples and families.
 
 **Live:** [dirtylaundry.club](https://dirtylaundry.club) ·
 **The app:** [app.dirtylaundry.club](https://app.dirtylaundry.club) ·
-**App source:** [dirtylaundry-app](https://github.com/harryndavies/dirtylaundry-app)
+**App source:** [the rest of this repo](..)
 
 It's a static [Astro](https://astro.build) site with no framework JavaScript and no tracking. It
 uses the same playful brutalist look as the app: chunky borders, hard shadows and IBM Plex Mono.
@@ -35,9 +35,10 @@ The home page runs in order:
 
 ## Run it locally
 
-You need Node 20+.
+You need Node 20+. The site lives in `site/` of the app repo and has its own `package.json`.
 
 ```bash
+cd site
 npm install
 npm run dev       # http://localhost:4321
 ```
@@ -64,5 +65,6 @@ library to learn.
 
 ## Deploy
 
-Hosted on Vercel as a static Astro project: framework preset **Astro**, output `dist/`. The
-custom domain `dirtylaundry.club` points at it. There are no environment variables.
+Hosted on Vercel as the `whoseturn-landing` project: framework preset **Astro**, Root Directory
+`site`, output `dist/`. It only rebuilds when something in `site/` changes. The custom domain
+`dirtylaundry.club` points at it. There are no environment variables.
