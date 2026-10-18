@@ -1,6 +1,7 @@
 -- Stage 2: data integrity and server-side actions.
 --
 -- * Columns that must always be set become NOT NULL (production has no gaps).
+-- * iOS push registration works (it needed a unique device_token).
 -- (Roles were already limited to owner / member / kid by group_members_role_check.)
 -- * complete_chore, undo_completion and mark_paid do in one transaction what the
 --   app used to do in several separate writes. complete_chore also fixes team
@@ -20,6 +21,13 @@ alter table public.nudges
   alter column to_user_id set not null;
 alter table public.reactions alter column completion_id set not null, alter column user_id set not null;
 alter table public.invitations alter column group_id set not null;
+
+-- iOS registers its device with upsert(..., { onConflict: 'device_token' }), which
+-- needs a plain unique constraint on device_token. Production had none, so no iOS
+-- device could ever register for push. (Web rows have no token; NULLs don't clash.)
+drop index if exists public.push_subscriptions_device_token_key;
+alter table public.push_subscriptions
+  add constraint push_subscriptions_device_token_key unique (device_token);
 
 -- Every row already gets a timestamp by default; make that a guarantee.
 alter table public.chores alter column created_at set not null;

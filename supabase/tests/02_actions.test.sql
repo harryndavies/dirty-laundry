@@ -1,7 +1,7 @@
 -- complete_chore, undo_completion and mark_paid.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(14);
+select plan(15);
 
 create function pg_temp.uid(p_letter text) returns uuid language sql immutable as $$
   select ('00000000-0000-0000-0000-00000000000' || p_letter)::uuid;
@@ -86,6 +86,15 @@ select is(pg_temp.points('b'), 100 - 20, '...which takes its points back (100 be
 select pg_temp.as_user('b');
 select throws_ok($$ select public.mark_paid((select id from public.group_members where user_id = pg_temp.uid('a')), 100, 10) $$,
   'not_allowed', 'only the owner can pay people');
+reset role;
+
+-- --- push registration --------------------------------------------------------
+select pg_temp.as_user('b');
+insert into public.push_subscriptions (user_id, platform, device_token) values (pg_temp.uid('b'), 'ios', 'tok-1')
+  on conflict (device_token) do update set user_id = excluded.user_id;
+select lives_ok($$ insert into public.push_subscriptions (user_id, platform, device_token)
+  values (pg_temp.uid('b'), 'ios', 'tok-1') on conflict (device_token) do update set user_id = excluded.user_id $$,
+  'an iOS device can register again (the app upserts on device_token)');
 reset role;
 
 select * from finish();
