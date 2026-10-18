@@ -1,5 +1,6 @@
 // Who is calling an Edge Function?
-//  * another function or a scheduler, with the service role key: trusted;
+//  * another function, with the service role key: trusted;
+//  * the database's scheduled jobs, with the cron secret: trusted;
 //  * a signed-in user, with their access token;
 //  * anyone else: rejected.
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -26,9 +27,24 @@ function bearer(req: Request): string {
 
 /** True when the request carries the service role key (other functions, schedulers). */
 export function isServiceCall(req: Request): boolean {
-  const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-  const token = bearer(req)
-  return key.length > 0 && token.length === key.length && token === key
+  return sameSecret(bearer(req), Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '')
+}
+
+function sameSecret(a: string, b: string): boolean {
+  if (a.length === 0 || a.length !== b.length) return false
+  let diff = 0
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  return diff === 0
+}
+
+/** True when a scheduled job (pg_cron, see the schedules migration) is calling. */
+export function isCronCall(req: Request): boolean {
+  return sameSecret(req.headers.get('x-cron-secret') ?? '', Deno.env.get('CRON_SECRET') ?? '')
+}
+
+/** Scheduled functions accept the service role key or the cron secret. */
+export function isTrustedCall(req: Request): boolean {
+  return isServiceCall(req) || isCronCall(req)
 }
 
 /** The signed-in user making the request, or null. */

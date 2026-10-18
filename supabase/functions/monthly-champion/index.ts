@@ -1,15 +1,14 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { isServiceCall } from '../_shared/auth.ts'
+import { isTrustedCall } from '../_shared/auth.ts'
 
-// Run this once a month at 00:00 UTC on the 1st.
-// Cron: 0 0 1 * *
+// Runs just after midnight UTC on the 1st (scheduled in the schedules migration).
 //
 // Finds the top scorer for the previous calendar month in each group and
 // sends a push notification to all group members.
 
 Deno.serve(async (req) => {
   // Scheduled job: only callable with the service role key.
-  if (!isServiceCall(req)) return new Response('Forbidden', { status: 403 })
+  if (!isTrustedCall(req)) return new Response('Forbidden', { status: 403 })
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
