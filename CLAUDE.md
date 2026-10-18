@@ -42,7 +42,7 @@ src/
 - **Routing:** React Router in `App.tsx`. Public routes: `/auth`, `/reset-password`. Protected routes wrapped in `AppShell`: `/chores`, `/leaderboard`, `/activity`, `/roulette`, `/report`, `/group`, `/profile`. Default redirect to `/chores`.
 - **Auth:** Supabase Auth with email/password + anonymous accounts. `AuthContext` provides `user`, `session`, `profile`.
 - **Groups:** Users belong to one group. `GroupContext` provides `group`, `members`, `userMember`. Realtime subscriptions on group data.
-- **Roles:** Group members have roles (`owner`, `member`, `kid`). Kids get restricted UI (no edit/delete, see pocket money instead).
+- **Roles:** Group members have roles (`owner`, `member`, `kid`). Kids get restricted UI (no edit/delete). Pro and pocket money exist in the database but are hidden in the app until launch.
 - **Schema:** change it with a migration in `supabase/migrations/`, then `npm run db:types`. Security is enforced by RLS and triggers; multi-step writes go through RPCs (`complete_chore`, `undo_completion`, `mark_paid`, `join_group_by_code`). The shipped iOS app still writes directly, so keep those paths working.
 - **Types:** import row types from `@/lib/db`, not `database.types.ts`.
 - **Mobile interactions:** Swipe gestures on chore cards (right = edit, left = assign). Touch tracking uses refs to avoid async state issues.

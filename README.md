@@ -39,8 +39,7 @@ Realtime, Storage, Edge Functions), Tailwind CSS v4, shadcn/Base UI, Framer Moti
 - **The houseplant:** a group mascot that flowers when chores get done and wilts when they
   don't.
 - **Wrapped:** a year in review, with your signature chore, longest streak and best day.
-- **Families:** a **kid** role (can complete chores, can't edit them) and **pocket money**,
-  where kids earn real money for points (a Pro feature).
+- **Families:** a **kid** role that can complete chores but not edit them.
 - **Push notifications and reminders:** Web Push in the browser, APNs on iOS, plus per-chore
   reminder times.
 - **Sign-in options:** email and password, Sign in with Apple, or a guest account. Guests can
@@ -48,10 +47,14 @@ Realtime, Storage, Edge Functions), Tailwind CSS v4, shadcn/Base UI, Framer Moti
 - **Account deletion** from the Profile tab, which removes the profile, points, completions and
   photos.
 
-### Pro
+### Pro (not launched)
 
-Pro is a one-off purchase per group through Stripe Checkout, and it unlocks pocket money. The
-`stripe-webhook` function marks the group as Pro (`groups.is_pro`).
+Pro is planned as a one-off purchase per group through Stripe Checkout, unlocking **pocket
+money**: kids earn real money for their points. It was hidden for the v1 launch (`5ef932d`).
+The database side is live and guarded (only the Stripe webhook can set `groups.is_pro`, and
+pocket money requires Pro), but nothing in the app shows it, and `create-checkout` and
+`stripe-webhook` are not deployed. To launch it, render `ProPaywall`, deploy both functions and
+set the Stripe secrets (see `TODO-stripe-setup.md`).
 
 ---
 
@@ -104,6 +107,8 @@ Security lives in the database, not the app:
 | `npm run format`       | Prettier                                                        |
 | `npm run build`        | type-check, then build to `dist/`                               |
 
+GitHub Actions runs all of these on every push and pull request (`.github/workflows/ci.yml`).
+
 ---
 
 ## How it fits together
@@ -145,8 +150,8 @@ site/                  the dirtylaundry.club marketing site (Astro), see site/RE
 | `send-reminders`   | sends chore reminders at each chore's reminder day and time    |
 | `weekly-champion`  | announces the week's top scorer                                |
 | `monthly-champion` | crowns the monthly champion and their prize                    |
-| `create-checkout`  | starts a Stripe Checkout session for Pro                       |
-| `stripe-webhook`   | marks a group as Pro once payment succeeds                     |
+| `create-checkout`  | starts a Stripe Checkout session for Pro (not deployed yet)    |
+| `stripe-webhook`   | marks a group as Pro once payment succeeds (not deployed yet)  |
 | `delete-account`   | permanently deletes a user's account and data                  |
 | `public-stats`     | anonymous totals (chores completed, households, points)        |
 
@@ -156,9 +161,34 @@ Their secrets are set with `npx supabase secrets set …`:
 - **Web Push:** `VAPID_PRIVATE_KEY`
 - **iOS push:** `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_BUNDLE_ID`, `APNS_HOST`
 
-The scheduled functions (reminders and champions) only accept calls made with the service role
-key, so whatever schedules them must send it. `send-push` accepts the service role key or a
-signed-in member sending to someone in their own household. Step-by-step guides are in `TODO-stripe-setup.md` and
+`send-push` accepts the service role key or a signed-in member sending to someone in their own
+household.
+
+### Scheduled jobs
+
+`pg_cron` runs them inside the database (see the `schedules` migration), and each job calls its
+function through `pg_net` with a shared secret in the `x-cron-secret` header:
+
+| Job                | When (UTC)               |
+| ------------------ | ------------------------ |
+| `send-reminders`   | every 15 minutes         |
+| `weekly-champion`  | Sundays at 20:00         |
+| `monthly-champion` | 00:05 on the 1st         |
+
+The jobs do nothing until two Vault secrets exist, and the functions reject any call without the
+same secret. One-off setup for a project:
+
+```sql
+select vault.create_secret('https://<project-ref>.supabase.co/functions/v1', 'dirty_laundry_functions_url');
+select vault.create_secret('<secret>', 'dirty_laundry_cron_secret');
+```
+
+```bash
+npx supabase secrets set CRON_SECRET=<secret>
+```
+
+See what ran with `select * from cron.job_run_details order by start_time desc limit 20;` and
+the functions' replies in `net._http_response`. Step-by-step guides are in `TODO-stripe-setup.md` and
 `TODO-apple-signin-setup.md`.
 
 ---
