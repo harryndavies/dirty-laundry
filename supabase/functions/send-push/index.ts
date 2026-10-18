@@ -151,11 +151,13 @@ Deno.serve(async (req) => {
           )
           sent++
         }
-      } catch (err: any) {
-        if (err.statusCode === 410 && sub.endpoint) {
+      } catch (err) {
+        // 410 Gone: the browser unsubscribed, so forget this endpoint.
+        const statusCode = (err as { statusCode?: number }).statusCode
+        if (statusCode === 410 && sub.endpoint) {
           await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)
         }
-        console.error(`Push failed: ${err.message}`)
+        console.error(`Push failed: ${err instanceof Error ? err.message : String(err)}`)
       }
     }
 

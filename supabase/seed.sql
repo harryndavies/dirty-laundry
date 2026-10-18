@@ -1,10 +1,9 @@
--- DEMO SEED SCRIPT
--- Creates a "The Johnsons" group with 4 members, chores, and completions
--- Run this in the Supabase SQL Editor
+-- Demo data for local development, loaded by `npm run db:reset`.
+-- "The Johnsons": Dad (owner), Mum, and two kids, Jake and Lily, with chores and
+-- a few weeks of completions.
 --
--- NOTE: This creates auth users directly. You won't be able to log in as them
--- (they're just for populating the demo). Log in as your own account and join
--- the group using the invite code printed at the end.
+-- The demo people can't sign in. Join as a guest in the app and enter the
+-- invite code DEMO2026.
 
 -- 1. Create fake auth users
 INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at, created_at, updated_at, instance_id, aud, role)

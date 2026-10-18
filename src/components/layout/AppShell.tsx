@@ -18,21 +18,22 @@ export function AppShell() {
   const stillLoading = authLoading || groupLoading
   const location = useLocation()
   const tour = useTour()
+  const { start: startTour } = tour
 
   // Auto-start tour for first-time users once they're on the chores page with a group
   useEffect(() => {
     if (!stillLoading && group && !tour.completed && !tour.active && location.pathname === '/chores') {
-      const t = setTimeout(() => tour.start(), 500)
+      const t = setTimeout(() => startTour(), 500)
       return () => clearTimeout(t)
     }
-  }, [stillLoading, group, tour.completed, tour.active, location.pathname])
+  }, [stillLoading, group, tour.completed, tour.active, location.pathname, startTour])
 
   // Listen for manual tour replay from profile page
   useEffect(() => {
-    const handler = () => tour.start()
+    const handler = () => startTour()
     window.addEventListener('start-tour', handler)
     return () => window.removeEventListener('start-tour', handler)
-  }, [tour.start])
+  }, [startTour])
 
   if (stillLoading) {
     return (

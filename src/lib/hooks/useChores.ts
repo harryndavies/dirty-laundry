@@ -1,9 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { z } from 'zod'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { useGroup } from '@/context/GroupContext'
 import { sendPushToUser } from '@/lib/pushNotifications'
 import { toast } from '@/components/ui/Toast'
+
+const CompleteChoreResult = z.object({ completion_id: z.uuid(), points_earned: z.number().int() })
 
 export function useChores() {
   const { user } = useAuth()
@@ -51,19 +54,15 @@ export function useChores() {
   })
 
   const completeChore = useMutation({
-    mutationFn: async ({ choreId, points, withUserId, photo, photoBefore }: { choreId: string; points: number; withUserId?: string; photo?: File; photoBefore?: File }) => {
+    // `points` is accepted for older callers but ignored: the database decides what a chore is worth.
+    mutationFn: async ({ choreId, withUserId, photo, photoBefore }: { choreId: string; points?: number; withUserId?: string; photo?: File; photoBefore?: File }) => {
       if (!group || !user) throw new Error('No group or user')
 
-      // Check if this chore was boosted by the completer
       const { data: chore } = await supabase
         .from('chores')
-        .select('name, points, base_points, boosted_by')
+        .select('name')
         .eq('id', choreId)
         .single()
-
-      const earnedPoints = (chore?.boosted_by === user.id && chore.points > chore.base_points)
-        ? chore.base_points
-        : points
 
       // Upload photo if provided
       let photoUrl: string | null = null
@@ -97,41 +96,16 @@ export function useChores() {
         }
       }
 
-      const { error } = await supabase
-        .from('completions')
-        .insert({
-          chore_id: choreId,
-          user_id: user.id,
-          group_id: group.id,
-          points_earned: earnedPoints,
-          chore_name: chore?.name ?? null,
-          photo_url: photoUrl,
-          photo_before_url: photoBeforeUrl,
-          with_user_id: withUserId ?? null,
-        })
+      // One server call records the completion (and your partner's, if you did it
+      // together), awards the points and uses up any bounty.
+      const { data: result, error } = await supabase.rpc('complete_chore', {
+        p_chore_id: choreId,
+        p_with_user_id: withUserId,
+        p_photo_url: photoUrl ?? undefined,
+        p_photo_before_url: photoBeforeUrl ?? undefined,
+      })
       if (error) throw error
-
-      // If done with someone, insert a completion for them too
-      if (withUserId) {
-        await supabase
-          .from('completions')
-          .insert({
-            chore_id: choreId,
-            user_id: withUserId,
-            group_id: group.id,
-            points_earned: earnedPoints,
-            chore_name: chore?.name ?? null,
-            with_user_id: user.id,
-          })
-      }
-
-      // Reset boosted points back to base
-      if (chore && chore.points !== chore.base_points) {
-        await supabase
-          .from('chores')
-          .update({ points: chore.base_points, boosted_by: null })
-          .eq('id', choreId)
-      }
+      const earnedPoints = CompleteChoreResult.parse(result).points_earned
 
       // Notify other group members
       const { data: members } = await supabase

@@ -1,4 +1,7 @@
-const audioCtx = () => new (window.AudioContext || (window as any).webkitAudioContext)()
+// Older Safari only has the prefixed constructor.
+const AudioContextClass =
+  window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+const audioCtx = () => new AudioContextClass()
 
 function playTone(frequency: number, duration: number, type: OscillatorType = 'sine', volume = 0.3) {
   try {
@@ -15,7 +18,9 @@ function playTone(frequency: number, duration: number, type: OscillatorType = 's
     gain.connect(ctx.destination)
     osc.start()
     osc.stop(ctx.currentTime + duration)
-  } catch {}
+  } catch {
+    // Sound is a nice-to-have; ignore devices that block audio.
+  }
 }
 
 export function playComplete() {
@@ -64,5 +69,7 @@ export function playResult() {
 function vibrate(pattern: number | number[]) {
   try {
     navigator?.vibrate?.(pattern)
-  } catch {}
+  } catch {
+    // Not every device can vibrate.
+  }
 }

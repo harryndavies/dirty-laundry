@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from './AuthContext'
 import { sendPushToUser } from '@/lib/pushNotifications'
 import { toast } from '@/components/ui/Toast'
-import type { Group, GroupMember, Profile } from '@/lib/database.types'
+import { asMember, type Group, type GroupMember, type Profile } from '@/lib/db'
 
 interface MemberWithProfile extends GroupMember {
   profiles: Profile
@@ -30,22 +30,36 @@ interface GroupContextType {
 const GroupContext = createContext<GroupContextType | null>(null)
 
 export function GroupProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const [group, setGroup] = useState<Group | null>(null)
   const [members, setMembers] = useState<MemberWithProfile[]>([])
   const [userMember, setUserMember] = useState<GroupMember | null>(null)
-  const [loading, setLoading] = useState(true)
+  // Whose household is loaded: undefined until the first load, null when signed out.
+  const [loadedFor, setLoadedFor] = useState<string | null | undefined>(undefined)
+
+  const refreshMembersForGroup = useCallback(async (groupId: string) => {
+    const { data: membersData } = await supabase
+      .from('group_members')
+      .select('*, profiles(*)')
+      .eq('group_id', groupId)
+      .order('total_points', { ascending: false })
+
+    const updated: MemberWithProfile[] = (membersData ?? []).map(asMember)
+    setMembers(updated)
+    if (user) {
+      const me = updated.find(m => m.user_id === user.id)
+      if (me) setUserMember(me)
+    }
+  }, [user])
 
   const fetchGroup = useCallback(async () => {
     if (!user) {
       setGroup(null)
       setMembers([])
       setUserMember(null)
-      setLoading(false)
+      setLoadedFor(null)
       return
     }
-
-    setLoading(true)
 
     // Check localStorage for cached group
     const cachedGroupId = localStorage.getItem('dirtylaundry_group_id')
@@ -71,7 +85,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
           localStorage.setItem('dirtylaundry_group_id', foundGroup.id)
           setGroup(foundGroup)
           await refreshMembersForGroup(foundGroup.id)
-          setLoading(false)
+          setLoadedFor(user.id)
           return
         }
       }
@@ -80,11 +94,11 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       setGroup(null)
       setMembers([])
       setUserMember(null)
-      setLoading(false)
+      setLoadedFor(user.id)
       return
     }
 
-    setUserMember(membership)
+    setUserMember(asMember(membership))
 
     const groupId = membership.group_id
     if (cachedGroupId !== groupId) {
@@ -100,62 +114,47 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     setGroup(groupData)
 
     await refreshMembersForGroup(groupId)
-    setLoading(false)
-  }, [user])
-
-  async function refreshMembersForGroup(groupId: string) {
-    const { data: membersData } = await supabase
-      .from('group_members')
-      .select('*, profiles(*)')
-      .eq('group_id', groupId)
-      .order('total_points', { ascending: false })
-
-    // The hand-written types have no relationships, so the profiles join is untyped.
-    const updated = (membersData as unknown as MemberWithProfile[]) ?? []
-    setMembers(updated)
-    if (user) {
-      const me = updated.find(m => m.user_id === user.id)
-      if (me) setUserMember(me)
-    }
-  }
+    setLoadedFor(user.id)
+  }, [user, refreshMembersForGroup])
 
   const refreshMembers = useCallback(async () => {
     if (group) {
       await refreshMembersForGroup(group.id)
     }
-  }, [group])
+  }, [group, refreshMembersForGroup])
 
   useEffect(() => {
     fetchGroup()
   }, [fetchGroup])
 
   // Realtime: refresh when group settings or member roles change
+  const groupId = group?.id
   useEffect(() => {
-    if (!group) return
+    if (!groupId) return
 
     const channel = supabase
-      .channel(`group-sync-${group.id}`)
+      .channel(`group-sync-${groupId}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'group_members', filter: `group_id=eq.${group.id}` },
-        () => refreshMembersForGroup(group.id)
+        { event: '*', schema: 'public', table: 'group_members', filter: `group_id=eq.${groupId}` },
+        () => refreshMembersForGroup(groupId)
       )
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'groups', filter: `id=eq.${group.id}` },
+        { event: 'UPDATE', schema: 'public', table: 'groups', filter: `id=eq.${groupId}` },
         () => fetchGroup()
       )
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'profiles' },
-        () => refreshMembersForGroup(group.id)
+        () => refreshMembersForGroup(groupId)
       )
       .subscribe()
 
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [group?.id])
+  }, [groupId, fetchGroup, refreshMembersForGroup])
 
   async function createGroup(name: string) {
     if (!user) return
@@ -326,13 +325,12 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     } catch { toast('Failed to update role', 'bg-brutal-pink') }
   }
 
-  async function markAsPaid(memberId: string, userId: string, amountPence: number, points: number) {
+  async function markAsPaid(memberId: string, _userId: string, amountPence: number, points: number) {
     if (!user || !group) return
     try {
-      const { error: updateError } = await supabase.from('group_members').update({ paid_up_to: new Date().toISOString() }).eq('id', memberId)
-      if (updateError) throw updateError
-      const { error: insertError } = await supabase.from('payouts').insert({ group_id: group.id, user_id: userId, paid_by: user.id, amount_pence: amountPence, points })
-      if (insertError) throw insertError
+      // Records the payout and moves "paid up to" in one server call.
+      const { error } = await supabase.rpc('mark_paid', { p_member_id: memberId, p_amount_pence: amountPence, p_points: points })
+      if (error) throw error
       if (group) await refreshMembersForGroup(group.id)
     } catch { toast('Failed to mark as paid', 'bg-brutal-pink') }
   }
@@ -349,7 +347,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <GroupContext.Provider value={{ group, members, userMember, loading, createGroup, joinGroup, refreshMembers, leaveGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid, updateSavingsGoal }}>
+    <GroupContext.Provider value={{ group, members, userMember, loading: authLoading || loadedFor !== (user?.id ?? null), createGroup, joinGroup, refreshMembers, leaveGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid, updateSavingsGoal }}>
       {children}
     </GroupContext.Provider>
   )

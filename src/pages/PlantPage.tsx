@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useGroup } from '@/context/GroupContext'
 import { Plant } from '@/components/Plant'
@@ -29,20 +29,18 @@ export function PlantPage() {
   const navigate = useNavigate()
 
   const nameKey = group ? `${NAME_KEY_PREFIX}${group.id}` : ''
-  const [name, setName] = useState(DEFAULT_NAME)
+  // The plant's name is kept per household on this device.
+  const [renamed, setRenamed] = useState<{ key: string; name: string } | null>(null)
+  const name =
+    renamed?.key === nameKey ? renamed.name : (nameKey && localStorage.getItem(nameKey)) || DEFAULT_NAME
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(DEFAULT_NAME)
-
-  useEffect(() => {
-    if (!nameKey) return
-    setName(localStorage.getItem(nameKey) || DEFAULT_NAME)
-  }, [nameKey])
 
   if (!group) return <Navigate to="/group" replace />
 
   const saveName = () => {
     const trimmed = draft.trim().slice(0, 16).toUpperCase() || DEFAULT_NAME
-    setName(trimmed)
+    setRenamed({ key: nameKey, name: trimmed })
     if (nameKey) localStorage.setItem(nameKey, trimmed)
     setEditing(false)
   }

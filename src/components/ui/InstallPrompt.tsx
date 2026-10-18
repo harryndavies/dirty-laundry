@@ -7,7 +7,14 @@ interface BeforeInstallPromptEvent extends Event {
 
 export function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  const [showIOSPrompt, setShowIOSPrompt] = useState(false)
+  // iOS Safari has no install event, so show manual instructions there.
+  const [showIOSPrompt, setShowIOSPrompt] = useState(() => {
+    if (window.matchMedia('(display-mode: standalone)').matches) return false
+    if (localStorage.getItem('install-prompt-dismissed')) return false
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
+    return isIOS && isSafari
+  })
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
@@ -22,13 +29,6 @@ export function InstallPrompt() {
       setDeferredPrompt(e as BeforeInstallPromptEvent)
     }
     window.addEventListener('beforeinstallprompt', handler)
-
-    // iOS Safari: detect and show manual instructions
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-    const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
-    if (isIOS && isSafari) {
-      setShowIOSPrompt(true)
-    }
 
     return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])

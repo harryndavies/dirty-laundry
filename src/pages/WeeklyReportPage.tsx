@@ -1,4 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { buildReport } from '@/lib/report'
 import { Spinner } from '@/components/ui/Spinner'
 import { supabase } from '@/lib/supabase'
 import { useGroup } from '@/context/GroupContext'
@@ -9,21 +11,6 @@ import { TimeOfDayHeatmap } from '@/components/TimeOfDayHeatmap'
 import { usePointsHistory } from '@/lib/hooks/usePointsHistory'
 import { Navigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-
-interface MemberStats {
-  user_id: string
-  display_name: string
-  avatar_color: string
-  points: number
-  completions: number
-  topChore: string | null
-}
-
-interface ChoreBreakdown {
-  name: string
-  doers: { user_id: string; display_name: string; avatar_color: string; count: number }[]
-  total: number
-}
 
 type Period = 'week' | 'month' | 'year'
 
@@ -68,99 +55,33 @@ export function WeeklyReportPage() {
   const { user } = useAuth()
   const [period, setPeriod] = useState<Period>('week')
   const [offset, setOffset] = useState(0)
-  const [stats, setStats] = useState<MemberStats[]>([])
-  const [choreBreakdown, setChoreBreakdown] = useState<ChoreBreakdown[]>([])
-  const [timeMatrix, setTimeMatrix] = useState<number[][]>(() => Array.from({ length: 7 }, () => new Array(24).fill(0)))
-  const [loading, setLoading] = useState(true)
 
   const { start, end, label } = getRange(period, offset)
   const { data: pointsHistory } = usePointsHistory(start, end)
-  const totalPoints = stats.reduce((sum, s) => sum + s.points, 0)
   const hasShares = members.some(m => m.chore_share > 0)
 
-  const fetchStats = useCallback(async () => {
-    if (!group) return
-    setLoading(true)
-
-    const { data: completions } = await supabase
-      .from('completions')
-      .select('user_id, points_earned, chore_name, completed_at')
-      .eq('group_id', group.id)
-      .gte('completed_at', start.toISOString())
-      .lte('completed_at', end.toISOString())
-
-    const memberMap = new Map<string, { points: number; completions: number; choreCounts: Map<string, number> }>()
-    const matrix: number[][] = Array.from({ length: 7 }, () => new Array(24).fill(0))
-
-    for (const c of (completions ?? []) as unknown as { user_id: string; points_earned: number; chore_name: string | null; completed_at: string }[]) {
-      if (!memberMap.has(c.user_id)) {
-        memberMap.set(c.user_id, { points: 0, completions: 0, choreCounts: new Map() })
-      }
-      const entry = memberMap.get(c.user_id)!
-      entry.points += c.points_earned
-      entry.completions += 1
-      const choreName = c.chore_name ?? 'Unknown'
-      entry.choreCounts.set(choreName, (entry.choreCounts.get(choreName) ?? 0) + 1)
-      const d = new Date(c.completed_at)
-      const row = (d.getDay() + 6) % 7 // Mon = 0, Sun = 6
-      const col = d.getHours()
-      matrix[row][col]++
-    }
-
-    const result: MemberStats[] = members.map(m => {
-      const data = memberMap.get(m.user_id)
-      let topChore: string | null = null
-      if (data) {
-        let maxCount = 0
-        for (const [name, count] of data.choreCounts) {
-          if (count > maxCount) { maxCount = count; topChore = name }
-        }
-      }
-      return {
-        user_id: m.user_id,
-        display_name: m.profiles.display_name,
-        avatar_color: m.profiles.avatar_color,
-        points: data?.points ?? 0,
-        completions: data?.completions ?? 0,
-        topChore,
-      }
-    }).sort((a, b) => b.points - a.points)
-
-    // Build chore breakdown
-    const choreMap = new Map<string, Map<string, number>>()
-    for (const c of (completions ?? []) as unknown as { user_id: string; points_earned: number; chore_name: string | null }[]) {
-      const choreName = c.chore_name ?? 'Unknown'
-      if (!choreMap.has(choreName)) choreMap.set(choreName, new Map())
-      const doerMap = choreMap.get(choreName)!
-      doerMap.set(c.user_id, (doerMap.get(c.user_id) ?? 0) + 1)
-    }
-
-    const breakdown: ChoreBreakdown[] = Array.from(choreMap.entries())
-      .map(([name, doerMap]) => {
-        const doers = Array.from(doerMap.entries())
-          .map(([userId, count]) => {
-            const m = members.find(m => m.user_id === userId)
-            return {
-              user_id: userId,
-              display_name: m?.profiles.display_name ?? '?',
-              avatar_color: m?.profiles.avatar_color ?? '#ccc',
-              count,
-            }
-          })
-          .sort((a, b) => b.count - a.count)
-        return { name, doers, total: doers.reduce((s, d) => s + d.count, 0) }
-      })
-      .sort((a, b) => b.total - a.total)
-
-    setChoreBreakdown(breakdown)
-    setStats(result)
-    setTimeMatrix(matrix)
-    setLoading(false)
-  }, [group, members, start.getTime(), end.getTime()])
-
-  useEffect(() => {
-    fetchStats()
-  }, [fetchStats])
+  const startMs = start.getTime()
+  const endMs = end.getTime()
+  const { data: completions, isPending } = useQuery({
+    queryKey: ['report-completions', group?.id, startMs, endMs],
+    enabled: !!group,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('completions')
+        .select('user_id, points_earned, chore_name, completed_at')
+        .eq('group_id', group!.id)
+        .gte('completed_at', new Date(startMs).toISOString())
+        .lte('completed_at', new Date(endMs).toISOString())
+      if (error) throw error
+      return data
+    },
+  })
+  const { stats, choreBreakdown, timeMatrix } = useMemo(
+    () => buildReport(completions ?? [], members),
+    [completions, members],
+  )
+  const loading = isPending
+  const totalPoints = stats.reduce((sum, s) => sum + s.points, 0)
 
   if (!group) return <Navigate to="/group" replace />
 

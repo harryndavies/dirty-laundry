@@ -66,13 +66,6 @@ Deno.serve(async (req) => {
         .eq('id', championId)
         .single()
 
-      // Get group name
-      const { data: group } = await supabase
-        .from('groups')
-        .select('name')
-        .eq('id', groupId)
-        .single()
-
       // Get all members
       const { data: members } = await supabase
         .from('group_members')

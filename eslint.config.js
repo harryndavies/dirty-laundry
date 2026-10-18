@@ -20,5 +20,15 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Prefix with _ to keep a parameter in a signature on purpose.
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      // Contexts export their hook beside the provider, and the UI kit exports its
+      // style variants; that only costs a full reload of those files in dev.
+      'react-refresh/only-export-components': [
+        'error',
+        { allowConstantExport: true, allowExportNames: ['useAuth', 'useGroup', 'useTheme', 'toast', 'buttonVariants', 'tabsListVariants'] },
+      ],
+    },
   },
 ])

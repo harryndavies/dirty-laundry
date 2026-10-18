@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { useGroup } from '@/context/GroupContext'
@@ -15,30 +16,25 @@ interface NudgeWithSender {
 export function useNudges() {
   const { user } = useAuth()
   const { group } = useGroup()
-  const [nudges, setNudges] = useState<NudgeWithSender[]>([])
-  const [unseenCount, setUnseenCount] = useState(0)
+  const queryClient = useQueryClient()
+  const queryKey = ['nudges', group?.id, user?.id]
 
-  const fetchNudges = useCallback(async () => {
-    if (!user || !group) return
-
-    const { data } = await supabase
-      .from('nudges')
-      .select('id, from_user_id, created_at, seen, profiles!nudges_from_user_id_fkey(display_name)')
-      .eq('to_user_id', user.id)
-      .eq('group_id', group.id)
-      .order('created_at', { ascending: false })
-      .limit(20)
-
-    if (data) {
-      const typed = data as unknown as NudgeWithSender[]
-      setNudges(typed)
-      setUnseenCount(typed.filter(n => !n.seen).length)
-    }
-  }, [user, group])
-
-  useEffect(() => {
-    fetchNudges()
-  }, [fetchNudges])
+  const { data: nudges = [] } = useQuery({
+    queryKey,
+    enabled: !!user && !!group,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('nudges')
+        .select('id, from_user_id, created_at, seen, profiles!nudges_from_user_id_fkey(display_name)')
+        .eq('to_user_id', user!.id)
+        .eq('group_id', group!.id)
+        .order('created_at', { ascending: false })
+        .limit(20)
+      if (error) throw error
+      return data as unknown as NudgeWithSender[]
+    },
+  })
+  const unseenCount = nudges.filter(n => !n.seen).length
 
   useEffect(() => {
     if (!user || !group) return
@@ -53,14 +49,14 @@ export function useNudges() {
           table: 'nudges',
           filter: `to_user_id=eq.${user.id}`,
         },
-        () => fetchNudges()
+        () => queryClient.invalidateQueries({ queryKey: ['nudges', group.id, user.id] })
       )
       .subscribe()
 
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [user, group, fetchNudges])
+  }, [user, group, queryClient])
 
   async function sendNudge(toUserId: string) {
     if (!user || !group) return
@@ -91,8 +87,8 @@ export function useNudges() {
       .eq('to_user_id', user.id)
       .eq('group_id', group.id)
       .eq('seen', false)
-    setUnseenCount(0)
-    fetchNudges()
+    queryClient.setQueryData<NudgeWithSender[]>(queryKey, prev => prev?.map(n => ({ ...n, seen: true })))
+    queryClient.invalidateQueries({ queryKey })
   }
 
   return { nudges, unseenCount, sendNudge, markSeen }

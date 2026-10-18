@@ -33,7 +33,7 @@ export function ProPaywall({ open, onClose, groupId }: ProPaywallProps) {
       } else {
         throw new Error('No checkout URL returned')
       }
-    } catch (err) {
+    } catch {
       toast('Failed to start checkout. Try again.', 'bg-brutal-pink')
       setLoading(false)
     }

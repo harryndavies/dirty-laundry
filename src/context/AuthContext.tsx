@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { Session, User } from '@supabase/supabase-js'
 import { SignInWithApple, type SignInWithAppleResponse } from '@capacitor-community/apple-sign-in'
 import { supabase } from '@/lib/supabase'
-import type { Profile } from '@/lib/database.types'
+import type { Profile } from '@/lib/db'
 
 interface AuthContextType {
   session: Session | null

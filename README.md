@@ -57,49 +57,52 @@ Pro is a one-off purchase per group through Stripe Checkout, and it unlocks pock
 
 ## Run it locally
 
-You need Node 20+ and a Supabase project (the hosted free tier is fine).
+You need Node 20+ and Docker (for the local Supabase stack).
 
 ```bash
 npm install
-cp .env.example .env.local   # then fill in the two values below
-npm run dev                  # http://localhost:5173
+npm run db:start                                 # local Supabase: migrations + demo data
+cp .env.localdb.example .env.localdb.local
+npm run dev:local                                # http://localhost:5175, against the local stack
 ```
 
-`.env.local`:
+Join as a guest and enter the invite code **DEMO2026** to land in the demo household.
 
-| Variable                 | Value                                         |
-| ------------------------ | --------------------------------------------- |
-| `VITE_SUPABASE_URL`      | your project's API URL                        |
-| `VITE_SUPABASE_ANON_KEY` | your project's anon (publishable) key         |
+To run against a hosted project instead, copy `.env.example` to `.env.local`, fill in the
+project's URL and anon key, and use `npm run dev`. The app refuses to start if either is missing.
 
 ### Database
 
-The SQL in the repo root is the history of how the hosted database was built. Run the scripts
-in the Supabase SQL editor in this order:
-
-1. `supabase-schema.sql`: core tables (profiles, groups, members, chores, completions,
-   invitations), triggers and RLS
-2. `supabase-push-subscriptions.sql`
-3. `supabase-chore-reminders.sql`
-4. `supabase-pro-migration.sql`
-5. `seed-demo.sql` (optional): a demo family with Mum, Dad, Lily and Jake
-
-The repo doesn't yet include scripts for the `nudges`, `reactions` and `payouts` tables. They
-were created directly in the hosted project. To recreate the full schema elsewhere, export it
-from a project that already has them:
+The schema lives in `supabase/migrations/`, starting from a baseline taken from production.
+Change it with a new migration, never by hand in the dashboard:
 
 ```bash
-npx supabase db dump --schema public > schema.sql
+npx supabase migration new <name>   # write the SQL
+npm run db:reset                    # rebuild the local database from scratch
+npm run db:types                    # regenerate src/lib/database.types.ts
+npm run test:db                     # run the database tests
+npx supabase db push                # apply to the linked production project
 ```
 
-### Scripts
+Security lives in the database, not the app:
 
-| Script            | What it does                         |
-| ----------------- | ------------------------------------ |
-| `npm run dev`     | Vite dev server                      |
-| `npm run build`   | type-check, then build to `dist/`    |
-| `npm run lint`    | ESLint                               |
-| `npm run preview` | serve the production build           |
+- **Row level security** on every table limits people to their own household.
+- **Triggers** guard what a client may change. Points always come from the chore, only you can
+  lower your own points (undo), roles are set by the owner, and Pro can only be switched on by
+  the Stripe webhook.
+- **Functions** do the multi-step actions in one transaction: `complete_chore` (including team
+  completions and bounties), `undo_completion`, `mark_paid` and `join_group_by_code`.
+
+### Tests and checks
+
+| Script                 | What it does                                                    |
+| ---------------------- | --------------------------------------------------------------- |
+| `npm test`             | unit and component tests (Vitest, Testing Library)              |
+| `npm run test:db`      | database tests (pgTAP): the security rules and the functions    |
+| `npm run typecheck`    | TypeScript                                                      |
+| `npm run lint`         | ESLint, including the React hooks rules                         |
+| `npm run format`       | Prettier                                                        |
+| `npm run build`        | type-check, then build to `dist/`                               |
 
 ---
 
@@ -115,9 +118,13 @@ src/
   context/             AuthContext, GroupContext, ThemeContext
   lib/
     hooks/             data hooks: useChores, useActivity, useLeaderboard, useFairTurn,
-                       usePocketMoney, usePlantState, …
-    supabase.ts        Supabase client
-    database.types.ts  generated types
+                       usePlantState, …
+    report.ts          the weekly/monthly report maths
+    supabase.ts        Supabase client (env checked by env.ts)
+    database.types.ts  generated types (npm run db:types)
+    db.ts              row type names, with roles checked by Zod
+supabase/migrations/   the schema, as migrations
+supabase/tests/        pgTAP database tests
 supabase/functions/    Edge Functions (Deno)
 ios/                   Capacitor iOS project (bundle id club.dirtylaundry.app)
 site/                  the dirtylaundry.club marketing site (Astro), see site/README.md
@@ -127,10 +134,8 @@ site/                  the dirtylaundry.club marketing site (Astro), see site/RE
   mutations invalidate the queries they affect. Group data stays live through Supabase Realtime.
 - **Auth:** Supabase Auth with email/password, Sign in with Apple and anonymous (guest)
   accounts. `AuthContext` provides `user`, `session` and `profile`.
-- **Groups and roles:** each user belongs to one group, with the role `admin`, `member` or
-  `kid`. Kids get a reduced interface.
-- **Security:** every table in the SQL scripts has row level security, so members can only see
-  and change their own group's data.
+- **Groups and roles:** each user belongs to one group, as its `owner`, a `member` or a `kid`.
+  Kids can complete chores but not manage them, and the database enforces that too.
 
 ### Edge Functions
 
@@ -151,8 +156,9 @@ Their secrets are set with `npx supabase secrets set …`:
 - **Web Push:** `VAPID_PRIVATE_KEY`
 - **iOS push:** `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_BUNDLE_ID`, `APNS_HOST`
 
-The scheduled functions (reminders and champions) are triggered by cron jobs set up in the
-Supabase dashboard. Step-by-step guides are in `TODO-stripe-setup.md` and
+The scheduled functions (reminders and champions) only accept calls made with the service role
+key, so whatever schedules them must send it. `send-push` accepts the service role key or a
+signed-in member sending to someone in their own household. Step-by-step guides are in `TODO-stripe-setup.md` and
 `TODO-apple-signin-setup.md`.
 
 ---

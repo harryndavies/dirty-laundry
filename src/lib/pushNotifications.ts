@@ -158,16 +158,7 @@ export async function sendPushToUser(
   toUserId: string,
   payload: { title: string; body: string; url?: string }
 ): Promise<void> {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-  const session = (await supabase.auth.getSession()).data.session
-
-  await fetch(`${supabaseUrl}/functions/v1/send-push`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session?.access_token ?? supabaseAnonKey}`,
-    },
-    body: JSON.stringify({ toUserId, payload }),
-  })
+  // Sent with the signed-in user's session; the function checks they share a household.
+  const { error } = await supabase.functions.invoke('send-push', { body: { toUserId, payload } })
+  if (error) throw error
 }

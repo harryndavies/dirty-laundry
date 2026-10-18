@@ -1,5 +1,7 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
+import { useInfiniteQuery, useQueryClient, type InfiniteData } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
+import { toast } from '@/components/ui/Toast'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
 import { sendPushToUser } from '@/lib/pushNotifications'
@@ -23,61 +25,51 @@ export interface ActivityEntry {
   reactions: Reaction[]
 }
 
+const PAGE_SIZE = 20
+const ACTIVITY_SELECT =
+  'id, user_id, points_earned, completed_at, chore_name, photo_url, photo_before_url, with_user_id, profiles!completions_user_id_fkey(display_name, avatar_color, avatar_url), reactions(id, emoji, user_id)'
+
 export function useActivity() {
   const { group, refreshMembers } = useGroup()
   const { user } = useAuth()
-  const PAGE_SIZE = 20
-  const [activity, setActivity] = useState<ActivityEntry[]>([])
-  const [loading, setLoading] = useState(true)
-  const [hasMore, setHasMore] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
+  const queryClient = useQueryClient()
+  const queryKey = ['activity', group?.id]
 
+  // Pages of 20, each starting just before the last entry of the previous one.
+  const { data, isPending, hasNextPage, isFetchingNextPage, fetchNextPage, refetch } = useInfiniteQuery({
+    queryKey,
+    enabled: !!group,
+    initialPageParam: null as string | null,
+    queryFn: async ({ pageParam }) => {
+      let query = supabase
+        .from('completions')
+        .select(ACTIVITY_SELECT)
+        .eq('group_id', group!.id)
+        .order('completed_at', { ascending: false })
+        .limit(PAGE_SIZE)
+      if (pageParam) query = query.lt('completed_at', pageParam)
+      const { data, error } = await query
+      if (error) throw error
+      return data as unknown as ActivityEntry[]
+    },
+    getNextPageParam: lastPage =>
+      lastPage.length === PAGE_SIZE ? lastPage[lastPage.length - 1].completed_at : undefined,
+  })
+
+  const activity = useMemo(() => data?.pages.flat() ?? [], [data])
   const fetchActivity = useCallback(async () => {
-    if (!group) return
-    const { data, error: fetchError } = await supabase
-      .from('completions')
-      .select('id, user_id, points_earned, completed_at, chore_name, photo_url, photo_before_url, with_user_id, profiles!completions_user_id_fkey(display_name, avatar_color, avatar_url), reactions(id, emoji, user_id)')
-      .eq('group_id', group.id)
-      .order('completed_at', { ascending: false })
-      .limit(PAGE_SIZE)
+    await refetch()
+  }, [refetch])
 
-    if (fetchError) {
-      console.error('Activity fetch error:', fetchError)
-    }
-
-    if (data) {
-      setActivity(data as unknown as ActivityEntry[])
-      setHasMore(data.length === PAGE_SIZE)
-    }
-    setLoading(false)
-  }, [group])
-
-  async function loadMore() {
-    if (!group || !hasMore || loadingMore || activity.length === 0) return
-    setLoadingMore(true)
-    const lastItem = activity[activity.length - 1]
-    const { data } = await supabase
-      .from('completions')
-      .select('id, user_id, points_earned, completed_at, chore_name, photo_url, photo_before_url, with_user_id, profiles!completions_user_id_fkey(display_name, avatar_color, avatar_url), reactions(id, emoji, user_id)')
-      .eq('group_id', group.id)
-      .order('completed_at', { ascending: false })
-      .lt('completed_at', lastItem.completed_at)
-      .limit(PAGE_SIZE)
-
-    if (data) {
-      setActivity(prev => [...prev, ...(data as unknown as ActivityEntry[])])
-      setHasMore(data.length === PAGE_SIZE)
-    }
-    setLoadingMore(false)
+  function loadMore() {
+    if (!hasNextPage || isFetchingNextPage) return
+    fetchNextPage()
   }
 
   useEffect(() => {
-    fetchActivity()
-  }, [fetchActivity])
-
-  useEffect(() => {
     if (!group) return
 
+    const refresh = () => queryClient.invalidateQueries({ queryKey: ['activity', group.id] })
     const channel = supabase
       .channel(`activity-${group.id}`)
       .on(
@@ -88,7 +80,7 @@ export function useActivity() {
           table: 'completions',
           filter: `group_id=eq.${group.id}`,
         },
-        () => fetchActivity()
+        refresh
       )
       .on(
         'postgres_changes',
@@ -97,14 +89,14 @@ export function useActivity() {
           schema: 'public',
           table: 'reactions',
         },
-        () => fetchActivity()
+        refresh
       )
       .subscribe()
 
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [group, fetchActivity])
+  }, [group, queryClient])
 
   async function toggleReaction(completionId: string, emoji: string) {
     if (!user) return
@@ -147,31 +139,35 @@ export function useActivity() {
     const entry = activity.find(a => a.id === completionId)
     if (!entry || entry.user_id !== user.id) return
 
-    // Subtract points from group_members
-    const { data: membership } = await supabase
-      .from('group_members')
-      .select('id, total_points')
-      .eq('group_id', group.id)
-      .eq('user_id', user.id)
-      .maybeSingle()
-
-    if (membership) {
-      await supabase
-        .from('group_members')
-        .update({ total_points: Math.max(0, membership.total_points - entry.points_earned) })
-        .eq('id', membership.id)
+    // Takes the points back and deletes the completion in one server call.
+    const { error } = await supabase.rpc('undo_completion', { p_completion_id: completionId })
+    if (error) {
+      toast('Could not undo that', 'bg-brutal-pink')
+      return
     }
-
-    // Delete the completion
-    await supabase.from('completions').delete().eq('id', completionId)
 
     await fetchActivity()
     await refreshMembers()
   }
 
   function updateEntry(completionId: string, updates: Partial<ActivityEntry>) {
-    setActivity(prev => prev.map(a => a.id === completionId ? { ...a, ...updates } : a))
+    queryClient.setQueryData<InfiniteData<ActivityEntry[]>>(queryKey, prev =>
+      prev && {
+        ...prev,
+        pages: prev.pages.map(page => page.map(a => (a.id === completionId ? { ...a, ...updates } : a))),
+      }
+    )
   }
 
-  return { activity, loading, hasMore, loadingMore, loadMore, toggleReaction, undoCompletion, refetch: fetchActivity, updateEntry }
+  return {
+    activity,
+    loading: isPending && !!group,
+    hasMore: hasNextPage,
+    loadingMore: isFetchingNextPage,
+    loadMore,
+    toggleReaction,
+    undoCompletion,
+    refetch: fetchActivity,
+    updateEntry,
+  }
 }

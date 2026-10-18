@@ -197,11 +197,18 @@ export function WrappedPage() {
   const touchX = useRef<number | null>(null)
   const touchStartTime = useRef<number>(0)
 
-  if (!group) return <Navigate to="/group" replace />
-  if (!user) return <Navigate to="/auth" replace />
-
   const cards = CARDS.filter(c => c.visible(stats))
   const total = cards.length
+
+  // Auto-advance unless paused. (Hooks must run before any early return.)
+  useEffect(() => {
+    if (loading || paused || idx >= total - 1) return
+    const t = setTimeout(() => setIdx(i => Math.min(total - 1, i + 1)), ADVANCE_MS)
+    return () => clearTimeout(t)
+  }, [idx, paused, loading, total])
+
+  if (!group) return <Navigate to="/group" replace />
+  if (!user) return <Navigate to="/auth" replace />
   const card = cards[idx] ?? cards[0]
 
   const ctx = {
@@ -212,13 +219,6 @@ export function WrappedPage() {
 
   const next = () => setIdx(i => Math.min(total - 1, i + 1))
   const prev = () => setIdx(i => Math.max(0, i - 1))
-
-  // Auto-advance unless paused
-  useEffect(() => {
-    if (loading || paused || idx >= total - 1) return
-    const t = setTimeout(next, ADVANCE_MS)
-    return () => clearTimeout(t)
-  }, [idx, paused, loading, total])
 
   if (loading) {
     return (

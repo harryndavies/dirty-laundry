@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { TOUR_STEPS } from '@/components/tour/AppTour'
+import { TOUR_STEPS } from '@/components/tour/steps'
 
 const STORAGE_KEY = 'dirtylaundry_tour_completed'
 

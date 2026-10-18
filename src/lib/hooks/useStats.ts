@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useMemo } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { useGroup } from '@/context/GroupContext'
 
@@ -8,7 +9,8 @@ interface MemberStats {
   current_streak: number
 }
 
-function calculateStreak(dates: string[]): number {
+/** Consecutive days with a completion, counting back from today or yesterday. */
+export function calculateStreak(dates: string[]): number {
   if (dates.length === 0) return 0
 
   const uniqueDays = [...new Set(dates.map(d => new Date(d).toDateString()))]
@@ -45,43 +47,38 @@ function calculateStreak(dates: string[]): number {
 
 export function useStats() {
   const { group, members } = useGroup()
-  const [stats, setStats] = useState<Map<string, MemberStats>>(new Map())
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
 
-  const fetchStats = useCallback(async () => {
-    if (!group || members.length === 0) return
+  // Completions from the last 60 days are enough to work out streaks.
+  const { data: completions, isPending } = useQuery({
+    queryKey: ['stats-completions', group?.id],
+    enabled: !!group,
+    queryFn: async () => {
+      const since = new Date()
+      since.setDate(since.getDate() - 60)
+      const { data, error } = await supabase
+        .from('completions')
+        .select('user_id, completed_at')
+        .eq('group_id', group!.id)
+        .gte('completed_at', since.toISOString())
+        .order('completed_at', { ascending: false })
+      if (error) throw error
+      return data
+    },
+  })
 
+  const stats = useMemo(() => {
     const statsMap = new Map<string, MemberStats>()
-
-    // Fetch all completions for the group in the last 60 days (enough for streaks)
-    const since = new Date()
-    since.setDate(since.getDate() - 60)
-
-    const { data: completions } = await supabase
-      .from('completions')
-      .select('user_id, completed_at')
-      .eq('group_id', group.id)
-      .gte('completed_at', since.toISOString())
-      .order('completed_at', { ascending: false })
-
     for (const member of members) {
-      const userCompletions = (completions ?? []).filter(c => c.user_id === member.user_id)
-      const dates = userCompletions.map(c => c.completed_at)
-
+      const dates = (completions ?? []).filter(c => c.user_id === member.user_id).map(c => c.completed_at)
       statsMap.set(member.user_id, {
         user_id: member.user_id,
         last_completion: dates[0] ?? null,
         current_streak: calculateStreak(dates),
       })
     }
-
-    setStats(statsMap)
-    setLoading(false)
-  }, [group, members])
-
-  useEffect(() => {
-    fetchStats()
-  }, [fetchStats])
+    return statsMap
+  }, [completions, members])
 
   useEffect(() => {
     if (!group) return
@@ -96,16 +93,16 @@ export function useStats() {
           table: 'completions',
           filter: `group_id=eq.${group.id}`,
         },
-        () => fetchStats()
+        () => queryClient.invalidateQueries({ queryKey: ['stats-completions', group.id] })
       )
       .subscribe()
 
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [group, fetchStats])
+  }, [group, queryClient])
 
-  return { stats, loading }
+  return { stats, loading: isPending && !!group }
 }
 
 export function formatLastActive(lastCompletion: string | null): string {

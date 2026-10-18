@@ -13,9 +13,11 @@ Group chore management app with gamification (points, leaderboards, roulette). M
 
 ## Commands
 
-- `npm run dev` — start dev server
-- `npm run build` — typecheck + production build
-- `npm run lint` — ESLint
+- `npm run dev:local` — dev server against the local Supabase stack (`npm run db:start` first)
+- `npm run dev` — dev server against the project in `.env.local`
+- `npm test` / `npm run test:db` — Vitest / pgTAP tests
+- `npm run typecheck`, `npm run lint`, `npm run format`
+- `npm run db:types` — regenerate `src/lib/database.types.ts` after a migration
 
 ## Project Structure
 
@@ -27,9 +29,10 @@ src/
 │   └── layout/      # AppShell, BottomNav, SideNav, ProtectedRoute
 ├── context/         # AuthContext, GroupContext, ThemeContext
 ├── lib/
-│   ├── hooks/       # Data hooks (useChores, useActivity, useLeaderboard, useFairTurn, usePocketMoney, etc.)
+│   ├── hooks/       # Data hooks (useChores, useActivity, useLeaderboard, useFairTurn, usePlantState, etc.)
 │   ├── supabase.ts  # Supabase client
-│   └── database.types.ts  # Generated Supabase types
+│   ├── database.types.ts  # Generated Supabase types
+│   └── db.ts              # Row type aliases
 ```
 
 ## Key Patterns
@@ -39,7 +42,9 @@ src/
 - **Routing:** React Router in `App.tsx`. Public routes: `/auth`, `/reset-password`. Protected routes wrapped in `AppShell`: `/chores`, `/leaderboard`, `/activity`, `/roulette`, `/report`, `/group`, `/profile`. Default redirect to `/chores`.
 - **Auth:** Supabase Auth with email/password + anonymous accounts. `AuthContext` provides `user`, `session`, `profile`.
 - **Groups:** Users belong to one group. `GroupContext` provides `group`, `members`, `userMember`. Realtime subscriptions on group data.
-- **Roles:** Group members have roles (`admin`, `member`, `kid`). Kids get restricted UI (no edit/delete, see pocket money instead).
+- **Roles:** Group members have roles (`owner`, `member`, `kid`). Kids get restricted UI (no edit/delete, see pocket money instead).
+- **Schema:** change it with a migration in `supabase/migrations/`, then `npm run db:types`. Security is enforced by RLS and triggers; multi-step writes go through RPCs (`complete_chore`, `undo_completion`, `mark_paid`, `join_group_by_code`). The shipped iOS app still writes directly, so keep those paths working.
+- **Types:** import row types from `@/lib/db`, not `database.types.ts`.
 - **Mobile interactions:** Swipe gestures on chore cards (right = edit, left = assign). Touch tracking uses refs to avoid async state issues.
 
 ## Database Tables
@@ -48,4 +53,4 @@ src/
 
 ## Environment
 
-Requires `.env.local` with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+`.env.local` (hosted) or `.env.localdb.local` (local stack, see `.env.localdb.example`) with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`; `src/lib/env.ts` validates them.
