@@ -1,0 +1,1665 @@
+---
+
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Dirty Laundry — the household chore app that makes housework fun. Track chores, earn points, climb the leaderboard. Free for flatmates, couples, and families." />
+    <meta name="keywords" content="chore tracker, household chores app, chore app for flatmates, family chore chart, roommate chores, housework tracker, chore points, chore leaderboard" />
+    <meta name="author" content="Dirty Laundry" />
+    <meta name="theme-color" content="#FFE500" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Dirty Laundry — Housework, but make it fun" />
+    <meta property="og:description" content="Turn household chores into a game. Track what gets done, earn points, compete on leaderboards. Free for flatmates, couples, and families." />
+    <meta property="og:url" content="https://dirtylaundry.club" />
+    <meta property="og:image" content="https://dirtylaundry.club/og-image.png" />
+    <meta property="og:site_name" content="Dirty Laundry" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Dirty Laundry — Housework, but make it fun" />
+    <meta name="twitter:description" content="Turn household chores into a game. Track what gets done, earn points, compete on leaderboards. Free." />
+    <meta name="twitter:image" content="https://dirtylaundry.club/og-image.png" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://dirtylaundry.club" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <title>Dirty Laundry — Housework, but make it fun</title>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Dirty Laundry",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "Web",
+      "description": "Household chore tracker that turns housework into a game. Points, leaderboards, and a fair split for flatmates and families.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "GBP"
+      },
+      "url": "https://dirtylaundry.club"
+    }
+    </script>
+  </head>
+  <body>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-badge">HOUSEWORK, BUT MAKE IT FUN</div>
+        <img src="/logo.png" alt="Dirty Laundry" class="hero-logo" />
+        <p class="hero-desc">
+          Turn your household to-do list into a game.<br />
+          Points. Leaderboards. A little bit of chaos.
+        </p>
+        <a href="https://app.dirtylaundry.club/auth" class="btn btn-black">GET STARTED</a>
+      </div>
+    </section>
+
+    <!-- LIVE STATS — hidden until numbers are worth showing -->
+
+    <!-- PROBLEM -->
+    <section class="section bg-white">
+      <div class="container">
+        <h2>WHY HOUSEWORK SUCKS</h2>
+        <div class="card-grid">
+          <div class="card card-pink">
+            <div class="card-icon">🧠</div>
+            <h3>IT'S BORING</h3>
+            <p>Nobody wakes up excited to clean the bathroom. Your brain would literally rather do anything else.</p>
+          </div>
+          <div class="card card-yellow">
+            <div class="card-icon">😶‍🌫️</div>
+            <h3>IT'S INVISIBLE</h3>
+            <p>You spent an hour cleaning and nobody even noticed. Effort without acknowledgement is exhausting.</p>
+          </div>
+          <div class="card card-lime">
+            <div class="card-icon">😵‍💫</div>
+            <h3>IT'S OVERWHELMING</h3>
+            <p>The list never ends. Where do you even start? So you stare at the mess and do nothing.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section bg-yellow">
+      <div class="container">
+        <h2>HOW IT WORKS</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-number bg-lime">1</div>
+            <div class="step-content">
+              <h3>CREATE A GROUP</h3>
+              <p>Set up your household and invite your partner, housemates, or whoever you share a bin with.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number bg-pink">2</div>
+            <div class="step-content">
+              <h3>ADD YOUR CHORES</h3>
+              <p>List the jobs that need doing and assign point values. Scrubbing the oven? That's worth more than wiping a counter.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number bg-blue">3</div>
+            <div class="step-content">
+              <h3>SET THE SPLIT</h3>
+              <p>Not everyone has the same free time. Agree on each person's fair share — 40/35/25 or whatever works. Scores adjust automatically.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number bg-orange">4</div>
+            <div class="step-content">
+              <h3>DO THE THING</h3>
+              <p>Finished something? Mark it done, earn your points, get a 👏 from your housemate. Instant gratification.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number bg-pink">5</div>
+            <div class="step-content">
+              <h3>WATCH THE LEADERBOARD</h3>
+              <p>Weekly reports, who-does-what breakdowns, and a leaderboard that makes housework weirdly competitive.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MID CTA -->
+    <section class="section bg-black mid-cta">
+      <div class="container cta">
+        <p class="cta-free">100% free. No ads. No catch. No premium tier.</p>
+        <a href="https://app.dirtylaundry.club/auth" class="btn btn-yellow">START TRACKING — IT'S FREE</a>
+      </div>
+    </section>
+
+    <!-- APP PREVIEW -->
+    <section class="section bg-white">
+      <div class="container">
+        <h2>SEE IT IN ACTION</h2>
+        <div class="phone-grid">
+
+          <!-- CHORES SCREEN -->
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="phone-header">
+              <span class="phone-title">Our Flat</span>
+              <span class="phone-action">+</span>
+            </div>
+            <div class="phone-filters">
+              <span class="pill pill-active">ALL</span>
+              <span class="pill">RECURRING</span>
+              <span class="pill">ONE-TIME</span>
+            </div>
+            <div class="phone-body">
+              <div class="mock-chore">
+                <div class="mock-chore-info">
+                  <span class="mock-chore-name">Do the dishes</span>
+                  <div class="mock-chore-tags">
+                    <span class="mock-tag tag-yellow">15 PTS</span>
+                    <span class="mock-tag tag-blue">RECURRING</span>
+                  </div>
+                </div>
+                <span class="mock-check bg-lime">✓</span>
+              </div>
+              <div class="mock-chore">
+                <div class="mock-chore-info">
+                  <span class="mock-chore-name">Clean the bathroom</span>
+                  <div class="mock-chore-tags">
+                    <span class="mock-tag tag-bounty">🔥 50 PTS</span>
+                    <span class="mock-tag tag-blue">RECURRING</span>
+                  </div>
+                  <div class="mock-turn">Tom's turn</div>
+                </div>
+                <span class="mock-check bg-lime">✓</span>
+              </div>
+              <div class="mock-chore">
+                <div class="mock-chore-info">
+                  <span class="mock-chore-name">Take bins out</span>
+                  <div class="mock-chore-tags">
+                    <span class="mock-tag tag-yellow">10 PTS</span>
+                    <span class="mock-tag tag-orange">ONE-TIME</span>
+                  </div>
+                </div>
+                <span class="mock-check bg-lime">✓</span>
+              </div>
+              <div class="mock-chore">
+                <div class="mock-chore-info">
+                  <span class="mock-chore-name">Hoover the flat</span>
+                  <div class="mock-chore-tags">
+                    <span class="mock-tag tag-yellow">20 PTS</span>
+                    <span class="mock-tag tag-blue">RECURRING</span>
+                  </div>
+                </div>
+                <span class="mock-check bg-lime">✓</span>
+              </div>
+            </div>
+            <div class="phone-nav">
+              <span class="nav-item nav-active">CHORES</span>
+              <span class="nav-item">SCORES</span>
+              <span class="nav-item">LOG</span>
+              <span class="nav-item">SPIN</span>
+              <span class="nav-item">REPORT</span>
+            </div>
+            <p class="phone-label">CHORES LIST</p>
+          </div>
+
+          <!-- LEADERBOARD SCREEN -->
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="phone-header phone-header-yellow">
+              <span class="phone-title-center">LEADERBOARD</span>
+            </div>
+            <div class="phone-body">
+              <div class="mock-leader-card">
+                <div class="mock-leader">
+                  <span class="mock-rank bg-yellow">1</span>
+                  <div class="mock-avatar" style="background:#FF2D9B;">S</div>
+                  <div class="mock-leader-info">
+                    <div class="mock-leader-name-row">
+                      <span class="mock-leader-name">Sarah</span>
+                      <span class="mock-streak">🔥 7</span>
+                    </div>
+                    <div class="mock-bar"><div class="mock-bar-fill bg-yellow" style="width:100%;"></div></div>
+                  </div>
+                  <div class="mock-points">285<span class="mock-pts">PTS</span></div>
+                </div>
+                <div class="mock-shame">
+                  <span class="mock-shame-label">LAST ACTIVE</span>
+                  <span class="mock-shame-value">2H AGO</span>
+                </div>
+              </div>
+              <div class="mock-leader-card">
+                <div class="mock-leader">
+                  <span class="mock-rank bg-pink">2</span>
+                  <div class="mock-avatar" style="background:#0066FF;">T</div>
+                  <div class="mock-leader-info">
+                    <span class="mock-leader-name">Tom</span>
+                    <div class="mock-bar"><div class="mock-bar-fill bg-pink" style="width:68%;"></div></div>
+                  </div>
+                  <div class="mock-points">195<span class="mock-pts">PTS</span></div>
+                </div>
+                <div class="mock-shame">
+                  <span class="mock-shame-label">LAST ACTIVE</span>
+                  <div class="mock-shame-row">
+                    <span class="mock-shame-warn">4 DAYS AGO</span>
+                    <span class="mock-nudge-btn">👀</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mock-leader-card">
+                <div class="mock-leader">
+                  <span class="mock-rank bg-lime">3</span>
+                  <div class="mock-avatar" style="background:#FF6B00;">J</div>
+                  <div class="mock-leader-info">
+                    <span class="mock-leader-name">Jake</span>
+                    <div class="mock-bar"><div class="mock-bar-fill bg-lime" style="width:39%;"></div></div>
+                  </div>
+                  <div class="mock-points">110<span class="mock-pts">PTS</span></div>
+                </div>
+                <div class="mock-shame">
+                  <span class="mock-shame-label">LAST ACTIVE</span>
+                  <div class="mock-shame-row">
+                    <span class="mock-shame-value">1D AGO</span>
+                    <span class="mock-nudge-btn">👀</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="phone-nav">
+              <span class="nav-item">CHORES</span>
+              <span class="nav-item nav-active">SCORES</span>
+              <span class="nav-item">LOG</span>
+              <span class="nav-item">SPIN</span>
+              <span class="nav-item">REPORT</span>
+            </div>
+            <p class="phone-label">LEADERBOARD</p>
+          </div>
+
+          <!-- ACTIVITY SCREEN -->
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="phone-header phone-header-orange">
+              <span class="phone-title-center">ACTIVITY</span>
+            </div>
+            <div class="phone-body">
+              <div class="mock-date-label">TODAY</div>
+              <div class="mock-activity">
+                <div class="mock-avatar-sm" style="background:#FF2D9B;">S</div>
+                <div class="mock-activity-info">
+                  <span><strong>Sarah</strong> completed <strong>Do the dishes</strong></span>
+                  <span class="mock-time">2m ago</span>
+                </div>
+                <span class="mock-tag tag-yellow">+15</span>
+              </div>
+              <div class="mock-activity">
+                <div class="mock-avatar-sm" style="background:#0066FF;">T</div>
+                <div class="mock-activity-info">
+                  <span><strong>Tom</strong> completed <strong>Take bins out</strong></span>
+                  <span class="mock-time">1h ago</span>
+                </div>
+                <span class="mock-tag tag-yellow">+10</span>
+              </div>
+              <div class="mock-date-label">YESTERDAY</div>
+              <div class="mock-activity">
+                <div class="mock-avatar-sm" style="background:#FF2D9B;">S</div>
+                <div class="mock-activity-info">
+                  <span><strong>Sarah</strong> completed <strong>Hoover the flat</strong></span>
+                  <span class="mock-time">1d ago</span>
+                </div>
+                <span class="mock-tag tag-yellow">+20</span>
+              </div>
+              <div class="mock-activity">
+                <div class="mock-avatar-sm" style="background:#FF6B00;">J</div>
+                <div class="mock-activity-info">
+                  <span><strong>Jake</strong> completed <strong>Clean the bathroom</strong></span>
+                  <span class="mock-time">1d ago</span>
+                </div>
+                <span class="mock-tag tag-yellow">+30</span>
+              </div>
+            </div>
+            <div class="phone-nav">
+              <span class="nav-item">CHORES</span>
+              <span class="nav-item">SCORES</span>
+              <span class="nav-item nav-active">LOG</span>
+              <span class="nav-item">SPIN</span>
+              <span class="nav-item">REPORT</span>
+            </div>
+            <p class="phone-label">ACTIVITY LOG</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="section bg-white">
+      <div class="container">
+        <h2>WHAT PEOPLE ARE SAYING</h2>
+        <div class="testimonial-grid">
+          <div class="testimonial">
+            <p class="testimonial-quote">"It's actually fun now? My partner and I race to hit our weekly points. Never thought I'd say that about cleaning."</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar bg-pink">L</div>
+              <div>
+                <span class="testimonial-name">Laura</span>
+                <span class="testimonial-detail">Lives with partner</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial">
+            <p class="testimonial-quote">"Three of us in a flat and we actually look forward to the weekly report now. It's become a whole thing. Someone boosted the bathroom to 50 points last week."</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar bg-blue">M</div>
+              <div>
+                <span class="testimonial-name">Marcus</span>
+                <span class="testimonial-detail">3-person flatshare</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial">
+            <p class="testimonial-quote">"I have ADHD and the chore roulette is genuinely the only reason my flat isn't a disaster. Spin, do, done."</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar bg-orange">R</div>
+              <div>
+                <span class="testimonial-name">Ria</span>
+                <span class="testimonial-detail">Lives alone (still needs accountability)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section bg-yellow">
+      <div class="container">
+        <h2>FEATURES</h2>
+        <div class="card-grid four">
+          <div class="feature">
+            <div class="feature-icon bg-lime">✓</div>
+            <h3>REAL-TIME SCORES</h3>
+            <p>Points update instantly. No refresh needed.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-pink">⏱️</div>
+            <h3>LAST ACTIVE</h3>
+            <p>Shows how long since someone last did a chore. A gentle prompt to get moving.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-orange">🔥</div>
+            <h3>STREAKS</h3>
+            <p>Consecutive days of getting stuff done. Keep the streak alive — it's weirdly motivating.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-blue">👀</div>
+            <h3>NUDGE</h3>
+            <p>One tap to give someone a friendly poke. They'll get the hint.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-yellow">🎰</div>
+            <h3>CHORE ROULETTE</h3>
+            <p>Can't decide what to do? Spin the wheel. Takes the thinking out of it.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-lime">📊</div>
+            <h3>WEEKLY REPORT</h3>
+            <p>See who did what this week, this month, or this year. Breakdowns that actually make sense.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-pink">🏆</div>
+            <h3>LEADERBOARD</h3>
+            <p>See who's on top. Nothing motivates like a bit of friendly competition.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-orange">📋</div>
+            <h3>ACTIVITY LOG</h3>
+            <p>Full history of who did what and when — with photos, reactions, and undo.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-yellow">💰</div>
+            <h3>CHORE BOUNTIES</h3>
+            <p>Boost a chore's points to bribe someone into doing the gross one. Can't claim your own bounty.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-lime">⚖️</div>
+            <h3>FAIR ASSIGNMENT</h3>
+            <p>Auto-suggests whose turn it is based on who's done it least. No more guessing.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-pink">👑</div>
+            <h3>MONTHLY CHAMPION</h3>
+            <p>Crown the winner each month. Top scorer takes their prize.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-blue">📸</div>
+            <h3>PHOTO PROOF</h3>
+            <p>Snap a pic when you complete a chore. Evidence that you actually did it.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-lime">😂</div>
+            <h3>REACTIONS</h3>
+            <p>React to completions with emoji. A 👏 from a housemate goes a long way.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-pink">🤝</div>
+            <h3>TEAM COMPLETIONS</h3>
+            <p>Did a chore together? Tag your partner and both get the points.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-orange">🏷️</div>
+            <h3>CHORE AREAS</h3>
+            <p>Organise by room — Kitchen, Bathroom, Garden. Find what you need fast.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-blue">👥</div>
+            <h3>SHARE LINK TO JOIN</h3>
+            <p>Drop a link in the group chat. One tap to join. No codes to type.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-yellow">🎯</div>
+            <h3>GROUP GOALS</h3>
+            <p>Set a weekly point target for the whole household. Teamwork makes the dream work.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-lime">🏆</div>
+            <h3>MONTHLY PRIZES</h3>
+            <p>Each person sets their prize. Winner takes theirs at the end of the month.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-pink">📦</div>
+            <h3>STARTER PACKS</h3>
+            <p>Student flat, family home, or couple — pick a pack and start in seconds.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-orange">🔔</div>
+            <h3>PUSH NOTIFICATIONS</h3>
+            <p>Reminders, reactions, and nudges — right to your phone. Keeps you in the loop.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon bg-blue">📱</div>
+            <h3>INSTALL AS APP</h3>
+            <p>Add to your home screen. Looks and feels like a real app. Because it is.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHORE SPLIT -->
+    <section class="section bg-white">
+      <div class="container">
+        <h2>NOT EVERYONE HAS THE SAME FREE TIME</h2>
+        <p class="split-intro">
+          Some weeks you're working late every night. Other weeks you're off.
+          Dirty Laundry lets your group set a <strong>fair chore split</strong> so everyone
+          contributes what they can — no guilt, no free rides.
+        </p>
+        <div class="split-grid">
+          <div class="split-card">
+            <div class="split-icon">⚖️</div>
+            <h3>GROUP-AGREED SPLIT</h3>
+            <p>The group owner sets each person's expected share. Everyone can see it. No one can quietly game it.</p>
+          </div>
+          <div class="split-card">
+            <div class="split-icon">📊</div>
+            <h3>FAIR SHARE SCORING</h3>
+            <p>The report scores you against <strong>your share</strong>, not everyone else's. Hit your target and you're golden — even if someone else did more raw points.</p>
+          </div>
+          <div class="split-card">
+            <div class="split-icon">🧠</div>
+            <h3>SMART SUGGESTIONS</h3>
+            <p>"Whose turn" factors in your split. If you're set to 20%, you won't get suggested as often as someone at 40%.</p>
+          </div>
+        </div>
+        <div class="split-example">
+          <div class="split-example-header">EXAMPLE: 3-PERSON FLAT</div>
+          <div class="split-bars">
+            <div class="split-bar-row">
+              <div class="split-bar-avatar" style="background:#FF2D9B;">S</div>
+              <span class="split-bar-name">Sarah</span>
+              <div class="split-bar-track">
+                <div class="split-bar-fill bg-pink" style="width:40%;"></div>
+              </div>
+              <span class="split-bar-pct">40%</span>
+            </div>
+            <div class="split-bar-row">
+              <div class="split-bar-avatar" style="background:#0066FF;">T</div>
+              <span class="split-bar-name">Tom</span>
+              <div class="split-bar-track">
+                <div class="split-bar-fill bg-blue" style="width:35%;"></div>
+              </div>
+              <span class="split-bar-pct">35%</span>
+            </div>
+            <div class="split-bar-row">
+              <div class="split-bar-avatar" style="background:#FF6B00;">J</div>
+              <span class="split-bar-name">Jake</span>
+              <div class="split-bar-track">
+                <div class="split-bar-fill bg-orange" style="width:25%;"></div>
+              </div>
+              <span class="split-bar-pct">25%</span>
+            </div>
+          </div>
+          <p class="split-example-note">Jake works 60-hour weeks. The group agreed on 25%. He does his share, no guilt.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAMILIES -->
+    <section class="section bg-white">
+      <div class="container">
+        <h2>WORKS FOR FAMILIES TOO</h2>
+        <p class="split-intro">
+          Dirty Laundry isn't just for flatmates. Families use it to split
+          the load fairly, teach kids responsibility, and turn chores into
+          a game everyone actually plays.
+        </p>
+        <div class="split-grid">
+          <div class="split-card">
+            <div class="split-icon">👶</div>
+            <h3>KID ROLE</h3>
+            <p>Mark members as "kid". Kids can complete chores and earn points but can't add chores or change settings. Parents stay in control.</p>
+          </div>
+          <div class="split-card">
+            <div class="split-icon">🏆</div>
+            <h3>POINTS + REWARDS</h3>
+            <p>Set a monthly prize — loser pays, winner picks a takeaway, whatever you like. The leaderboard gives kids something to aim for without the parent having to nag.</p>
+          </div>
+          <div class="split-card">
+            <div class="split-icon">📸</div>
+            <h3>PROOF PHOTOS</h3>
+            <p>"Did you actually do it?" becomes a thing of the past. Snap a photo when you complete a chore — visible to the rest of the household.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADHD -->
+    <section class="section bg-yellow">
+      <div class="container">
+        <h2>BUILT FOR BRAINS THAT STRUGGLE WITH CHORES</h2>
+        <p class="adhd-intro">
+          If you've ever stared at a messy kitchen and felt completely paralysed —
+          you're not lazy. You might just have a brain that needs a different system.
+          Dirty Laundry was built with that in mind.
+        </p>
+        <div class="adhd-grid">
+          <div class="adhd-card">
+            <div class="adhd-icon">🎯</div>
+            <h3>DECISION FATIGUE?</h3>
+            <p><strong>"Whose turn"</strong> tells you exactly what to do next. No staring at the mess wondering where to start.</p>
+          </div>
+          <div class="adhd-card">
+            <div class="adhd-icon">🎰</div>
+            <h3>CAN'T START?</h3>
+            <p><strong>Chore roulette</strong> makes it random and a bit fun. Spin the wheel, do the thing. Takes the weight off choosing.</p>
+          </div>
+          <div class="adhd-card">
+            <div class="adhd-icon">🏆</div>
+            <h3>NEED DOPAMINE?</h3>
+            <p><strong>Points, reactions, and leaderboards</strong> turn boring tasks into a game. Your brain wants a reward — here it is.</p>
+          </div>
+          <div class="adhd-card">
+            <div class="adhd-icon">🔔</div>
+            <h3>OUT OF SIGHT, OUT OF MIND?</h3>
+            <p><strong>Push reminders and nudges</strong> are your external memory. The app remembers so you don't have to.</p>
+          </div>
+          <div class="adhd-card">
+            <div class="adhd-icon">⚖️</div>
+            <h3>GUILT SPIRAL?</h3>
+            <p><strong>The chore split</strong> means you're only measured against your own capacity. Bad week? Adjust the share. No shame.</p>
+          </div>
+          <div class="adhd-card">
+            <div class="adhd-icon">👏</div>
+            <h3>NEED ACKNOWLEDGEMENT?</h3>
+            <p><strong>Reactions on completions</strong> mean your effort gets seen. A 👏 from a housemate goes a long way.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section bg-black">
+      <div class="container cta">
+        <h2 class="text-white">READY TO MAKE HOUSEWORK FUN?</h2>
+        <p class="text-white-muted">100% free. No ads. No catch. No premium tier. Just accountability.</p>
+        <a href="https://app.dirtylaundry.club/auth" class="btn btn-yellow">START TRACKING — IT'S FREE</a>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="container footer-inner">
+        <span class="footer-brand">DIRTY LAUNDRY</span>
+        <a href="https://buymeacoffee.com/dirtylaundry" target="_blank" rel="noopener" class="footer-coffee">☕ BUY US A COFFEE</a>
+        <a href="/faq" class="footer-link">FAQ</a>
+        <a href="/privacy" class="footer-link">PRIVACY</a>
+        <a href="/terms" class="footer-link">TERMS</a>
+        <span class="footer-copy">Made with good intentions and a messy flat.</span>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  /* ================================
+     RESET & BASE
+     ================================ */
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    background: #FFFFFF;
+    color: #000000;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ================================
+     COLORS
+     ================================ */
+  .bg-yellow { background: #FFE500; }
+  .bg-lime { background: #BFFF00; }
+  .bg-pink { background: #FF2D9B; color: #FFFFFF; }
+  .bg-blue { background: #0066FF; color: #FFFFFF; }
+  .bg-orange { background: #FF6B00; color: #FFFFFF; }
+  .bg-black { background: #000000; }
+  .bg-white { background: #FFFFFF; }
+  .text-white { color: #FFFFFF; }
+  .text-white-muted { color: rgba(255,255,255,0.6); font-size: 0.875rem; }
+
+  /* ================================
+     LAYOUT
+     ================================ */
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .section {
+    padding: 5rem 0;
+  }
+
+  .section h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+
+  /* ================================
+     HERO
+     ================================ */
+  .hero {
+    background: #FFE500;
+    border-bottom: 4px solid #000;
+    padding: 2.5rem 0 2rem;
+    text-align: center;
+  }
+
+  .hero-logo {
+    max-width: 400px;
+    width: 80%;
+    height: auto;
+    margin-bottom: 0.75rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: #000;
+    color: #FFE500;
+    padding: 0.4rem 1rem;
+    margin-bottom: 0.75rem;
+    border: 2px solid #000;
+  }
+
+  .hero h1 {
+    font-size: clamp(3rem, 10vw, 5rem);
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-tagline {
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 0.6;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-desc {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    opacity: 0.7;
+    max-width: 400px;
+    margin: 0 auto 1.5rem;
+  }
+
+  /* ================================
+     BUTTONS
+     ================================ */
+  .btn {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 0.875rem 2rem;
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0 0 #000;
+    transition: all 0.1s ease;
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    box-shadow: 3px 3px 0 0 #000;
+    transform: translate(3px, 3px);
+  }
+
+  .btn:active {
+    box-shadow: none;
+    transform: translate(6px, 6px);
+  }
+
+  .btn-black {
+    background: #000;
+    color: #FFE500;
+  }
+
+  .btn-yellow {
+    background: #FFE500;
+    color: #000;
+  }
+
+  /* ================================
+     CARDS
+     ================================ */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .card-grid.four {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .card {
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0 0 #000;
+    padding: 1.5rem;
+  }
+
+  .card-pink { background: #FF2D9B; color: #FFF; }
+  .card-yellow { background: #FFE500; }
+  .card-lime { background: #BFFF00; }
+
+  .card-icon {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .card h3 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+  }
+
+  .card p {
+    font-size: 0.75rem;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  /* ================================
+     STEPS
+     ================================ */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: #FFF;
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0 0 #000;
+    padding: 1.25rem;
+  }
+
+  .step-number {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border: 3px solid #000;
+  }
+
+  .step-content h3 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+  }
+
+  .step-content p {
+    font-size: 0.75rem;
+    line-height: 1.6;
+    opacity: 0.7;
+  }
+
+  /* ================================
+     PHONE MOCKUPS
+     ================================ */
+  .phone-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    justify-items: center;
+  }
+
+  .phone {
+    width: 100%;
+    max-width: 220px;
+    background: #FFF;
+    border: 3px solid #000;
+    box-shadow: 8px 8px 0 0 #000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .phone-notch {
+    width: 60px;
+    height: 6px;
+    background: #000;
+    border-radius: 3px;
+    margin: 8px auto 4px;
+  }
+
+  .phone-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 3px solid #000;
+    background: #FFF;
+  }
+
+  .phone-header-yellow { background: #FFE500; }
+  .phone-header-orange { background: #FF6B00; }
+
+  .phone-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .phone-title-center {
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 100%;
+    text-align: center;
+  }
+
+  .phone-header-orange .phone-title-center {
+    color: #FFF;
+  }
+
+  .phone-action {
+    width: 24px;
+    height: 24px;
+    background: #0066FF;
+    color: #FFF;
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .phone-filters {
+    display: flex;
+    gap: 4px;
+    padding: 8px 10px;
+  }
+
+  .pill {
+    font-size: 0.45rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border: 2px solid #000;
+    background: #FFF;
+  }
+
+  .pill-active {
+    background: #000;
+    color: #FFF;
+  }
+
+  .phone-body {
+    flex: 1;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 200px;
+  }
+
+  .phone-nav {
+    display: flex;
+    border-top: 3px solid #000;
+  }
+
+  .nav-item {
+    flex: 1;
+    text-align: center;
+    font-size: 0.4rem;
+    font-weight: 700;
+    padding: 6px 0;
+    letter-spacing: 0.5px;
+    color: rgba(0,0,0,0.4);
+  }
+
+  .nav-active {
+    background: #FFE500;
+    color: #000;
+  }
+
+  .phone-label {
+    text-align: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-top: 1rem;
+    opacity: 0.4;
+  }
+
+  /* Mock chore items */
+  .mock-chore {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    border: 2px solid #000;
+    box-shadow: 2px 2px 0 0 #000;
+    background: #FFF;
+  }
+
+  .mock-chore-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mock-chore-name {
+    font-size: 0.55rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .mock-chore-tags {
+    display: flex;
+    gap: 3px;
+  }
+
+  .mock-tag {
+    font-size: 0.4rem;
+    font-weight: 700;
+    padding: 1px 4px;
+    border: 1px solid #000;
+  }
+
+  .tag-yellow { background: #FFE500; }
+  .tag-bounty { background: #FF6B00; color: #FFF; border-color: #FF6B00; animation: pulse 2s infinite; }
+  .tag-blue { background: rgba(0,102,255,0.1); color: #0066FF; border-color: #0066FF; }
+  .tag-orange { background: rgba(255,107,0,0.1); color: #FF6B00; border-color: #FF6B00; }
+
+  .mock-turn {
+    font-size: 0.35rem;
+    color: rgba(0,0,0,0.4);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .mock-check {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 700;
+    border: 2px solid #000;
+    box-shadow: 2px 2px 0 0 #000;
+    flex-shrink: 0;
+  }
+
+  /* Mock leaderboard */
+  .mock-leader-card {
+    border: 2px solid #000;
+    box-shadow: 2px 2px 0 0 #000;
+    background: #FFF;
+  }
+
+  .mock-leader-name-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .mock-streak {
+    font-size: 0.4rem;
+    font-weight: 700;
+    background: rgba(255,107,0,0.15);
+    border: 1px solid #FF6B00;
+    color: #FF6B00;
+    padding: 0 3px;
+  }
+
+  .mock-shame {
+    border-top: 1px solid rgba(0,0,0,0.1);
+    padding: 3px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mock-shame-label {
+    font-size: 0.35rem;
+    font-weight: 700;
+    opacity: 0.35;
+  }
+
+  .mock-shame-value {
+    font-size: 0.35rem;
+    font-weight: 700;
+    opacity: 0.5;
+  }
+
+  .mock-shame-warn {
+    font-size: 0.35rem;
+    font-weight: 700;
+    color: #FF6B00;
+  }
+
+  .mock-shame-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .mock-nudge-btn {
+    font-size: 0.4rem;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #FF2D9B;
+    background: rgba(255,45,155,0.1);
+  }
+
+  .mock-leader {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .mock-rank {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 700;
+    border: 2px solid #000;
+    flex-shrink: 0;
+  }
+
+  .mock-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 0;
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.5rem;
+    font-weight: 700;
+    color: #FFF;
+    flex-shrink: 0;
+  }
+
+  .mock-avatar-sm {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.4rem;
+    font-weight: 700;
+    color: #FFF;
+    flex-shrink: 0;
+  }
+
+  .mock-leader-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mock-leader-name {
+    font-size: 0.5rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .mock-bar {
+    height: 4px;
+    background: rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.15);
+  }
+
+  .mock-bar-fill {
+    height: 100%;
+  }
+
+  .mock-points {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-align: right;
+    min-width: 30px;
+  }
+
+  .mock-pts {
+    display: block;
+    font-size: 0.35rem;
+    opacity: 0.4;
+  }
+
+  /* Mock activity */
+  .mock-date-label {
+    font-size: 0.4rem;
+    font-weight: 700;
+    opacity: 0.35;
+    letter-spacing: 1px;
+    padding: 2px 0;
+  }
+
+  .mock-activity {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border: 2px solid #000;
+    box-shadow: 2px 2px 0 0 #000;
+    background: #FFF;
+  }
+
+  .mock-activity-info {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.4rem;
+    line-height: 1.4;
+  }
+
+  .mock-time {
+    display: block;
+    font-size: 0.35rem;
+    opacity: 0.4;
+    margin-top: 1px;
+  }
+
+  @media (max-width: 700px) {
+    .phone-grid {
+      grid-template-columns: 1fr;
+      max-width: 240px;
+      margin: 0 auto;
+    }
+  }
+
+  /* ================================
+     FEATURES
+     ================================ */
+  .feature {
+    text-align: center;
+    padding: 1.25rem;
+    border: 3px solid #000;
+    box-shadow: 4px 4px 0 0 #000;
+    background: #FFF;
+  }
+
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    border: 2px solid #000;
+    margin-bottom: 0.75rem;
+  }
+
+  .feature h3 {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.35rem;
+  }
+
+  .feature p {
+    font-size: 0.7rem;
+    line-height: 1.5;
+    opacity: 0.6;
+  }
+
+  /* ================================
+     CTA
+     ================================ */
+  .cta {
+    text-align: center;
+  }
+
+  .cta h2 {
+    margin-bottom: 0.75rem;
+  }
+
+  .cta p {
+    margin-bottom: 2rem;
+  }
+
+  /* ================================
+     FOOTER
+     ================================ */
+  /* ================================
+     LIVE STATS
+     ================================ */
+
+  .stats-section {
+    padding: 2.5rem 0;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #FFE500;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.15em;
+    margin-top: 0.5rem;
+  }
+
+  /* ================================
+     MID CTA
+     ================================ */
+
+  .mid-cta {
+    padding: 2.5rem 0;
+  }
+
+  .cta-free {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 1.25rem;
+  }
+
+  /* ================================
+     TESTIMONIALS
+     ================================ */
+
+  .testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .testimonial {
+    border: 3px solid #000;
+    padding: 1.5rem;
+    background: #fff;
+    box-shadow: 6px 6px 0 #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .testimonial-quote {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: rgba(0,0,0,0.7);
+    margin-bottom: 1.25rem;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .testimonial-avatar {
+    width: 36px;
+    height: 36px;
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .testimonial-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: block;
+  }
+
+  .testimonial-detail {
+    font-size: 0.625rem;
+    color: rgba(0,0,0,0.4);
+  }
+
+  /* ================================
+     CHORE SPLIT SECTION
+     ================================ */
+
+  .split-intro {
+    font-size: 1rem;
+    color: rgba(0,0,0,0.6);
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .split-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .split-card {
+    border: 3px solid #000;
+    padding: 1.5rem;
+    background: #fff;
+    box-shadow: 6px 6px 0 #000;
+  }
+
+  .split-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .split-card h3 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .split-card p {
+    font-size: 0.75rem;
+    color: rgba(0,0,0,0.5);
+    line-height: 1.5;
+  }
+
+  .split-example {
+    border: 4px solid #000;
+    box-shadow: 8px 8px 0 #000;
+    background: #FFF;
+    max-width: 500px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .split-example-header {
+    background: #000;
+    color: #FFE500;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .split-bars {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .split-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .split-bar-avatar {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .split-bar-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    width: 50px;
+    flex-shrink: 0;
+  }
+
+  .split-bar-track {
+    flex: 1;
+    height: 20px;
+    border: 2px solid #000;
+    background: rgba(0,0,0,0.05);
+  }
+
+  .split-bar-fill {
+    height: 100%;
+  }
+
+  .split-bar-pct {
+    font-size: 0.875rem;
+    font-weight: 700;
+    width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .split-example-note {
+    font-size: 0.6875rem;
+    color: rgba(0,0,0,0.4);
+    padding: 0 1.25rem 1.25rem;
+    text-align: center;
+  }
+
+  /* ================================
+     ADHD SECTION
+     ================================ */
+
+  .adhd-intro {
+    font-size: 1rem;
+    color: rgba(0,0,0,0.6);
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .adhd-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .adhd-card {
+    border: 3px solid #000;
+    padding: 1.5rem;
+    background: #fff;
+    box-shadow: 6px 6px 0 #000;
+  }
+
+  .adhd-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .adhd-card h3 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .adhd-card p {
+    font-size: 0.75rem;
+    color: rgba(0,0,0,0.5);
+    line-height: 1.5;
+  }
+
+  .footer {
+    background: #000;
+    border-top: 4px solid #FFE500;
+    padding: 1.5rem 0;
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .footer-brand {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #FFE500;
+  }
+
+  .footer-coffee {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #FFE500;
+    text-decoration: none;
+    border: 2px solid #FFE500;
+    padding: 0.4rem 0.75rem;
+    transition: all 0.15s;
+  }
+
+  .footer-coffee:hover {
+    background: #FFE500;
+    color: #000;
+  }
+
+  .footer-link {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+  }
+
+  .footer-link:hover {
+    color: #FFE500;
+  }
+
+  .footer-copy {
+    font-size: 0.625rem;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* ================================
+     RESPONSIVE
+     ================================ */
+  @media (max-width: 600px) {
+    .section {
+      padding: 3rem 0;
+    }
+
+    .hero {
+      padding: 3rem 0 2.5rem;
+    }
+
+    .section h2 {
+      font-size: 1.375rem;
+    }
+
+    .card-grid, .card-grid.four {
+      grid-template-columns: 1fr;
+    }
+
+    .stat-number {
+      font-size: 1.75rem;
+    }
+
+    .split-grid, .adhd-grid, .testimonial-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
