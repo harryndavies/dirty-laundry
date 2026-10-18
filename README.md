@@ -175,7 +175,7 @@ This one repo feeds two Vercel projects:
 | Vercel project      | Root directory | Serves                  |
 | ------------------- | -------------- | ----------------------- |
 | `dirty-laundry`     | `/`            | `app.dirtylaundry.club` |
-| `dirtylaundry-site` | `site`         | `dirtylaundry.club`     |
+| `dirty-laundry-site` | `site`        | `dirtylaundry.club`     |
 
 Each one only rebuilds when its own files change. The app skips builds that only touch `site/`,
 and the site skips builds that touch nothing in `site/`.
