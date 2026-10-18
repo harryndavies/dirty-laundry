@@ -18,22 +18,22 @@ export function ToastContainer() {
   useEffect(() => {
     addToast = (text: string, color = 'bg-brutal-lime') => {
       const id = Date.now()
-      setToasts(prev => [...prev, { id, text, color }])
+      setToasts((prev) => [...prev, { id, text, color }])
       setTimeout(() => {
-        setToasts(prev => prev.filter(t => t.id !== id))
+        setToasts((prev) => prev.filter((t) => t.id !== id))
       }, 2500)
     }
   }, [])
 
   return (
     <div
-      className="fixed left-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"
+      className="pointer-events-none fixed right-4 left-4 z-[100] flex flex-col gap-2"
       style={{ top: 'calc(env(safe-area-inset-top) + 1rem)' }}
     >
-      {toasts.map(t => (
+      {toasts.map((t) => (
         <div
           key={t.id}
-          className={`${t.color} border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] px-4 py-3 font-mono font-bold text-sm text-brutal-black animate-in slide-in-from-top duration-200`}
+          className={`${t.color} animate-in border-2 border-brutal-black px-4 py-3 font-mono text-sm font-bold text-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] duration-200 slide-in-from-top`}
         >
           {t.text}
         </div>

@@ -21,7 +21,15 @@ interface AppTourProps {
   onTapTarget: () => void
 }
 
-export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss, onTapTarget }: AppTourProps) {
+export function AppTour({
+  active,
+  step,
+  onNext,
+  onPrev,
+  onFinish,
+  onDismiss,
+  onTapTarget,
+}: AppTourProps) {
   const [targetRect, setTargetRect] = useState<Rect | null>(null)
 
   const currentStep = TOUR_STEPS[step]
@@ -205,17 +213,19 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss, onT
             className="fixed z-[101]"
             style={getTooltipStyle()}
           >
-            <div className={`${currentStep.color} border-3 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6`}>
+            <div
+              className={`${currentStep.color} border-3 border-brutal-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]`}
+            >
               {/* Skip button */}
               <button
                 onClick={onDismiss}
-                className="absolute top-3 right-3 w-8 h-8 bg-brutal-black/10 flex items-center justify-center active:bg-brutal-black/20"
+                className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center bg-brutal-black/10 active:bg-brutal-black/20"
               >
                 <X size={16} strokeWidth={3} />
               </button>
 
-              <h3 className="font-mono font-bold text-lg mb-2 pr-8">{currentStep.title}</h3>
-              <p className="font-mono text-sm leading-relaxed text-brutal-black/70 mb-5">
+              <h3 className="mb-2 pr-8 font-mono text-lg font-bold">{currentStep.title}</h3>
+              <p className="mb-5 font-mono text-sm leading-relaxed text-brutal-black/70">
                 {currentStep.description}
               </p>
 
@@ -225,7 +235,7 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss, onT
                   {TOUR_STEPS.map((_, i) => (
                     <div
                       key={i}
-                      className={`w-2.5 h-2.5 border border-brutal-black transition-colors ${
+                      className={`h-2.5 w-2.5 border border-brutal-black transition-colors ${
                         i === step ? 'bg-brutal-black' : 'bg-brutal-black/20'
                       }`}
                     />
@@ -236,19 +246,19 @@ export function AppTour({ active, step, onNext, onPrev, onFinish, onDismiss, onT
                   {!isFirst && !isTapStep && (
                     <button
                       onClick={onPrev}
-                      className="w-10 h-10 bg-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+                      className="flex h-10 w-10 items-center justify-center border-2 border-brutal-black bg-brutal-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                     >
                       <ChevronLeft size={18} strokeWidth={3} />
                     </button>
                   )}
                   {isTapStep ? (
-                    <div className="h-10 px-4 flex items-center font-mono font-bold text-xs text-brutal-black/50 tracking-wide">
+                    <div className="flex h-10 items-center px-4 font-mono text-xs font-bold tracking-wide text-brutal-black/50">
                       TAP TO CONTINUE
                     </div>
                   ) : (
                     <button
                       onClick={isLast ? onFinish : onNext}
-                      className="h-10 px-5 bg-brutal-black text-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono font-bold text-sm active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all gap-1"
+                      className="flex h-10 items-center justify-center gap-1 border-2 border-brutal-black bg-brutal-black px-5 font-mono text-sm font-bold text-brutal-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                     >
                       {isLast ? 'LET\u2019S GO' : 'NEXT'}
                       {!isLast && <ChevronRight size={16} strokeWidth={3} />}

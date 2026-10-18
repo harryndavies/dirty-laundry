@@ -63,10 +63,10 @@ export function usePointsHistory(start: Date, end: Date) {
       }
 
       // Build per-member history with cumulative totals
-      const histories: MemberPointsHistory[] = members.map(member => {
+      const histories: MemberPointsHistory[] = members.map((member) => {
         const userMap = byUserDate.get(member.user_id) ?? new Map()
         let cumulative = 0
-        const daily = dates.map(date => {
+        const daily = dates.map((date) => {
           const points = userMap.get(date) ?? 0
           cumulative += points
           return { date, points, cumulative }

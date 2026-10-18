@@ -32,11 +32,11 @@ export function useTour() {
 
   const next = useCallback(() => {
     setWaiting(false)
-    setStep(s => s + 1)
+    setStep((s) => s + 1)
   }, [])
 
   const prev = useCallback(() => {
-    setStep(s => Math.max(0, s - 1))
+    setStep((s) => Math.max(0, s - 1))
   }, [])
 
   /** Called when user taps a highlighted element on a tap step — hides the tour while they interact */
@@ -53,7 +53,7 @@ export function useTour() {
       const currentStep = TOUR_STEPS[step]
       if (currentStep?.action === 'tap' && currentStep?.target === target) {
         setWaiting(false)
-        setStep(s => s + 1)
+        setStep((s) => s + 1)
       }
     }
     window.addEventListener('tour-advance', handler)

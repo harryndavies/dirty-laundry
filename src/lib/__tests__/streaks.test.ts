@@ -47,7 +47,11 @@ describe('formatLastActive', () => {
     expect(formatLastActive(new Date(NOW.getTime() - 30_000).toISOString())).toBe('just now')
     expect(formatLastActive(new Date(NOW.getTime() - 5 * 60_000).toISOString())).toBe('5m ago')
     expect(formatLastActive(new Date(NOW.getTime() - 3 * 3_600_000).toISOString())).toBe('3h ago')
-    expect(formatLastActive(new Date(NOW.getTime() - 26 * 3_600_000).toISOString())).toBe('1 day ago')
-    expect(formatLastActive(new Date(NOW.getTime() - 72 * 3_600_000).toISOString())).toBe('3 days ago')
+    expect(formatLastActive(new Date(NOW.getTime() - 26 * 3_600_000).toISOString())).toBe(
+      '1 day ago',
+    )
+    expect(formatLastActive(new Date(NOW.getTime() - 72 * 3_600_000).toISOString())).toBe(
+      '3 days ago',
+    )
   })
 })

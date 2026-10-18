@@ -76,11 +76,26 @@ Deno.serve(async (req) => {
 
       const name = champion?.display_name ?? 'Someone'
       const messages = [
-        { title: "Weekly champion! 👑", body: `${name} smashed it this week with ${maxPoints} pts. Nice one!` },
-        { title: "This week's MVP 🏆", body: `${name} topped the leaderboard with ${maxPoints} pts!` },
-        { title: "What a week! 🔥", body: `${name} earned ${maxPoints} pts this week. Legendary effort.` },
-        { title: "Champion crowned 👑", body: `${name} takes the top spot with ${maxPoints} pts. Well deserved!` },
-        { title: "Look who's winning! 🎉", body: `${name} led the way this week — ${maxPoints} pts. Keep it up!` },
+        {
+          title: 'Weekly champion! 👑',
+          body: `${name} smashed it this week with ${maxPoints} pts. Nice one!`,
+        },
+        {
+          title: "This week's MVP 🏆",
+          body: `${name} topped the leaderboard with ${maxPoints} pts!`,
+        },
+        {
+          title: 'What a week! 🔥',
+          body: `${name} earned ${maxPoints} pts this week. Legendary effort.`,
+        },
+        {
+          title: 'Champion crowned 👑',
+          body: `${name} takes the top spot with ${maxPoints} pts. Well deserved!`,
+        },
+        {
+          title: "Look who's winning! 🎉",
+          body: `${name} led the way this week — ${maxPoints} pts. Keep it up!`,
+        },
       ]
       const pick = messages[Math.floor(Math.random() * messages.length)]
       const payload = {
@@ -94,7 +109,7 @@ Deno.serve(async (req) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseServiceKey}`,
+            Authorization: `Bearer ${supabaseServiceKey}`,
           },
           body: JSON.stringify({ toUserId: m.user_id, payload }),
         })

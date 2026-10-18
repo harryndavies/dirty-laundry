@@ -7,7 +7,24 @@ import { HeatMap } from '@/components/HeatMap'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
-import { Check, Pencil, Moon, Sun, Bell, BellOff, HelpCircle, Sparkles, Smartphone, TrendingUp, Dices, Users, Focus, Trash2, Shield, FileText } from 'lucide-react'
+import {
+  Check,
+  Pencil,
+  Moon,
+  Sun,
+  Bell,
+  BellOff,
+  HelpCircle,
+  Sparkles,
+  Smartphone,
+  TrendingUp,
+  Dices,
+  Users,
+  Focus,
+  Trash2,
+  Shield,
+  FileText,
+} from 'lucide-react'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '@/lib/pushNotifications'
@@ -26,27 +43,32 @@ const TIPS = [
   {
     icon: TrendingUp,
     title: 'BOOST BOUNTIES',
-    description: 'Tap the points badge on any chore to increase its value. Great for motivating others to tackle tough jobs.',
+    description:
+      'Tap the points badge on any chore to increase its value. Great for motivating others to tackle tough jobs.',
   },
   {
     icon: Focus,
     title: 'FOCUS MODE',
-    description: 'Tap the crosshair button on the chores page to enter "Just Do One" mode — it picks a random chore so you can stop overthinking.',
+    description:
+      'Tap the crosshair button on the chores page to enter "Just Do One" mode — it picks a random chore so you can stop overthinking.',
   },
   {
     icon: Dices,
     title: 'CHORE ROULETTE',
-    description: 'Can\u2019t agree on who does what? Spin the roulette to randomly assign chores. Fair and square.',
+    description:
+      'Can\u2019t agree on who does what? Spin the roulette to randomly assign chores. Fair and square.',
   },
   {
     icon: Users,
     title: 'INVITE HOUSEMATES',
-    description: 'Go to the Group tab to get an invite code. Share it with your housemates so they can join and start earning points.',
+    description:
+      'Go to the Group tab to get an invite code. Share it with your housemates so they can join and start earning points.',
   },
   {
     icon: Bell,
     title: 'REMINDERS',
-    description: 'When creating or editing a chore, set a reminder day and time. You\u2019ll see a "DUE TODAY" badge when it\u2019s time.',
+    description:
+      'When creating or editing a chore, set a reminder day and time. You\u2019ll see a "DUE TODAY" badge when it\u2019s time.',
   },
 ]
 
@@ -104,28 +126,28 @@ export function ProfilePage() {
 
   return (
     <div className="min-h-full">
-      <div className="sticky top-0 z-10 bg-brutal-white border-b-4 border-brutal-black px-4 py-3">
-        <h1 className="font-mono font-bold text-lg tracking-tight">PROFILE</h1>
+      <div className="sticky top-0 z-10 border-b-4 border-brutal-black bg-brutal-white px-4 py-3">
+        <h1 className="font-mono text-lg font-bold tracking-tight">PROFILE</h1>
       </div>
 
-      <div className="p-4 space-y-6 md:max-w-md md:mx-auto">
+      <div className="space-y-6 p-4 md:mx-auto md:max-w-md">
         {/* Avatar + name */}
         <div className="flex flex-col items-center pt-4">
-          <label className="relative cursor-pointer group">
+          <label className="group relative cursor-pointer">
             <Avatar
               name={profile?.display_name ?? '?'}
               color={profile?.avatar_color ?? '#FF2D9B'}
               size="lg"
               imageUrl={profile?.avatar_url}
             />
-            <div className="absolute inset-0 bg-brutal-black/40 flex items-center justify-center opacity-0 group-active:opacity-100 md:group-hover:opacity-100 transition-opacity border-2 border-brutal-black">
-              <span className="text-brutal-white text-xs font-bold font-mono">EDIT</span>
+            <div className="absolute inset-0 flex items-center justify-center border-2 border-brutal-black bg-brutal-black/40 opacity-0 transition-opacity group-active:opacity-100 md:group-hover:opacity-100">
+              <span className="font-mono text-xs font-bold text-brutal-white">EDIT</span>
             </div>
             <input
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={async e => {
+              onChange={async (e) => {
                 const file = e.target.files?.[0]
                 if (!file || !user) return
                 const path = `avatars/${user.id}/${Date.now()}.jpg`
@@ -146,24 +168,27 @@ export function ProfilePage() {
           </label>
 
           {editing ? (
-            <div className="flex items-center gap-2 mt-4">
+            <div className="mt-4 flex items-center gap-2">
               <Input
                 value={name}
-                onChange={e => setName(e.target.value)}
-                className="border-2 border-brutal-black font-mono h-10 w-48 text-center"
+                onChange={(e) => setName(e.target.value)}
+                className="h-10 w-48 border-2 border-brutal-black text-center font-mono"
                 autoFocus
               />
               <button
                 onClick={handleSaveName}
-                className="w-10 h-10 bg-brutal-lime border-2 border-brutal-black flex items-center justify-center active:bg-brutal-lime/70 transition-colors"
+                className="flex h-10 w-10 items-center justify-center border-2 border-brutal-black bg-brutal-lime transition-colors active:bg-brutal-lime/70"
               >
                 <Check size={18} />
               </button>
             </div>
           ) : (
             <button
-              onClick={() => { setName(profile?.display_name ?? ''); setEditing(true) }}
-              className="flex items-center gap-2 mt-4 font-mono font-bold text-xl active:opacity-60 transition-opacity"
+              onClick={() => {
+                setName(profile?.display_name ?? '')
+                setEditing(true)
+              }}
+              className="mt-4 flex items-center gap-2 font-mono text-xl font-bold transition-opacity active:opacity-60"
             >
               {profile?.display_name ?? '—'}
               <Pencil size={16} />
@@ -171,11 +196,11 @@ export function ProfilePage() {
           )}
 
           {user?.email ? (
-            <p className="font-mono text-xs text-brutal-black/40 mt-1">{user.email}</p>
+            <p className="mt-1 font-mono text-xs text-brutal-black/40">{user.email}</p>
           ) : (
-            <p className="font-mono text-xs text-brutal-black/40 mt-1">Guest account</p>
+            <p className="mt-1 font-mono text-xs text-brutal-black/40">Guest account</p>
           )}
-          <div className="mt-2 px-3 py-1 bg-brutal-yellow border-2 border-brutal-black font-mono font-bold text-sm">
+          <div className="mt-2 border-2 border-brutal-black bg-brutal-yellow px-3 py-1 font-mono text-sm font-bold">
             {userMember?.total_points ?? 0} PTS
           </div>
         </div>
@@ -183,11 +208,13 @@ export function ProfilePage() {
         {/* Year in Review entry */}
         <button
           onClick={() => navigate('/wrapped')}
-          className="w-full bg-brutal-black text-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] px-4 py-3 flex items-center justify-between transition-all"
+          className="flex w-full items-center justify-between border-2 border-brutal-black bg-brutal-black px-4 py-3 text-brutal-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
         >
           <div className="text-left">
-            <div className="font-mono text-[10px] tracking-widest font-bold opacity-60">YOUR {new Date().getFullYear()} WRAPPED</div>
-            <div className="font-mono font-bold text-base mt-0.5">SEE YOUR YEAR ➝</div>
+            <div className="font-mono text-[10px] font-bold tracking-widest opacity-60">
+              YOUR {new Date().getFullYear()} WRAPPED
+            </div>
+            <div className="mt-0.5 font-mono text-base font-bold">SEE YOUR YEAR ➝</div>
           </div>
           <Sparkles size={20} strokeWidth={2.5} />
         </button>
@@ -197,11 +224,13 @@ export function ProfilePage() {
 
         {/* Color picker */}
         <div>
-          <h3 className="font-mono text-xs font-bold uppercase mb-2">AVATAR COLOR</h3>
-          <div className="flex gap-2 flex-wrap">
-            {COLORS.map(c => {
+          <h3 className="mb-2 font-mono text-xs font-bold uppercase">AVATAR COLOR</h3>
+          <div className="flex flex-wrap gap-2">
+            {COLORS.map((c) => {
               const isOwn = c === profile?.avatar_color
-              const takenBy = members.find(m => m.user_id !== user?.id && m.profiles.avatar_color === c)
+              const takenBy = members.find(
+                (m) => m.user_id !== user?.id && m.profiles.avatar_color === c,
+              )
               const isTaken = !!takenBy && !isOwn
 
               return (
@@ -209,18 +238,18 @@ export function ProfilePage() {
                   key={c}
                   onClick={() => !isTaken && handleColorChange(c)}
                   disabled={isTaken}
-                  className={`w-10 h-10 border-2 transition-all relative ${
+                  className={`relative h-10 w-10 border-2 transition-all ${
                     isOwn
-                      ? 'border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] scale-110'
+                      ? 'scale-110 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'
                       : isTaken
-                        ? 'border-brutal-black/15 opacity-35 cursor-not-allowed'
-                        : 'border-brutal-black/30 active:scale-95 hover:scale-105 hover:border-brutal-black/60'
+                        ? 'cursor-not-allowed border-brutal-black/15 opacity-35'
+                        : 'border-brutal-black/30 hover:scale-105 hover:border-brutal-black/60 active:scale-95'
                   }`}
                   style={{ backgroundColor: c }}
                   title={isTaken ? `Taken by ${takenBy.profiles.display_name}` : undefined}
                 >
                   {isTaken && (
-                    <span className="absolute inset-0 flex items-center justify-center text-brutal-black/60 font-mono font-bold text-lg">
+                    <span className="absolute inset-0 flex items-center justify-center font-mono text-lg font-bold text-brutal-black/60">
                       ×
                     </span>
                   )}
@@ -233,13 +262,17 @@ export function ProfilePage() {
         {/* Link account */}
         {isAnonymous && !linkSuccess && (
           <div className="border-2 border-brutal-black bg-brutal-yellow/10 p-4">
-            <h3 className="font-mono text-xs font-bold uppercase mb-1">SAVE YOUR ACCOUNT</h3>
-            <p className="font-mono text-[10px] text-brutal-black/40 mb-3">Add an email and password so you don't lose your progress.</p>
+            <h3 className="mb-1 font-mono text-xs font-bold uppercase">SAVE YOUR ACCOUNT</h3>
+            <p className="mb-3 font-mono text-[10px] text-brutal-black/40">
+              Add an email and password so you don't lose your progress.
+            </p>
             {linkError && (
-              <div className="bg-brutal-pink/20 border border-brutal-pink p-2 font-mono text-xs font-bold mb-3">{linkError}</div>
+              <div className="mb-3 border border-brutal-pink bg-brutal-pink/20 p-2 font-mono text-xs font-bold">
+                {linkError}
+              </div>
             )}
             <form
-              onSubmit={async e => {
+              onSubmit={async (e) => {
                 e.preventDefault()
                 if (!linkEmail.trim() || !linkPassword) return
                 setLinkingAccount(true)
@@ -260,24 +293,24 @@ export function ProfilePage() {
               <Input
                 type="email"
                 value={linkEmail}
-                onChange={e => setLinkEmail(e.target.value)}
+                onChange={(e) => setLinkEmail(e.target.value)}
                 placeholder="Email"
-                className="border-2 border-brutal-black font-mono h-10"
+                className="h-10 border-2 border-brutal-black font-mono"
                 required
               />
               <Input
                 type="password"
                 value={linkPassword}
-                onChange={e => setLinkPassword(e.target.value)}
+                onChange={(e) => setLinkPassword(e.target.value)}
                 placeholder="Password"
-                className="border-2 border-brutal-black font-mono h-10"
+                className="h-10 border-2 border-brutal-black font-mono"
                 minLength={6}
                 required
               />
               <Button
                 type="submit"
                 disabled={linkingAccount}
-                className="w-full h-10 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-xs border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+                className="h-10 w-full border-2 border-brutal-black bg-brutal-black font-mono text-xs font-bold text-brutal-white uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
               >
                 {linkingAccount ? 'SAVING...' : 'SAVE ACCOUNT'}
               </Button>
@@ -286,23 +319,29 @@ export function ProfilePage() {
         )}
         {linkSuccess && (
           <div className="border-2 border-brutal-lime bg-brutal-lime/20 p-4 text-center">
-            <p className="font-mono text-xs font-bold">Account saved! You can now log in with your email.</p>
+            <p className="font-mono text-xs font-bold">
+              Account saved! You can now log in with your email.
+            </p>
           </div>
         )}
 
         {/* Dark mode toggle */}
         <div>
-          <h3 className="font-mono text-xs font-bold uppercase mb-2">THEME</h3>
+          <h3 className="mb-2 font-mono text-xs font-bold uppercase">THEME</h3>
           <button
             onClick={toggle}
-            className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            className="flex w-full items-center justify-between border-2 border-brutal-black bg-brutal-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
           >
             <div className="flex items-center gap-3">
               {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
-              <span className="font-mono font-bold text-sm">{theme === 'dark' ? 'DARK MODE' : 'LIGHT MODE'}</span>
+              <span className="font-mono text-sm font-bold">
+                {theme === 'dark' ? 'DARK MODE' : 'LIGHT MODE'}
+              </span>
             </div>
-            <div className={`w-12 h-7 border-2 border-brutal-black flex items-center p-0.5 transition-colors ${theme === 'dark' ? 'bg-brutal-yellow justify-end' : 'bg-brutal-white justify-start'}`}>
-              <div className="w-5 h-5 bg-brutal-black" />
+            <div
+              className={`flex h-7 w-12 items-center border-2 border-brutal-black p-0.5 transition-colors ${theme === 'dark' ? 'justify-end bg-brutal-yellow' : 'justify-start bg-brutal-white'}`}
+            >
+              <div className="h-5 w-5 bg-brutal-black" />
             </div>
           </button>
         </div>
@@ -310,7 +349,7 @@ export function ProfilePage() {
         {/* Notifications */}
         {pushSupported && (
           <div>
-            <h3 className="font-mono text-xs font-bold uppercase mb-2">NOTIFICATIONS</h3>
+            <h3 className="mb-2 font-mono text-xs font-bold uppercase">NOTIFICATIONS</h3>
             <button
               onClick={async () => {
                 if (pushLoading || !user) return
@@ -331,14 +370,18 @@ export function ProfilePage() {
                 }
               }}
               disabled={pushLoading}
-              className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+              className="flex w-full items-center justify-between border-2 border-brutal-black bg-brutal-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none disabled:opacity-50"
             >
               <div className="flex items-center gap-3">
                 {pushEnabled ? <Bell size={20} /> : <BellOff size={20} />}
-                <span className="font-mono font-bold text-sm">{pushEnabled ? 'NOTIFICATIONS ON' : 'NOTIFICATIONS OFF'}</span>
+                <span className="font-mono text-sm font-bold">
+                  {pushEnabled ? 'NOTIFICATIONS ON' : 'NOTIFICATIONS OFF'}
+                </span>
               </div>
-              <div className={`w-12 h-7 border-2 border-brutal-black flex items-center p-0.5 transition-colors ${pushEnabled ? 'bg-brutal-yellow justify-end' : 'bg-brutal-white justify-start'}`}>
-                <div className="w-5 h-5 bg-brutal-black" />
+              <div
+                className={`flex h-7 w-12 items-center border-2 border-brutal-black p-0.5 transition-colors ${pushEnabled ? 'justify-end bg-brutal-yellow' : 'justify-start bg-brutal-white'}`}
+              >
+                <div className="h-5 w-5 bg-brutal-black" />
               </div>
             </button>
           </div>
@@ -346,7 +389,7 @@ export function ProfilePage() {
 
         {/* Help */}
         <div>
-          <h3 className="font-mono text-xs font-bold uppercase mb-2">HELP</h3>
+          <h3 className="mb-2 font-mono text-xs font-bold uppercase">HELP</h3>
           <div className="space-y-2">
             <button
               onClick={() => {
@@ -354,36 +397,38 @@ export function ProfilePage() {
                 navigate('/chores')
                 setTimeout(() => window.dispatchEvent(new Event('start-tour')), 300)
               }}
-              className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="flex w-full items-center justify-between border-2 border-brutal-black bg-brutal-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
             >
               <div className="flex items-center gap-3">
                 <HelpCircle size={20} />
-                <span className="font-mono font-bold text-sm">REPLAY APP TOUR</span>
+                <span className="font-mono text-sm font-bold">REPLAY APP TOUR</span>
               </div>
             </button>
 
             <button
               onClick={() => setShowTips(true)}
-              className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="flex w-full items-center justify-between border-2 border-brutal-black bg-brutal-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
             >
               <div className="flex items-center gap-3">
                 <Sparkles size={20} />
-                <span className="font-mono font-bold text-sm">TIPS & TRICKS</span>
+                <span className="font-mono text-sm font-bold">TIPS & TRICKS</span>
               </div>
             </button>
           </div>
         </div>
 
         <BottomSheet open={showTips} onClose={() => setShowTips(false)}>
-          <h2 className="font-mono font-bold text-lg mb-4">TIPS & TRICKS</h2>
+          <h2 className="mb-4 font-mono text-lg font-bold">TIPS & TRICKS</h2>
           <div className="space-y-3">
-            {TIPS.map(tip => (
+            {TIPS.map((tip) => (
               <div key={tip.title} className="border-2 border-brutal-black bg-brutal-white p-4">
-                <div className="flex items-center gap-2.5 mb-1.5">
-                  <tip.icon size={16} strokeWidth={2.5} className="text-brutal-black/60 shrink-0" />
-                  <span className="font-mono font-bold text-xs">{tip.title}</span>
+                <div className="mb-1.5 flex items-center gap-2.5">
+                  <tip.icon size={16} strokeWidth={2.5} className="shrink-0 text-brutal-black/60" />
+                  <span className="font-mono text-xs font-bold">{tip.title}</span>
                 </div>
-                <p className="font-mono text-[11px] leading-relaxed text-brutal-black/50">{tip.description}</p>
+                <p className="font-mono text-[11px] leading-relaxed text-brutal-black/50">
+                  {tip.description}
+                </p>
               </div>
             ))}
           </div>
@@ -391,28 +436,28 @@ export function ProfilePage() {
 
         {/* Legal */}
         <div>
-          <h3 className="font-mono text-xs font-bold uppercase mb-2">LEGAL</h3>
+          <h3 className="mb-2 font-mono text-xs font-bold uppercase">LEGAL</h3>
           <div className="space-y-2">
             <a
               href="https://dirtylaundry.club/privacy"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="flex w-full items-center justify-between border-2 border-brutal-black bg-brutal-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
             >
               <div className="flex items-center gap-3">
                 <Shield size={20} />
-                <span className="font-mono font-bold text-sm">PRIVACY POLICY</span>
+                <span className="font-mono text-sm font-bold">PRIVACY POLICY</span>
               </div>
             </a>
             <a
               href="https://dirtylaundry.club/terms"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-between p-4 border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-brutal-white active:shadow-none active:translate-x-[4px] active:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="flex w-full items-center justify-between border-2 border-brutal-black bg-brutal-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
             >
               <div className="flex items-center gap-3">
                 <FileText size={20} />
-                <span className="font-mono font-bold text-sm">TERMS OF SERVICE</span>
+                <span className="font-mono text-sm font-bold">TERMS OF SERVICE</span>
               </div>
             </a>
           </div>
@@ -424,7 +469,7 @@ export function ProfilePage() {
             leaveGroup()
             await signOut()
           }}
-          className="w-full h-12 bg-red-500 text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+          className="h-12 w-full border-2 border-brutal-black bg-red-500 font-mono text-sm font-bold text-brutal-white uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
         >
           SIGN OUT
         </Button>
@@ -432,7 +477,7 @@ export function ProfilePage() {
         {/* Delete account */}
         <button
           onClick={() => setShowDeleteConfirm(true)}
-          className="w-full flex items-center justify-center gap-2 h-12 bg-brutal-white text-red-600 font-mono font-bold uppercase text-xs border-2 border-red-500 active:bg-red-500/10 transition-colors"
+          className="flex h-12 w-full items-center justify-center gap-2 border-2 border-red-500 bg-brutal-white font-mono text-xs font-bold text-red-600 uppercase transition-colors active:bg-red-500/10"
         >
           <Trash2 size={16} />
           DELETE ACCOUNT
@@ -442,7 +487,11 @@ export function ProfilePage() {
       <ConfirmDialog
         open={showDeleteConfirm}
         title="Delete account?"
-        message={deleting ? 'Deleting your account and all associated data...' : 'This permanently deletes your profile, points, and chore history. This cannot be undone.'}
+        message={
+          deleting
+            ? 'Deleting your account and all associated data...'
+            : 'This permanently deletes your profile, points, and chore history. This cannot be undone.'
+        }
         confirmLabel={deleting ? 'DELETING...' : 'DELETE FOREVER'}
         confirmColor="bg-red-500 text-brutal-white"
         onConfirm={handleDeleteAccount}

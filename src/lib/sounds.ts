@@ -1,9 +1,15 @@
 // Older Safari only has the prefixed constructor.
 const AudioContextClass =
-  window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+  window.AudioContext ??
+  (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
 const audioCtx = () => new AudioContextClass()
 
-function playTone(frequency: number, duration: number, type: OscillatorType = 'sine', volume = 0.3) {
+function playTone(
+  frequency: number,
+  duration: number,
+  type: OscillatorType = 'sine',
+  volume = 0.3,
+) {
   try {
     const ctx = audioCtx()
     const osc = ctx.createOscillator()
@@ -25,8 +31,8 @@ function playTone(frequency: number, duration: number, type: OscillatorType = 's
 
 export function playComplete() {
   // Two-tone rising ding
-  playTone(523, 0.15, 'sine', 0.25)       // C5
-  setTimeout(() => playTone(784, 0.3, 'sine', 0.3), 100)  // G5
+  playTone(523, 0.15, 'sine', 0.25) // C5
+  setTimeout(() => playTone(784, 0.3, 'sine', 0.3), 100) // G5
   vibrate(15)
 }
 

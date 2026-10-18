@@ -15,7 +15,7 @@ const LEAF: Record<PlantMood, string> = {
   dying: '#5A4A20',
 }
 
-const POT_COLOR = '#FF2D9B'      // brutal-pink
+const POT_COLOR = '#FF2D9B' // brutal-pink
 const POT_SHADOW = '#000'
 
 export function Plant({ mood, size = 200, bob = true }: PlantProps) {
@@ -41,7 +41,15 @@ export function Plant({ mood, size = 200, bob = true }: PlantProps) {
         {/* Pot */}
         <g>
           {/* rim */}
-          <rect x="58" y="138" width="84" height="14" fill={POT_COLOR} stroke={POT_SHADOW} strokeWidth="5" />
+          <rect
+            x="58"
+            y="138"
+            width="84"
+            height="14"
+            fill={POT_COLOR}
+            stroke={POT_SHADOW}
+            strokeWidth="5"
+          />
           {/* body — trapezoid */}
           <path
             d="M64 152 L136 152 L128 192 L72 192 Z"
@@ -58,8 +66,21 @@ export function Plant({ mood, size = 200, bob = true }: PlantProps) {
         {mood === 'flowering' && (
           <g>
             {/* Tall straight stem */}
-            <path d="M100 144 L100 50" stroke={leaf} strokeWidth="6" strokeLinecap="round" fill="none" />
-            <path d="M100 144 L100 50" stroke={POT_SHADOW} strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.4" />
+            <path
+              d="M100 144 L100 50"
+              stroke={leaf}
+              strokeWidth="6"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <path
+              d="M100 144 L100 50"
+              stroke={POT_SHADOW}
+              strokeWidth="2"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.4"
+            />
             {/* Leaves */}
             <Leaf x={100} y={120} dir={-1} color={leaf} />
             <Leaf x={100} y={100} dir={1} color={leaf} />
@@ -70,14 +91,36 @@ export function Plant({ mood, size = 200, bob = true }: PlantProps) {
             <Bloom cx={132} cy={70} fill="#FF2D9B" />
             <Bloom cx={100} cy={42} fill="#FFE500" />
             {/* Sun rays subtle */}
-            <line x1="14" y1="40" x2="26" y2="48" stroke={POT_SHADOW} strokeWidth="3" strokeLinecap="round" />
-            <line x1="186" y1="40" x2="174" y2="48" stroke={POT_SHADOW} strokeWidth="3" strokeLinecap="round" />
+            <line
+              x1="14"
+              y1="40"
+              x2="26"
+              y2="48"
+              stroke={POT_SHADOW}
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
+            <line
+              x1="186"
+              y1="40"
+              x2="174"
+              y2="48"
+              stroke={POT_SHADOW}
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
           </g>
         )}
 
         {mood === 'thriving' && (
           <g>
-            <path d="M100 144 L100 56" stroke={leaf} strokeWidth="6" strokeLinecap="round" fill="none" />
+            <path
+              d="M100 144 L100 56"
+              stroke={leaf}
+              strokeWidth="6"
+              strokeLinecap="round"
+              fill="none"
+            />
             <Leaf x={100} y={124} dir={-1} color={leaf} />
             <Leaf x={100} y={104} dir={1} color={leaf} />
             <Leaf x={100} y={84} dir={-1} color={leaf} />
@@ -88,7 +131,13 @@ export function Plant({ mood, size = 200, bob = true }: PlantProps) {
         {mood === 'dry' && (
           <g>
             {/* Slight bend */}
-            <path d="M100 144 Q 102 100 92 60" stroke={leaf} strokeWidth="6" strokeLinecap="round" fill="none" />
+            <path
+              d="M100 144 Q 102 100 92 60"
+              stroke={leaf}
+              strokeWidth="6"
+              strokeLinecap="round"
+              fill="none"
+            />
             <Leaf x={101} y={124} dir={-1} color={leaf} droop={5} />
             <Leaf x={100} y={106} dir={1} color={leaf} droop={5} />
             <Leaf x={97} y={86} dir={-1} color={leaf} droop={6} />
@@ -99,7 +148,13 @@ export function Plant({ mood, size = 200, bob = true }: PlantProps) {
         {mood === 'wilting' && (
           <g>
             {/* Bowed over */}
-            <path d="M100 144 Q 124 110 70 80" stroke={leaf} strokeWidth="6" strokeLinecap="round" fill="none" />
+            <path
+              d="M100 144 Q 124 110 70 80"
+              stroke={leaf}
+              strokeWidth="6"
+              strokeLinecap="round"
+              fill="none"
+            />
             <Leaf x={108} y={130} dir={-1} color={leaf} droop={14} />
             <Leaf x={114} y={114} dir={1} color={leaf} droop={14} />
             <Leaf x={104} y={96} dir={-1} color={leaf} droop={16} />
@@ -112,7 +167,13 @@ export function Plant({ mood, size = 200, bob = true }: PlantProps) {
         {mood === 'dying' && (
           <g>
             {/* Stub stem */}
-            <path d="M100 144 L100 116" stroke={leaf} strokeWidth="6" strokeLinecap="round" fill="none" />
+            <path
+              d="M100 144 L100 116"
+              stroke={leaf}
+              strokeWidth="6"
+              strokeLinecap="round"
+              fill="none"
+            />
             <Leaf x={100} y={130} dir={-1} color={leaf} droop={20} />
             {/* Fallen leaves on either side */}
             <FallenLeaf x={36} y={186} color={leaf} />
@@ -125,27 +186,31 @@ export function Plant({ mood, size = 200, bob = true }: PlantProps) {
   )
 }
 
-function Leaf({ x, y, dir, color, droop = 0 }: { x: number; y: number; dir: 1 | -1; color: string; droop?: number }) {
+function Leaf({
+  x,
+  y,
+  dir,
+  color,
+  droop = 0,
+}: {
+  x: number
+  y: number
+  dir: 1 | -1
+  color: string
+  droop?: number
+}) {
   // dir = 1 right, -1 left. Drawn as an oval extending out from the stem.
   const tipX = x + dir * 28
   const tipY = y + droop
   const ctrl1Y = y - 12 + droop * 0.3
   const ctrl2Y = y + 12 + droop * 0.7
   const path = `M ${x} ${y} Q ${x + dir * 8} ${ctrl1Y} ${tipX} ${tipY} Q ${x + dir * 8} ${ctrl2Y} ${x} ${y} Z`
-  return (
-    <path
-      d={path}
-      fill={color}
-      stroke="#000"
-      strokeWidth="4"
-      strokeLinejoin="round"
-    />
-  )
+  return <path d={path} fill={color} stroke="#000" strokeWidth="4" strokeLinejoin="round" />
 }
 
 function Bloom({ cx, cy, fill }: { cx: number; cy: number; fill: string }) {
   // 5-petal flower — small circles around a center
-  const petals = [0, 1, 2, 3, 4].map(i => {
+  const petals = [0, 1, 2, 3, 4].map((i) => {
     const a = (i * (Math.PI * 2)) / 5 - Math.PI / 2
     return { x: cx + Math.cos(a) * 6, y: cy + Math.sin(a) * 6 }
   })
@@ -159,7 +224,17 @@ function Bloom({ cx, cy, fill }: { cx: number; cy: number; fill: string }) {
   )
 }
 
-function FallenLeaf({ x, y, color, rotate = 20 }: { x: number; y: number; color: string; rotate?: number }) {
+function FallenLeaf({
+  x,
+  y,
+  color,
+  rotate = 20,
+}: {
+  x: number
+  y: number
+  color: string
+  rotate?: number
+}) {
   return (
     <g transform={`rotate(${rotate} ${x} ${y})`}>
       <ellipse cx={x} cy={y} rx="14" ry="5" fill={color} stroke="#000" strokeWidth="3" />

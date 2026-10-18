@@ -36,25 +36,26 @@ export function useActivity() {
   const queryKey = ['activity', group?.id]
 
   // Pages of 20, each starting just before the last entry of the previous one.
-  const { data, isPending, hasNextPage, isFetchingNextPage, fetchNextPage, refetch } = useInfiniteQuery({
-    queryKey,
-    enabled: !!group,
-    initialPageParam: null as string | null,
-    queryFn: async ({ pageParam }) => {
-      let query = supabase
-        .from('completions')
-        .select(ACTIVITY_SELECT)
-        .eq('group_id', group!.id)
-        .order('completed_at', { ascending: false })
-        .limit(PAGE_SIZE)
-      if (pageParam) query = query.lt('completed_at', pageParam)
-      const { data, error } = await query
-      if (error) throw error
-      return data as unknown as ActivityEntry[]
-    },
-    getNextPageParam: lastPage =>
-      lastPage.length === PAGE_SIZE ? lastPage[lastPage.length - 1].completed_at : undefined,
-  })
+  const { data, isPending, hasNextPage, isFetchingNextPage, fetchNextPage, refetch } =
+    useInfiniteQuery({
+      queryKey,
+      enabled: !!group,
+      initialPageParam: null as string | null,
+      queryFn: async ({ pageParam }) => {
+        let query = supabase
+          .from('completions')
+          .select(ACTIVITY_SELECT)
+          .eq('group_id', group!.id)
+          .order('completed_at', { ascending: false })
+          .limit(PAGE_SIZE)
+        if (pageParam) query = query.lt('completed_at', pageParam)
+        const { data, error } = await query
+        if (error) throw error
+        return data as unknown as ActivityEntry[]
+      },
+      getNextPageParam: (lastPage) =>
+        lastPage.length === PAGE_SIZE ? lastPage[lastPage.length - 1].completed_at : undefined,
+    })
 
   const activity = useMemo(() => data?.pages.flat() ?? [], [data])
   const fetchActivity = useCallback(async () => {
@@ -80,7 +81,7 @@ export function useActivity() {
           table: 'completions',
           filter: `group_id=eq.${group.id}`,
         },
-        refresh
+        refresh,
       )
       .on(
         'postgres_changes',
@@ -89,7 +90,7 @@ export function useActivity() {
           schema: 'public',
           table: 'reactions',
         },
-        refresh
+        refresh,
       )
       .subscribe()
 
@@ -102,8 +103,8 @@ export function useActivity() {
     if (!user) return
 
     // Find existing reaction by this user with this emoji
-    const entry = activity.find(a => a.id === completionId)
-    const existing = entry?.reactions.find(r => r.user_id === user.id && r.emoji === emoji)
+    const entry = activity.find((a) => a.id === completionId)
+    const existing = entry?.reactions.find((r) => r.user_id === user.id && r.emoji === emoji)
 
     if (existing) {
       await supabase.from('reactions').delete().eq('id', existing.id)
@@ -136,7 +137,7 @@ export function useActivity() {
   async function undoCompletion(completionId: string) {
     if (!user || !group) return
 
-    const entry = activity.find(a => a.id === completionId)
+    const entry = activity.find((a) => a.id === completionId)
     if (!entry || entry.user_id !== user.id) return
 
     // Takes the points back and deletes the completion in one server call.
@@ -151,11 +152,15 @@ export function useActivity() {
   }
 
   function updateEntry(completionId: string, updates: Partial<ActivityEntry>) {
-    queryClient.setQueryData<InfiniteData<ActivityEntry[]>>(queryKey, prev =>
-      prev && {
-        ...prev,
-        pages: prev.pages.map(page => page.map(a => (a.id === completionId ? { ...a, ...updates } : a))),
-      }
+    queryClient.setQueryData<InfiniteData<ActivityEntry[]>>(
+      queryKey,
+      (prev) =>
+        prev && {
+          ...prev,
+          pages: prev.pages.map((page) =>
+            page.map((a) => (a.id === completionId ? { ...a, ...updates } : a)),
+          ),
+        },
     )
   }
 

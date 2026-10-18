@@ -17,15 +17,20 @@ export function useRealtime() {
         { event: '*', schema: 'public', table: 'chores', filter: `group_id=eq.${group.id}` },
         () => {
           queryClient.invalidateQueries({ queryKey: ['chores', group.id] })
-        }
+        },
       )
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'completions', filter: `group_id=eq.${group.id}` },
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'completions',
+          filter: `group_id=eq.${group.id}`,
+        },
         () => {
           queryClient.invalidateQueries({ queryKey: ['chores', group.id] })
           refreshMembers()
-        }
+        },
       )
       .subscribe()
 

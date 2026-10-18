@@ -34,12 +34,15 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
 
     // Decode the JWT to get the user ID
     const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token)
     if (authError || !user) {
       return new Response(JSON.stringify({ error: 'Invalid token' }), {
         status: 401,
@@ -78,19 +81,19 @@ Deno.serve(async (req) => {
 
     // Create Stripe Checkout Session
     const params = new URLSearchParams({
-      'mode': 'payment',
+      mode: 'payment',
       'line_items[0][price]': STRIPE_PRICE_ID,
       'line_items[0][quantity]': '1',
-      'success_url': `${APP_URL}/group?pro=success`,
-      'cancel_url': `${APP_URL}/group?pro=cancelled`,
-      'client_reference_id': groupId,
+      success_url: `${APP_URL}/group?pro=success`,
+      cancel_url: `${APP_URL}/group?pro=cancelled`,
+      client_reference_id: groupId,
       'metadata[group_id]': groupId,
     })
 
     const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
+        Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: params.toString(),

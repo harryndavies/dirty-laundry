@@ -46,9 +46,15 @@ Deno.serve(async (req) => {
 
     if (error) throw error
     if (!chores?.length) {
-      return new Response(JSON.stringify({ message: 'No reminders due', checked: `${windowStart}-${windowEnd} day=${currentDay}` }), {
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({
+          message: 'No reminders due',
+          checked: `${windowStart}-${windowEnd} day=${currentDay}`,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     // Group chores by group_id
@@ -71,7 +77,7 @@ Deno.serve(async (req) => {
       if (!members?.length) continue
 
       // Get push subscriptions for these members
-      const userIds = members.map(m => m.user_id)
+      const userIds = members.map((m) => m.user_id)
       const { data: subscriptions } = await supabase
         .from('push_subscriptions')
         .select('user_id, endpoint, keys_p256dh, keys_auth')
@@ -80,22 +86,23 @@ Deno.serve(async (req) => {
       if (!subscriptions?.length) continue
 
       // Build notification message
-      const choreNames = groupChores.map(c => c.name).join(', ')
+      const choreNames = groupChores.map((c) => c.name).join(', ')
       const payload = {
         title: 'Chore reminder!',
-        body: groupChores.length === 1
-          ? `Time to do: ${choreNames}`
-          : `${groupChores.length} chores due: ${choreNames}`,
+        body:
+          groupChores.length === 1
+            ? `Time to do: ${choreNames}`
+            : `${groupChores.length} chores due: ${choreNames}`,
         url: '/chores',
       }
 
       // Send via the send-push function for each user
-      for (const userId of [...new Set(subscriptions.map(s => s.user_id))]) {
+      for (const userId of [...new Set(subscriptions.map((s) => s.user_id))]) {
         const response = await fetch(`${supabaseUrl}/functions/v1/send-push`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseServiceKey}`,
+            Authorization: `Bearer ${supabaseServiceKey}`,
           },
           body: JSON.stringify({ toUserId: userId, payload }),
         })

@@ -18,7 +18,7 @@ export function useDailyPoints(days: number = 365): Map<string, number> {
   start.setDate(start.getDate() - (days - 1))
 
   // Member total_points changes signal new completions land — refetch then.
-  const me = members.find(m => m.user_id === user?.id)
+  const me = members.find((m) => m.user_id === user?.id)
 
   const { data } = useQuery({
     queryKey: ['dailyPoints', user?.id, group?.id, days, me?.total_points ?? 0],

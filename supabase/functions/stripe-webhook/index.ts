@@ -5,13 +5,16 @@ const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET')!
 async function verifyStripeSignature(
   payload: string,
   signature: string,
-  secret: string
+  secret: string,
 ): Promise<boolean> {
-  const parts = signature.split(',').reduce((acc, part) => {
-    const [key, value] = part.split('=')
-    acc[key] = value
-    return acc
-  }, {} as Record<string, string>)
+  const parts = signature.split(',').reduce(
+    (acc, part) => {
+      const [key, value] = part.split('=')
+      acc[key] = value
+      return acc
+    },
+    {} as Record<string, string>,
+  )
 
   const timestamp = parts['t']
   const expectedSig = parts['v1']
@@ -24,11 +27,11 @@ async function verifyStripeSignature(
     encoder.encode(secret),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
-    ['sign']
+    ['sign'],
   )
   const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(signedPayload))
   const computedSig = Array.from(new Uint8Array(sig))
-    .map(b => b.toString(16).padStart(2, '0'))
+    .map((b) => b.toString(16).padStart(2, '0'))
     .join('')
 
   return computedSig === expectedSig
@@ -70,7 +73,7 @@ Deno.serve(async (req) => {
 
       const supabase = createClient(
         Deno.env.get('SUPABASE_URL')!,
-        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
       )
 
       const { error } = await supabase

@@ -12,7 +12,19 @@ import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/Toast'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { playComplete, playDelete, playBoost } from '@/lib/sounds'
-import { Plus, Minus, RotateCw, Zap, Dices, TrendingUp, Bell, Camera, X, Focus, Search } from 'lucide-react'
+import {
+  Plus,
+  Minus,
+  RotateCw,
+  Zap,
+  Dices,
+  TrendingUp,
+  Bell,
+  Camera,
+  X,
+  Focus,
+  Search,
+} from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { advanceTour } from '@/lib/hooks/useTour'
 
@@ -28,7 +40,11 @@ function stepPoints(current: number, direction: 'up' | 'down'): number {
   return current <= 5 ? current - 1 : current - 5
 }
 
-const CHORE_PACKS: { name: string; emoji: string; chores: { name: string; points: number; area: string }[] }[] = [
+const CHORE_PACKS: {
+  name: string
+  emoji: string
+  chores: { name: string; points: number; area: string }[]
+}[] = [
   {
     name: 'STUDENT FLAT',
     emoji: '🎓',
@@ -80,9 +96,10 @@ const CHORE_PACKS: { name: string; emoji: string; chores: { name: string; points
 export function ChoresPage() {
   const { group, members, loading: groupLoading } = useGroup()
   const { user } = useAuth()
-  const { chores, loading, addChore, completeChore, deleteChore, boostChore, editChore } = useChores()
+  const { chores, loading, addChore, completeChore, deleteChore, boostChore, editChore } =
+    useChores()
   const { suggestions } = useFairTurn()
-  const userMember = members.find(m => m.user_id === user?.id)
+  const userMember = members.find((m) => m.user_id === user?.id)
   const isKid = userMember?.role === 'kid'
   const isAnonymous = user?.is_anonymous ?? false
   const navigate = useNavigate()
@@ -102,7 +119,11 @@ export function ChoresPage() {
   const [justDoOneIndex, setJustDoOneIndex] = useState(0)
 
   // Confirm dialog state
-  const [confirmComplete, setConfirmComplete] = useState<{ id: string; points: number; name: string } | null>(null)
+  const [confirmComplete, setConfirmComplete] = useState<{
+    id: string
+    points: number
+    name: string
+  } | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [withUserId, setWithUserId] = useState<string | null>(null)
   const [photo, setPhoto] = useState<File | null>(null)
@@ -110,12 +131,33 @@ export function ChoresPage() {
   const [photoBefore, setPhotoBefore] = useState<File | null>(null)
   const [photoBeforePreview, setPhotoBeforePreview] = useState<string | null>(null)
   const [addingPack, setAddingPack] = useState(false)
-  const [completionOverlay, setCompletionOverlay] = useState<{ points: number; totalPoints: number; choreName: string } | null>(null)
-  const [editingChore, setEditingChore] = useState<{ id: string; name: string; points: number; is_persistent: boolean; area: string | null; reminder_day: number | null; reminder_time: string | null; assigned_to: string | null } | null>(null)
-  const [assigningChore, setAssigningChore] = useState<{ id: string; name: string; assigned_to: string | null } | null>(null)
+  const [completionOverlay, setCompletionOverlay] = useState<{
+    points: number
+    totalPoints: number
+    choreName: string
+  } | null>(null)
+  const [editingChore, setEditingChore] = useState<{
+    id: string
+    name: string
+    points: number
+    is_persistent: boolean
+    area: string | null
+    reminder_day: number | null
+    reminder_time: string | null
+    assigned_to: string | null
+  } | null>(null)
+  const [assigningChore, setAssigningChore] = useState<{
+    id: string
+    name: string
+    assigned_to: string | null
+  } | null>(null)
 
   // Bounty state
-  const [bountyChore, setBountyChore] = useState<{ id: string; name: string; points: number } | null>(null)
+  const [bountyChore, setBountyChore] = useState<{
+    id: string
+    name: string
+    points: number
+  } | null>(null)
   const [bountyAmount, setBountyAmount] = useState(10)
 
   // Swipe state — use refs for tracking to avoid async state issues, state only for rendering
@@ -131,19 +173,22 @@ export function ChoresPage() {
   const today = new Date().getDay()
 
   const searchLower = search.toLowerCase().trim()
-  const filtered = chores.filter(c => {
-    if (searchLower && !c.name.toLowerCase().includes(searchLower)) return false
-    if (filter === 'mine') return c.assigned_to === user?.id || suggestions.get(c.id)?.user_id === user?.id
-    if (filter === 'persistent') return c.is_persistent
-    if (filter === 'one-time') return !c.is_persistent
-    if (areaFilter && c.area !== areaFilter) return false
-    return true
-  }).sort((a, b) => {
-    // Due today chores first
-    const aDue = a.reminder_day === today ? 1 : 0
-    const bDue = b.reminder_day === today ? 1 : 0
-    return bDue - aDue
-  })
+  const filtered = chores
+    .filter((c) => {
+      if (searchLower && !c.name.toLowerCase().includes(searchLower)) return false
+      if (filter === 'mine')
+        return c.assigned_to === user?.id || suggestions.get(c.id)?.user_id === user?.id
+      if (filter === 'persistent') return c.is_persistent
+      if (filter === 'one-time') return !c.is_persistent
+      if (areaFilter && c.area !== areaFilter) return false
+      return true
+    })
+    .sort((a, b) => {
+      // Due today chores first
+      const aDue = a.reminder_day === today ? 1 : 0
+      const bDue = b.reminder_day === today ? 1 : 0
+      return bDue - aDue
+    })
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
@@ -223,7 +268,7 @@ export function ChoresPage() {
     setSwipeOffset(diff)
   }
 
-  function onTouchEnd(chore: typeof chores[0]) {
+  function onTouchEnd(chore: (typeof chores)[0]) {
     const offset = swipeOffsetRef.current
     if (offset < -80 && !isKid) {
       setAssigningChore({ id: chore.id, name: chore.name, assigned_to: chore.assigned_to })
@@ -255,12 +300,12 @@ export function ChoresPage() {
   return (
     <div className="min-h-full">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-brutal-white border-b-4 border-brutal-black px-4 py-3 flex items-center justify-between">
-        <h1 className="font-mono font-bold text-lg tracking-tight">{group.name}</h1>
+      <div className="sticky top-0 z-10 flex items-center justify-between border-b-4 border-brutal-black bg-brutal-white px-4 py-3">
+        <h1 className="font-mono text-lg font-bold tracking-tight">{group.name}</h1>
         <div className="flex gap-2" data-tour="header-actions">
           <button
             onClick={() => {
-              const persistent = chores.filter(c => c.is_persistent)
+              const persistent = chores.filter((c) => c.is_persistent)
               if (persistent.length === 0) {
                 toast('Add some recurring chores first', 'bg-brutal-yellow')
                 return
@@ -268,13 +313,13 @@ export function ChoresPage() {
               setJustDoOneIndex(Math.floor(Math.random() * persistent.length))
               setJustDoOne(true)
             }}
-            className="w-11 h-11 bg-brutal-yellow border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            className="flex h-11 w-11 items-center justify-center border-2 border-brutal-black bg-brutal-yellow shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
           >
             <Focus size={20} strokeWidth={2.5} />
           </button>
           <button
             onClick={() => navigate('/roulette')}
-            className="w-11 h-11 bg-brutal-pink text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            className="flex h-11 w-11 items-center justify-center border-2 border-brutal-black bg-brutal-pink text-brutal-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
           >
             <Dices size={20} strokeWidth={2.5} />
           </button>
@@ -282,7 +327,7 @@ export function ChoresPage() {
             <button
               onClick={() => setShowAdd(true)}
               data-tour="chore-add"
-              className="w-11 h-11 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              className="flex h-11 w-11 items-center justify-center border-2 border-brutal-black bg-brutal-blue text-brutal-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
             >
               <Plus size={20} strokeWidth={3} />
             </button>
@@ -294,7 +339,7 @@ export function ChoresPage() {
       {isAnonymous && (
         <button
           onClick={() => navigate('/profile')}
-          className="mx-4 mt-2 p-2 bg-brutal-yellow/30 border border-brutal-yellow font-mono text-[10px] text-brutal-black/50 text-center active:bg-brutal-yellow/50"
+          className="mx-4 mt-2 border border-brutal-yellow bg-brutal-yellow/30 p-2 text-center font-mono text-[10px] text-brutal-black/50 active:bg-brutal-yellow/50"
         >
           Guest account — tap to save your progress with an email
         </button>
@@ -303,18 +348,21 @@ export function ChoresPage() {
       {/* Search */}
       <div className="px-4 pt-3">
         <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-brutal-black/40" />
+          <Search
+            size={14}
+            className="absolute top-1/2 left-3 -translate-y-1/2 text-brutal-black/40"
+          />
           <input
             type="text"
             placeholder="Search chores..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-8 py-2 border-2 border-brutal-black font-mono text-xs bg-brutal-white placeholder:text-brutal-black/30 focus:outline-none focus:ring-0"
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full border-2 border-brutal-black bg-brutal-white py-2 pr-8 pl-9 font-mono text-xs placeholder:text-brutal-black/30 focus:ring-0 focus:outline-none"
           />
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-brutal-black/40 active:text-brutal-black"
+              className="absolute top-1/2 right-2 -translate-y-1/2 text-brutal-black/40 active:text-brutal-black"
             >
               <X size={14} />
             </button>
@@ -323,12 +371,15 @@ export function ChoresPage() {
       </div>
 
       {/* Filters */}
-      <div className="px-4 pt-2 pb-1 flex gap-1.5 overflow-x-auto">
-        {filters.map(f => (
+      <div className="flex gap-1.5 overflow-x-auto px-4 pt-2 pb-1">
+        {filters.map((f) => (
           <button
             key={f.value}
-            onClick={() => { setFilter(f.value); setAreaFilter(null) }}
-            className={`font-mono text-[10px] font-bold px-3 py-1.5 border-2 border-brutal-black whitespace-nowrap transition-all ${
+            onClick={() => {
+              setFilter(f.value)
+              setAreaFilter(null)
+            }}
+            className={`border-2 border-brutal-black px-3 py-1.5 font-mono text-[10px] font-bold whitespace-nowrap transition-all ${
               filter === f.value && !areaFilter
                 ? 'bg-brutal-black text-brutal-white'
                 : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
@@ -337,12 +388,15 @@ export function ChoresPage() {
             {f.label}
           </button>
         ))}
-        <div className="w-px bg-brutal-black/20 mx-1" />
-        {[...new Set(chores.map(c => c.area).filter(Boolean))].map(area => (
+        <div className="mx-1 w-px bg-brutal-black/20" />
+        {[...new Set(chores.map((c) => c.area).filter(Boolean))].map((area) => (
           <button
             key={area}
-            onClick={() => { setAreaFilter(areaFilter === area ? null : area!); setFilter('all') }}
-            className={`font-mono text-[10px] font-bold px-3 py-1.5 border-2 border-brutal-black whitespace-nowrap transition-all ${
+            onClick={() => {
+              setAreaFilter(areaFilter === area ? null : area!)
+              setFilter('all')
+            }}
+            className={`border-2 border-brutal-black px-3 py-1.5 font-mono text-[10px] font-bold whitespace-nowrap transition-all ${
               areaFilter === area
                 ? 'bg-brutal-blue text-brutal-white'
                 : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
@@ -356,17 +410,21 @@ export function ChoresPage() {
       {/* Chore list */}
       <div className="px-4 pb-4">
         {loading ? (
-          <div className="py-12"><Spinner /></div>
+          <div className="py-12">
+            <Spinner />
+          </div>
         ) : filtered.length === 0 ? (
           chores.length === 0 && !isKid ? (
             <div className="py-8">
-              <div className="text-center mb-4">
-                <div className="text-4xl mb-3">🧹</div>
-                <p className="font-mono font-bold text-brutal-black/40 text-sm">NO CHORES YET</p>
-                <p className="font-mono text-brutal-black/30 text-xs mt-1">Pick a starter pack or add your own</p>
+              <div className="mb-4 text-center">
+                <div className="mb-3 text-4xl">🧹</div>
+                <p className="font-mono text-sm font-bold text-brutal-black/40">NO CHORES YET</p>
+                <p className="mt-1 font-mono text-xs text-brutal-black/30">
+                  Pick a starter pack or add your own
+                </p>
               </div>
               <div className="space-y-2" data-tour="chore-packs">
-                {CHORE_PACKS.map(pack => (
+                {CHORE_PACKS.map((pack) => (
                   <button
                     key={pack.name}
                     disabled={addingPack}
@@ -384,12 +442,14 @@ export function ChoresPage() {
                       toast(`${pack.chores.length} chores added!`, 'bg-brutal-lime')
                       advanceTour('chore-packs')
                     }}
-                    className="w-full border-2 border-brutal-black bg-brutal-white p-4 flex items-center gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-50"
+                    className="flex w-full items-center gap-3 border-2 border-brutal-black bg-brutal-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none disabled:opacity-50"
                   >
                     <span className="text-2xl">{pack.emoji}</span>
                     <div className="flex-1 text-left">
-                      <span className="font-mono font-bold text-sm block">{pack.name}</span>
-                      <span className="font-mono text-[10px] text-brutal-black/40">{pack.chores.length} chores</span>
+                      <span className="block font-mono text-sm font-bold">{pack.name}</span>
+                      <span className="font-mono text-[10px] text-brutal-black/40">
+                        {pack.chores.length} chores
+                      </span>
                     </div>
                     <span className="font-mono text-xs text-brutal-black/40">ADD ALL</span>
                   </button>
@@ -398,18 +458,18 @@ export function ChoresPage() {
             </div>
           ) : (
             <div className="py-12 text-center">
-              <div className="text-4xl mb-3">🧹</div>
-              <p className="font-mono font-bold text-brutal-black/40 text-sm">
+              <div className="mb-3 text-4xl">🧹</div>
+              <p className="font-mono text-sm font-bold text-brutal-black/40">
                 {chores.length === 0 ? 'NO CHORES YET' : 'NO CHORES MATCH'}
               </p>
-              <p className="font-mono text-brutal-black/30 text-xs mt-1">
+              <p className="mt-1 font-mono text-xs text-brutal-black/30">
                 {isKid ? 'Ask a parent to add some chores' : 'Tap + to add one'}
               </p>
             </div>
           )
         ) : (
           (() => {
-            const hasAreas = filtered.some(c => c.area)
+            const hasAreas = filtered.some((c) => c.area)
             const grouped = new Map<string, typeof filtered>()
             for (const c of filtered) {
               const key = c.area ?? (hasAreas ? 'Uncategorised' : '')
@@ -419,149 +479,202 @@ export function ChoresPage() {
             return Array.from(grouped.entries()).map(([area, areaChores]) => (
               <div key={area} className="mb-4">
                 {area && (
-                  <div className="font-mono font-bold text-[11px] text-brutal-black/40 tracking-widest mb-2 px-1 sticky top-0 bg-brutal-white py-2 z-[5]">
+                  <div className="sticky top-0 z-[5] mb-2 bg-brutal-white px-1 py-2 font-mono text-[11px] font-bold tracking-widest text-brutal-black/40">
                     {area.toUpperCase()}
                   </div>
                 )}
                 <div className="space-y-3">
-          {areaChores.map(chore => {
-            const isSwiping = swipingId === chore.id
-            const offset = isSwiping ? swipeOffset : 0
-            const showEdit = offset > 40 && !isKid
-            const showAssign = offset < -40 && !isKid
+                  {areaChores.map((chore) => {
+                    const isSwiping = swipingId === chore.id
+                    const offset = isSwiping ? swipeOffset : 0
+                    const showEdit = offset > 40 && !isKid
+                    const showAssign = offset < -40 && !isKid
 
-            return (
-              <div key={chore.id} className="relative overflow-hidden group/chore">
-                {/* Swipe backgrounds */}
-                <div className="absolute inset-0 flex md:hidden">
-                  <div className={`flex-1 bg-brutal-blue flex items-center px-4 font-mono font-bold text-sm text-brutal-white transition-opacity ${showEdit ? 'opacity-100' : 'opacity-0'}`}>
-                    EDIT ✎
-                  </div>
-                  <div className={`flex-1 bg-brutal-orange flex items-center justify-end px-4 font-mono font-bold text-sm text-brutal-white transition-opacity ${showAssign ? 'opacity-100' : 'opacity-0'}`}>
-                    ASSIGN 📋
-                  </div>
-                </div>
+                    return (
+                      <div key={chore.id} className="group/chore relative overflow-hidden">
+                        {/* Swipe backgrounds */}
+                        <div className="absolute inset-0 flex md:hidden">
+                          <div
+                            className={`flex flex-1 items-center bg-brutal-blue px-4 font-mono text-sm font-bold text-brutal-white transition-opacity ${showEdit ? 'opacity-100' : 'opacity-0'}`}
+                          >
+                            EDIT ✎
+                          </div>
+                          <div
+                            className={`flex flex-1 items-center justify-end bg-brutal-orange px-4 font-mono text-sm font-bold text-brutal-white transition-opacity ${showAssign ? 'opacity-100' : 'opacity-0'}`}
+                          >
+                            ASSIGN 📋
+                          </div>
+                        </div>
 
-                <div
-                  className="relative bg-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 flex items-center gap-3 touch-pan-y md:hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] md:hover:translate-x-[2px] md:hover:translate-y-[2px] md:transition-all"
-                  style={{ transform: isSwiping ? `translateX(${offset}px)` : 'translateX(0)', transition: isSwiping ? 'none' : 'transform 0.2s' }}
-                  onTouchStart={e => onTouchStart(e, chore.id)}
-                  onTouchMove={onTouchMove}
-                  onTouchEnd={() => onTouchEnd(chore)}
-                >
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-mono font-bold text-base truncate">{chore.name}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <button
-                        onClick={() => { setBountyChore({ id: chore.id, name: chore.name, points: chore.points }); setBountyAmount(10) }}
-                        className={`inline-flex items-center gap-1 border border-brutal-black px-2 py-0.5 font-mono text-xs font-bold active:opacity-70 transition-colors ${
-                          chore.points > chore.base_points
-                            ? 'bg-brutal-orange text-brutal-white animate-pulse'
-                            : 'bg-brutal-yellow'
-                        }`}
-                      >
-                        {chore.points > chore.base_points && '🔥 '}
-                        {chore.points} PTS <TrendingUp size={10} />
-                      </button>
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] font-bold border ${
-                        chore.is_persistent
-                          ? 'bg-brutal-blue/10 border-brutal-blue text-brutal-blue'
-                          : 'bg-brutal-orange/10 border-brutal-orange text-brutal-orange'
-                      }`}>
-                        {chore.is_persistent ? <><RotateCw size={10} /> RECURRING</> : <><Zap size={10} /> ONE-TIME</>}
-                      </span>
-                      {chore.reminder_day !== null && (
-                        chore.reminder_day === today ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] font-bold border bg-brutal-pink/20 border-brutal-pink text-brutal-pink">
-                            <Bell size={10} /> DUE TODAY
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] font-bold border bg-brutal-yellow/20 border-brutal-yellow text-brutal-black/60">
-                            <Bell size={10} /> {['SUN','MON','TUE','WED','THU','FRI','SAT'][chore.reminder_day]} {chore.reminder_time?.slice(0, 5)}
-                          </span>
-                        )
-                      )}
-                    </div>
-                    {chore.assigned_to && (() => {
-                      const assignee = members.find(m => m.user_id === chore.assigned_to)
-                      if (!assignee) return null
-                      return (
-                        <div className="mt-1.5 flex items-center gap-1.5">
-                          {assignee.profiles.avatar_url ? (
-                            <img src={assignee.profiles.avatar_url} alt="" className="w-4 h-4 border border-brutal-black object-cover shrink-0" />
-                          ) : (
-                            <div className="w-4 h-4 border border-brutal-black flex items-center justify-center font-mono text-[8px] font-bold text-white shrink-0" style={{ background: assignee.profiles.avatar_color }}>
-                              {assignee.profiles.display_name[0]}
+                        <div
+                          className="relative flex touch-pan-y items-center gap-3 border-2 border-brutal-black bg-brutal-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:transition-all md:hover:translate-x-[2px] md:hover:translate-y-[2px] md:hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                          style={{
+                            transform: isSwiping ? `translateX(${offset}px)` : 'translateX(0)',
+                            transition: isSwiping ? 'none' : 'transform 0.2s',
+                          }}
+                          onTouchStart={(e) => onTouchStart(e, chore.id)}
+                          onTouchMove={onTouchMove}
+                          onTouchEnd={() => onTouchEnd(chore)}
+                        >
+                          <div className="min-w-0 flex-1">
+                            <h3 className="truncate font-mono text-base font-bold">{chore.name}</h3>
+                            <div className="mt-1 flex items-center gap-2">
+                              <button
+                                onClick={() => {
+                                  setBountyChore({
+                                    id: chore.id,
+                                    name: chore.name,
+                                    points: chore.points,
+                                  })
+                                  setBountyAmount(10)
+                                }}
+                                className={`inline-flex items-center gap-1 border border-brutal-black px-2 py-0.5 font-mono text-xs font-bold transition-colors active:opacity-70 ${
+                                  chore.points > chore.base_points
+                                    ? 'animate-pulse bg-brutal-orange text-brutal-white'
+                                    : 'bg-brutal-yellow'
+                                }`}
+                              >
+                                {chore.points > chore.base_points && '🔥 '}
+                                {chore.points} PTS <TrendingUp size={10} />
+                              </button>
+                              <span
+                                className={`inline-flex items-center gap-1 border px-2 py-0.5 font-mono text-[10px] font-bold ${
+                                  chore.is_persistent
+                                    ? 'border-brutal-blue bg-brutal-blue/10 text-brutal-blue'
+                                    : 'border-brutal-orange bg-brutal-orange/10 text-brutal-orange'
+                                }`}
+                              >
+                                {chore.is_persistent ? (
+                                  <>
+                                    <RotateCw size={10} /> RECURRING
+                                  </>
+                                ) : (
+                                  <>
+                                    <Zap size={10} /> ONE-TIME
+                                  </>
+                                )}
+                              </span>
+                              {chore.reminder_day !== null &&
+                                (chore.reminder_day === today ? (
+                                  <span className="inline-flex items-center gap-1 border border-brutal-pink bg-brutal-pink/20 px-2 py-0.5 font-mono text-[10px] font-bold text-brutal-pink">
+                                    <Bell size={10} /> DUE TODAY
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 border border-brutal-yellow bg-brutal-yellow/20 px-2 py-0.5 font-mono text-[10px] font-bold text-brutal-black/60">
+                                    <Bell size={10} />{' '}
+                                    {
+                                      ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][
+                                        chore.reminder_day
+                                      ]
+                                    }{' '}
+                                    {chore.reminder_time?.slice(0, 5)}
+                                  </span>
+                                ))}
+                            </div>
+                            {chore.assigned_to &&
+                              (() => {
+                                const assignee = members.find(
+                                  (m) => m.user_id === chore.assigned_to,
+                                )
+                                if (!assignee) return null
+                                return (
+                                  <div className="mt-1.5 flex items-center gap-1.5">
+                                    {assignee.profiles.avatar_url ? (
+                                      <img
+                                        src={assignee.profiles.avatar_url}
+                                        alt=""
+                                        className="h-4 w-4 shrink-0 border border-brutal-black object-cover"
+                                      />
+                                    ) : (
+                                      <div
+                                        className="flex h-4 w-4 shrink-0 items-center justify-center border border-brutal-black font-mono text-[8px] font-bold text-white"
+                                        style={{ background: assignee.profiles.avatar_color }}
+                                      >
+                                        {assignee.profiles.display_name[0]}
+                                      </div>
+                                    )}
+                                    <span className="font-mono text-[10px] text-brutal-black/50">
+                                      {assignee.profiles.display_name}'s job
+                                    </span>
+                                  </div>
+                                )
+                              })()}
+                            {!chore.assigned_to &&
+                              chore.is_persistent &&
+                              suggestions.get(chore.id) && (
+                                <div className="mt-1.5 flex items-center gap-1.5">
+                                  {suggestions.get(chore.id)!.avatar_url ? (
+                                    <img
+                                      src={suggestions.get(chore.id)!.avatar_url!}
+                                      alt=""
+                                      className="h-4 w-4 shrink-0 border border-brutal-black object-cover"
+                                    />
+                                  ) : (
+                                    <div
+                                      className="flex h-4 w-4 shrink-0 items-center justify-center border border-brutal-black font-mono text-[8px] font-bold text-white"
+                                      style={{
+                                        background: suggestions.get(chore.id)!.avatar_color,
+                                      }}
+                                    >
+                                      {suggestions.get(chore.id)!.display_name[0]}
+                                    </div>
+                                  )}
+                                  <span className="font-mono text-[10px] text-brutal-black/50">
+                                    {suggestions.get(chore.id)!.display_name}'s turn
+                                  </span>
+                                </div>
+                              )}
+                          </div>
+
+                          {/* Desktop action buttons — hidden on mobile, shown on hover */}
+                          {!isKid && (
+                            <div className="hidden gap-1 opacity-0 transition-opacity group-hover/chore:opacity-100 md:flex">
+                              <button
+                                onClick={() =>
+                                  setEditingChore({
+                                    id: chore.id,
+                                    name: chore.name,
+                                    points: chore.points,
+                                    is_persistent: chore.is_persistent,
+                                    area: chore.area,
+                                    reminder_day: chore.reminder_day,
+                                    reminder_time: chore.reminder_time,
+                                    assigned_to: chore.assigned_to,
+                                  })
+                                }
+                                className="flex h-10 w-10 items-center justify-center border-2 border-brutal-black bg-brutal-blue font-mono text-xs font-bold text-brutal-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                                title="Edit"
+                              >
+                                ✎
+                              </button>
+                              <button
+                                onClick={() =>
+                                  setAssigningChore({
+                                    id: chore.id,
+                                    name: chore.name,
+                                    assigned_to: chore.assigned_to,
+                                  })
+                                }
+                                className="flex h-10 w-10 items-center justify-center border-2 border-brutal-black bg-brutal-orange font-mono text-xs font-bold text-brutal-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                                title="Assign"
+                              >
+                                📋
+                              </button>
                             </div>
                           )}
-                          <span className="font-mono text-[10px] text-brutal-black/50">
-                            {assignee.profiles.display_name}'s job
-                          </span>
-                        </div>
-                      )
-                    })()}
-                    {!chore.assigned_to && chore.is_persistent && suggestions.get(chore.id) && (
-                      <div className="mt-1.5 flex items-center gap-1.5">
-                        {suggestions.get(chore.id)!.avatar_url ? (
-                          <img
-                            src={suggestions.get(chore.id)!.avatar_url!}
-                            alt=""
-                            className="w-4 h-4 border border-brutal-black object-cover shrink-0"
-                          />
-                        ) : (
-                          <div
-                            className="w-4 h-4 border border-brutal-black flex items-center justify-center font-mono text-[8px] font-bold text-white shrink-0"
-                            style={{ background: suggestions.get(chore.id)!.avatar_color }}
+                          <button
+                            onClick={() => handleComplete(chore.id, chore.points, chore.name)}
+                            {...(filtered.indexOf(chore) === 0
+                              ? { 'data-tour': 'chore-complete' }
+                              : {})}
+                            className="flex h-12 w-12 items-center justify-center border-2 border-brutal-black bg-brutal-lime font-mono text-sm font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
                           >
-                            {suggestions.get(chore.id)!.display_name[0]}
-                          </div>
-                        )}
-                        <span className="font-mono text-[10px] text-brutal-black/50">
-                          {suggestions.get(chore.id)!.display_name}'s turn
-                        </span>
+                            ✓
+                          </button>
+                        </div>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Desktop action buttons — hidden on mobile, shown on hover */}
-                  {!isKid && (
-                    <div className="hidden md:flex gap-1 opacity-0 group-hover/chore:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => setEditingChore({
-                          id: chore.id,
-                          name: chore.name,
-                          points: chore.points,
-                          is_persistent: chore.is_persistent,
-                          area: chore.area,
-                          reminder_day: chore.reminder_day,
-                          reminder_time: chore.reminder_time,
-                          assigned_to: chore.assigned_to,
-                        })}
-                        className="w-10 h-10 bg-brutal-blue text-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono text-xs font-bold hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-                        title="Edit"
-                      >
-                        ✎
-                      </button>
-                      <button
-                        onClick={() => setAssigningChore({ id: chore.id, name: chore.name, assigned_to: chore.assigned_to })}
-                        className="w-10 h-10 bg-brutal-orange text-brutal-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono text-xs font-bold hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-                        title="Assign"
-                      >
-                        📋
-                      </button>
-                    </div>
-                  )}
-                  <button
-                    onClick={() => handleComplete(chore.id, chore.points, chore.name)}
-                    {...(filtered.indexOf(chore) === 0 ? { 'data-tour': 'chore-complete' } : {})}
-                    className="w-12 h-12 bg-brutal-lime border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center font-mono font-bold text-sm active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-                  >
-                    ✓
-                  </button>
-                </div>
-              </div>
-            )
-          })}
+                    )
+                  })}
                 </div>
               </div>
             ))
@@ -571,37 +684,37 @@ export function ChoresPage() {
 
       {/* Add chore sheet */}
       <BottomSheet open={showAdd} onClose={() => setShowAdd(false)}>
-        <h2 className="font-mono font-bold text-lg mb-4">ADD CHORE</h2>
+        <h2 className="mb-4 font-mono text-lg font-bold">ADD CHORE</h2>
         <form onSubmit={handleAdd} className="space-y-4">
           <div>
-            <label className="font-mono text-xs font-bold uppercase block mb-1">NAME</label>
+            <label className="mb-1 block font-mono text-xs font-bold uppercase">NAME</label>
             <Input
               value={newName}
-              onChange={e => setNewName(e.target.value)}
+              onChange={(e) => setNewName(e.target.value)}
               placeholder="e.g. Do the dishes"
-              className="border-2 border-brutal-black font-mono h-12"
+              className="h-12 border-2 border-brutal-black font-mono"
               autoFocus
               required
             />
           </div>
 
           <div>
-            <label className="font-mono text-xs font-bold uppercase block mb-1">POINTS</label>
+            <label className="mb-1 block font-mono text-xs font-bold uppercase">POINTS</label>
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setNewPoints(stepPoints(newPoints, 'down'))}
-                className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+                className="flex h-12 w-12 items-center justify-center border-2 border-brutal-black bg-brutal-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
               >
                 <Minus size={18} />
               </button>
-              <div className="flex-1 h-12 bg-brutal-yellow border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-xl">
+              <div className="flex h-12 flex-1 items-center justify-center border-2 border-brutal-black bg-brutal-yellow font-mono text-xl font-bold">
                 {newPoints}
               </div>
               <button
                 type="button"
                 onClick={() => setNewPoints(stepPoints(newPoints, 'up'))}
-                className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+                className="flex h-12 w-12 items-center justify-center border-2 border-brutal-black bg-brutal-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
               >
                 <Plus size={18} />
               </button>
@@ -609,12 +722,12 @@ export function ChoresPage() {
           </div>
 
           <div>
-            <label className="font-mono text-xs font-bold uppercase block mb-1">TYPE</label>
+            <label className="mb-1 block font-mono text-xs font-bold uppercase">TYPE</label>
             <div className="flex border-2 border-brutal-black">
               <button
                 type="button"
                 onClick={() => setNewPersistent(true)}
-                className={`flex-1 py-3 font-mono font-bold text-xs uppercase transition-colors ${
+                className={`flex-1 py-3 font-mono text-xs font-bold uppercase transition-colors ${
                   newPersistent ? 'bg-brutal-blue text-brutal-white' : 'bg-brutal-white'
                 }`}
               >
@@ -623,7 +736,7 @@ export function ChoresPage() {
               <button
                 type="button"
                 onClick={() => setNewPersistent(false)}
-                className={`flex-1 py-3 font-mono font-bold text-xs uppercase border-l-2 border-brutal-black transition-colors ${
+                className={`flex-1 border-l-2 border-brutal-black py-3 font-mono text-xs font-bold uppercase transition-colors ${
                   !newPersistent ? 'bg-brutal-orange text-brutal-white' : 'bg-brutal-white'
                 }`}
               >
@@ -633,24 +746,28 @@ export function ChoresPage() {
           </div>
 
           <div>
-            <label className="font-mono text-xs font-bold uppercase block mb-1">AREA</label>
+            <label className="mb-1 block font-mono text-xs font-bold uppercase">AREA</label>
             <div className="flex flex-wrap gap-1.5">
               <button
                 type="button"
                 onClick={() => setNewArea(null)}
-                className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${
-                  newArea === null ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
+                className={`border-2 border-brutal-black px-3 py-2 font-mono text-xs font-bold transition-all ${
+                  newArea === null
+                    ? 'bg-brutal-black text-brutal-white'
+                    : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
                 }`}
               >
                 NONE
               </button>
-              {AREAS.map(a => (
+              {AREAS.map((a) => (
                 <button
                   key={a}
                   type="button"
                   onClick={() => setNewArea(a)}
-                  className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${
-                    newArea === a ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
+                  className={`border-2 border-brutal-black px-3 py-2 font-mono text-xs font-bold transition-all ${
+                    newArea === a
+                      ? 'bg-brutal-black text-brutal-white'
+                      : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
                   }`}
                 >
                   {a.toUpperCase()}
@@ -660,7 +777,7 @@ export function ChoresPage() {
           </div>
 
           <div>
-            <label className="font-mono text-xs font-bold uppercase block mb-1">REMINDER</label>
+            <label className="mb-1 block font-mono text-xs font-bold uppercase">REMINDER</label>
             <div className="flex flex-wrap gap-1.5">
               {[
                 { label: 'NONE', value: null },
@@ -671,12 +788,12 @@ export function ChoresPage() {
                 { label: 'FRI', value: 5 },
                 { label: 'SAT', value: 6 },
                 { label: 'SUN', value: 0 },
-              ].map(d => (
+              ].map((d) => (
                 <button
                   key={d.label}
                   type="button"
                   onClick={() => setNewReminderDay(d.value)}
-                  className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${
+                  className={`border-2 border-brutal-black px-3 py-2 font-mono text-xs font-bold transition-all ${
                     newReminderDay === d.value
                       ? 'bg-brutal-black text-brutal-white'
                       : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
@@ -687,13 +804,13 @@ export function ChoresPage() {
               ))}
             </div>
             {newReminderDay !== null && (
-              <div className="flex items-center gap-2 mt-2">
+              <div className="mt-2 flex items-center gap-2">
                 <Bell size={14} className="text-brutal-black/50" />
                 <input
                   type="time"
                   value={newReminderTime}
-                  onChange={e => setNewReminderTime(e.target.value)}
-                  className="flex-1 h-10 border-2 border-brutal-black px-3 font-mono text-sm bg-brutal-white"
+                  onChange={(e) => setNewReminderTime(e.target.value)}
+                  className="h-10 flex-1 border-2 border-brutal-black bg-brutal-white px-3 font-mono text-sm"
                 />
               </div>
             )}
@@ -702,7 +819,7 @@ export function ChoresPage() {
           <Button
             type="submit"
             disabled={addChore.isPending}
-            className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+            className="h-12 w-full border-2 border-brutal-black bg-brutal-black font-mono text-sm font-bold text-brutal-white uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
           >
             {addChore.isPending ? 'ADDING...' : 'ADD CHORE'}
           </Button>
@@ -713,33 +830,35 @@ export function ChoresPage() {
       <BottomSheet open={!!bountyChore} onClose={() => setBountyChore(null)}>
         {bountyChore && (
           <>
-            <h2 className="font-mono font-bold text-lg mb-1">BOOST BOUNTY</h2>
-            <p className="font-mono text-xs text-brutal-black/50 mb-4">
-              Make "{bountyChore.name}" worth more to get it done.
-              Currently <span className="font-bold">{bountyChore.points} pts</span>.
+            <h2 className="mb-1 font-mono text-lg font-bold">BOOST BOUNTY</h2>
+            <p className="mb-4 font-mono text-xs text-brutal-black/50">
+              Make "{bountyChore.name}" worth more to get it done. Currently{' '}
+              <span className="font-bold">{bountyChore.points} pts</span>.
             </p>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="mb-4 flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setBountyAmount(Math.max(5, bountyAmount - 5))}
-                className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+                className="flex h-12 w-12 items-center justify-center border-2 border-brutal-black bg-brutal-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
               >
                 <Minus size={18} />
               </button>
-              <div className="flex-1 h-12 bg-brutal-orange border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-xl text-brutal-white">
+              <div className="flex h-12 flex-1 items-center justify-center border-2 border-brutal-black bg-brutal-orange font-mono text-xl font-bold text-brutal-white">
                 +{bountyAmount}
               </div>
               <button
                 type="button"
                 onClick={() => setBountyAmount(bountyAmount + 5)}
-                className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all"
+                className="flex h-12 w-12 items-center justify-center border-2 border-brutal-black bg-brutal-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
               >
                 <Plus size={18} />
               </button>
             </div>
-            <div className="bg-brutal-yellow/30 border-2 border-brutal-black p-3 mb-4 text-center">
+            <div className="mb-4 border-2 border-brutal-black bg-brutal-yellow/30 p-3 text-center">
               <span className="font-mono text-xs text-brutal-black/50">NEW VALUE: </span>
-              <span className="font-mono font-bold text-lg">{bountyChore.points + bountyAmount} PTS</span>
+              <span className="font-mono text-lg font-bold">
+                {bountyChore.points + bountyAmount} PTS
+              </span>
             </div>
             <Button
               onClick={async () => {
@@ -749,7 +868,7 @@ export function ChoresPage() {
                 setBountyChore(null)
               }}
               disabled={boostChore.isPending}
-              className="w-full h-12 bg-brutal-orange text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+              className="h-12 w-full border-2 border-brutal-black bg-brutal-orange font-mono text-sm font-bold text-brutal-white uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
             >
               {boostChore.isPending ? 'BOOSTING...' : 'BOOST BOUNTY'}
             </Button>
@@ -757,59 +876,101 @@ export function ChoresPage() {
         )}
       </BottomSheet>
 
-      <BottomSheet open={!!confirmComplete} onClose={() => { setConfirmComplete(null); setWithUserId(null) }}>
+      <BottomSheet
+        open={!!confirmComplete}
+        onClose={() => {
+          setConfirmComplete(null)
+          setWithUserId(null)
+        }}
+      >
         {confirmComplete && (
           <>
-            <h2 className="font-mono font-bold text-lg mb-1">COMPLETE CHORE</h2>
-            <p className="font-mono text-xs text-brutal-black/50 mb-4">
+            <h2 className="mb-1 font-mono text-lg font-bold">COMPLETE CHORE</h2>
+            <p className="mb-4 font-mono text-xs text-brutal-black/50">
               Mark "{confirmComplete.name}" as done for +{confirmComplete.points} pts?
             </p>
 
             {members.length > 1 && (
               <div className="mb-4">
-                <p className="font-mono text-[10px] font-bold text-brutal-black/40 tracking-widest mb-2">DID THIS WITH...</p>
+                <p className="mb-2 font-mono text-[10px] font-bold tracking-widest text-brutal-black/40">
+                  DID THIS WITH...
+                </p>
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => setWithUserId(null)}
-                    className={`flex items-center gap-1.5 px-3 py-2 border-2 border-brutal-black font-mono text-xs font-bold transition-all ${
+                    className={`flex items-center gap-1.5 border-2 border-brutal-black px-3 py-2 font-mono text-xs font-bold transition-all ${
                       !withUserId ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white'
                     }`}
                   >
                     JUST ME
                   </button>
-                  {members.filter(m => m.user_id !== user?.id).map(m => (
-                    <button
-                      key={m.user_id}
-                      onClick={() => setWithUserId(withUserId === m.user_id ? null : m.user_id)}
-                      className={`flex items-center gap-1.5 px-3 py-2 border-2 border-brutal-black font-mono text-xs font-bold transition-all ${
-                        withUserId === m.user_id ? 'bg-brutal-lime' : 'bg-brutal-white'
-                      }`}
-                    >
-                      <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" imageUrl={m.profiles.avatar_url} />
-                      {m.profiles.display_name}
-                    </button>
-                  ))}
+                  {members
+                    .filter((m) => m.user_id !== user?.id)
+                    .map((m) => (
+                      <button
+                        key={m.user_id}
+                        onClick={() => setWithUserId(withUserId === m.user_id ? null : m.user_id)}
+                        className={`flex items-center gap-1.5 border-2 border-brutal-black px-3 py-2 font-mono text-xs font-bold transition-all ${
+                          withUserId === m.user_id ? 'bg-brutal-lime' : 'bg-brutal-white'
+                        }`}
+                      >
+                        <Avatar
+                          name={m.profiles.display_name}
+                          color={m.profiles.avatar_color}
+                          size="sm"
+                          imageUrl={m.profiles.avatar_url}
+                        />
+                        {m.profiles.display_name}
+                      </button>
+                    ))}
                 </div>
               </div>
             )}
 
             {/* Photo proof */}
             <div className="mb-4">
-              <p className="font-mono text-[10px] font-bold text-brutal-black/40 tracking-widest mb-2">BEFORE & AFTER (OPTIONAL)</p>
+              <p className="mb-2 font-mono text-[10px] font-bold tracking-widest text-brutal-black/40">
+                BEFORE & AFTER (OPTIONAL)
+              </p>
               <div className="grid grid-cols-2 gap-2">
                 {/* Before photo */}
                 <div>
                   {photoBeforePreview ? (
                     <div className="relative">
-                      <img src={photoBeforePreview} alt="Before" className="w-full h-24 object-cover border-2 border-brutal-black" />
-                      <span className="absolute top-1 left-1 font-mono text-[8px] font-bold bg-brutal-black text-brutal-white px-1">BEFORE</span>
-                      <button onClick={() => { setPhotoBefore(null); setPhotoBeforePreview(null) }} className="absolute top-1 right-1 w-5 h-5 bg-brutal-black text-brutal-white flex items-center justify-center"><X size={10} /></button>
+                      <img
+                        src={photoBeforePreview}
+                        alt="Before"
+                        className="h-24 w-full border-2 border-brutal-black object-cover"
+                      />
+                      <span className="absolute top-1 left-1 bg-brutal-black px-1 font-mono text-[8px] font-bold text-brutal-white">
+                        BEFORE
+                      </span>
+                      <button
+                        onClick={() => {
+                          setPhotoBefore(null)
+                          setPhotoBeforePreview(null)
+                        }}
+                        className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center bg-brutal-black text-brutal-white"
+                      >
+                        <X size={10} />
+                      </button>
                     </div>
                   ) : (
-                    <label className="flex flex-col items-center justify-center h-24 border-2 border-dashed border-brutal-black/30 bg-brutal-white font-mono text-[10px] font-bold text-brutal-black/40 active:bg-brutal-black/5 cursor-pointer gap-1">
+                    <label className="flex h-24 cursor-pointer flex-col items-center justify-center gap-1 border-2 border-dashed border-brutal-black/30 bg-brutal-white font-mono text-[10px] font-bold text-brutal-black/40 active:bg-brutal-black/5">
                       <Camera size={14} />
                       BEFORE
-                      <input type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) { setPhotoBefore(f); setPhotoBeforePreview(URL.createObjectURL(f)) } }} />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0]
+                          if (f) {
+                            setPhotoBefore(f)
+                            setPhotoBeforePreview(URL.createObjectURL(f))
+                          }
+                        }}
+                      />
                     </label>
                   )}
                 </div>
@@ -817,15 +978,40 @@ export function ChoresPage() {
                 <div>
                   {photoPreview ? (
                     <div className="relative">
-                      <img src={photoPreview} alt="After" className="w-full h-24 object-cover border-2 border-brutal-black" />
-                      <span className="absolute top-1 left-1 font-mono text-[8px] font-bold bg-brutal-lime text-brutal-black px-1">AFTER</span>
-                      <button onClick={() => { setPhoto(null); setPhotoPreview(null) }} className="absolute top-1 right-1 w-5 h-5 bg-brutal-black text-brutal-white flex items-center justify-center"><X size={10} /></button>
+                      <img
+                        src={photoPreview}
+                        alt="After"
+                        className="h-24 w-full border-2 border-brutal-black object-cover"
+                      />
+                      <span className="absolute top-1 left-1 bg-brutal-lime px-1 font-mono text-[8px] font-bold text-brutal-black">
+                        AFTER
+                      </span>
+                      <button
+                        onClick={() => {
+                          setPhoto(null)
+                          setPhotoPreview(null)
+                        }}
+                        className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center bg-brutal-black text-brutal-white"
+                      >
+                        <X size={10} />
+                      </button>
                     </div>
                   ) : (
-                    <label className="flex flex-col items-center justify-center h-24 border-2 border-dashed border-brutal-black/30 bg-brutal-white font-mono text-[10px] font-bold text-brutal-black/40 active:bg-brutal-black/5 cursor-pointer gap-1">
+                    <label className="flex h-24 cursor-pointer flex-col items-center justify-center gap-1 border-2 border-dashed border-brutal-black/30 bg-brutal-white font-mono text-[10px] font-bold text-brutal-black/40 active:bg-brutal-black/5">
                       <Camera size={14} />
                       AFTER
-                      <input type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) { setPhoto(f); setPhotoPreview(URL.createObjectURL(f)) } }} />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0]
+                          if (f) {
+                            setPhoto(f)
+                            setPhotoPreview(URL.createObjectURL(f))
+                          }
+                        }}
+                      />
                     </label>
                   )}
                 </div>
@@ -835,9 +1021,13 @@ export function ChoresPage() {
             <Button
               onClick={doComplete}
               disabled={completeChore.isPending}
-              className="w-full h-12 bg-brutal-lime font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+              className="h-12 w-full border-2 border-brutal-black bg-brutal-lime font-mono text-sm font-bold uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
             >
-              {completeChore.isPending ? 'COMPLETING...' : withUserId ? 'DONE TOGETHER ✓' : 'DONE ✓'}
+              {completeChore.isPending
+                ? 'COMPLETING...'
+                : withUserId
+                  ? 'DONE TOGETHER ✓'
+                  : 'DONE ✓'}
             </Button>
           </>
         )}
@@ -847,37 +1037,52 @@ export function ChoresPage() {
       <BottomSheet open={!!assigningChore} onClose={() => setAssigningChore(null)}>
         {assigningChore && (
           <>
-            <h2 className="font-mono font-bold text-lg mb-1">ASSIGN CHORE</h2>
-            <p className="font-mono text-xs text-brutal-black/50 mb-4">
+            <h2 className="mb-1 font-mono text-lg font-bold">ASSIGN CHORE</h2>
+            <p className="mb-4 font-mono text-xs text-brutal-black/50">
               Who should do "{assigningChore.name}"?
             </p>
             <div className="space-y-2">
               <button
                 onClick={async () => {
-                  await editChore.mutateAsync({ choreId: assigningChore.id, updates: { assigned_to: null } })
+                  await editChore.mutateAsync({
+                    choreId: assigningChore.id,
+                    updates: { assigned_to: null },
+                  })
                   toast('Assignment removed', 'bg-brutal-white')
                   setAssigningChore(null)
                 }}
-                className={`w-full flex items-center gap-3 p-3 border-2 border-brutal-black transition-all ${
-                  !assigningChore.assigned_to ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white active:bg-brutal-black/5'
+                className={`flex w-full items-center gap-3 border-2 border-brutal-black p-3 transition-all ${
+                  !assigningChore.assigned_to
+                    ? 'bg-brutal-black text-brutal-white'
+                    : 'bg-brutal-white active:bg-brutal-black/5'
                 }`}
               >
-                <span className="font-mono font-bold text-sm">ANYONE</span>
+                <span className="font-mono text-sm font-bold">ANYONE</span>
               </button>
-              {members.map(m => (
+              {members.map((m) => (
                 <button
                   key={m.user_id}
                   onClick={async () => {
-                    await editChore.mutateAsync({ choreId: assigningChore.id, updates: { assigned_to: m.user_id, name: assigningChore.name } })
+                    await editChore.mutateAsync({
+                      choreId: assigningChore.id,
+                      updates: { assigned_to: m.user_id, name: assigningChore.name },
+                    })
                     toast(`Assigned to ${m.profiles.display_name}!`, 'bg-brutal-orange')
                     setAssigningChore(null)
                   }}
-                  className={`w-full flex items-center gap-3 p-3 border-2 border-brutal-black transition-all ${
-                    assigningChore.assigned_to === m.user_id ? 'bg-brutal-orange text-brutal-white' : 'bg-brutal-white active:bg-brutal-black/5'
+                  className={`flex w-full items-center gap-3 border-2 border-brutal-black p-3 transition-all ${
+                    assigningChore.assigned_to === m.user_id
+                      ? 'bg-brutal-orange text-brutal-white'
+                      : 'bg-brutal-white active:bg-brutal-black/5'
                   }`}
                 >
-                  <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" imageUrl={m.profiles.avatar_url} />
-                  <span className="font-mono font-bold text-sm">{m.profiles.display_name}</span>
+                  <Avatar
+                    name={m.profiles.display_name}
+                    color={m.profiles.avatar_color}
+                    size="sm"
+                    imageUrl={m.profiles.avatar_url}
+                  />
+                  <span className="font-mono text-sm font-bold">{m.profiles.display_name}</span>
                 </button>
               ))}
             </div>
@@ -889,49 +1094,72 @@ export function ChoresPage() {
       <BottomSheet open={!!editingChore} onClose={() => setEditingChore(null)}>
         {editingChore && (
           <>
-            <h2 className="font-mono font-bold text-lg mb-4">EDIT CHORE</h2>
+            <h2 className="mb-4 font-mono text-lg font-bold">EDIT CHORE</h2>
             <div className="space-y-4">
               <div>
-                <label className="font-mono text-xs font-bold uppercase block mb-1">NAME</label>
+                <label className="mb-1 block font-mono text-xs font-bold uppercase">NAME</label>
                 <Input
                   value={editingChore.name}
-                  onChange={e => setEditingChore({ ...editingChore, name: e.target.value })}
-                  className="border-2 border-brutal-black font-mono h-12"
+                  onChange={(e) => setEditingChore({ ...editingChore, name: e.target.value })}
+                  className="h-12 border-2 border-brutal-black font-mono"
                 />
               </div>
               <div>
-                <label className="font-mono text-xs font-bold uppercase block mb-1">POINTS</label>
+                <label className="mb-1 block font-mono text-xs font-bold uppercase">POINTS</label>
                 <div className="flex items-center gap-3">
-                  <button type="button" onClick={() => setEditingChore({ ...editingChore, points: stepPoints(editingChore.points, 'down') })}
-                    className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEditingChore({
+                        ...editingChore,
+                        points: stepPoints(editingChore.points, 'down'),
+                      })
+                    }
+                    className="flex h-12 w-12 items-center justify-center border-2 border-brutal-black bg-brutal-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
+                  >
                     <Minus size={18} />
                   </button>
-                  <div className="flex-1 h-12 bg-brutal-yellow border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-xl">
+                  <div className="flex h-12 flex-1 items-center justify-center border-2 border-brutal-black bg-brutal-yellow font-mono text-xl font-bold">
                     {editingChore.points}
                   </div>
-                  <button type="button" onClick={() => setEditingChore({ ...editingChore, points: stepPoints(editingChore.points, 'up') })}
-                    className="w-12 h-12 bg-brutal-white border-2 border-brutal-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEditingChore({
+                        ...editingChore,
+                        points: stepPoints(editingChore.points, 'up'),
+                      })
+                    }
+                    className="flex h-12 w-12 items-center justify-center border-2 border-brutal-black bg-brutal-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
+                  >
                     <Plus size={18} />
                   </button>
                 </div>
               </div>
               <div>
-                <label className="font-mono text-xs font-bold uppercase block mb-1">AREA</label>
+                <label className="mb-1 block font-mono text-xs font-bold uppercase">AREA</label>
                 <div className="flex flex-wrap gap-1.5">
-                  <button type="button" onClick={() => setEditingChore({ ...editingChore, area: null })}
-                    className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${editingChore.area === null ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white'}`}>
+                  <button
+                    type="button"
+                    onClick={() => setEditingChore({ ...editingChore, area: null })}
+                    className={`border-2 border-brutal-black px-3 py-2 font-mono text-xs font-bold transition-all ${editingChore.area === null ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white'}`}
+                  >
                     NONE
                   </button>
-                  {AREAS.map(a => (
-                    <button key={a} type="button" onClick={() => setEditingChore({ ...editingChore, area: a })}
-                      className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${editingChore.area === a ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white'}`}>
+                  {AREAS.map((a) => (
+                    <button
+                      key={a}
+                      type="button"
+                      onClick={() => setEditingChore({ ...editingChore, area: a })}
+                      className={`border-2 border-brutal-black px-3 py-2 font-mono text-xs font-bold transition-all ${editingChore.area === a ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white'}`}
+                    >
                       {a.toUpperCase()}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="font-mono text-xs font-bold uppercase block mb-1">REMINDER</label>
+                <label className="mb-1 block font-mono text-xs font-bold uppercase">REMINDER</label>
                 <div className="flex flex-wrap gap-1.5">
                   {[
                     { label: 'NONE', value: null },
@@ -942,12 +1170,12 @@ export function ChoresPage() {
                     { label: 'FRI', value: 5 },
                     { label: 'SAT', value: 6 },
                     { label: 'SUN', value: 0 },
-                  ].map(d => (
+                  ].map((d) => (
                     <button
                       key={d.label}
                       type="button"
                       onClick={() => setEditingChore({ ...editingChore, reminder_day: d.value })}
-                      className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${
+                      className={`border-2 border-brutal-black px-3 py-2 font-mono text-xs font-bold transition-all ${
                         editingChore.reminder_day === d.value
                           ? 'bg-brutal-black text-brutal-white'
                           : 'bg-brutal-white text-brutal-black active:bg-brutal-black/10'
@@ -958,39 +1186,57 @@ export function ChoresPage() {
                   ))}
                 </div>
                 {editingChore.reminder_day !== null && (
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="mt-2 flex items-center gap-2">
                     <Bell size={14} className="text-brutal-black/50" />
                     <input
                       type="time"
                       value={editingChore.reminder_time ?? '09:00'}
-                      onChange={e => setEditingChore({ ...editingChore, reminder_time: e.target.value })}
-                      className="flex-1 h-10 border-2 border-brutal-black px-3 font-mono text-sm bg-brutal-white"
+                      onChange={(e) =>
+                        setEditingChore({ ...editingChore, reminder_time: e.target.value })
+                      }
+                      className="h-10 flex-1 border-2 border-brutal-black bg-brutal-white px-3 font-mono text-sm"
                     />
                   </div>
                 )}
               </div>
               <div>
-                <label className="font-mono text-xs font-bold uppercase block mb-1">ASSIGN TO</label>
+                <label className="mb-1 block font-mono text-xs font-bold uppercase">
+                  ASSIGN TO
+                </label>
                 <div className="flex flex-wrap gap-1.5">
                   <button
                     type="button"
                     onClick={() => setEditingChore({ ...editingChore, assigned_to: null })}
-                    className={`px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${
-                      !editingChore.assigned_to ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white'
+                    className={`border-2 border-brutal-black px-3 py-2 font-mono text-xs font-bold transition-all ${
+                      !editingChore.assigned_to
+                        ? 'bg-brutal-black text-brutal-white'
+                        : 'bg-brutal-white'
                     }`}
                   >
                     ANYONE
                   </button>
-                  {members.map(m => (
+                  {members.map((m) => (
                     <button
                       key={m.user_id}
                       type="button"
-                      onClick={() => setEditingChore({ ...editingChore, assigned_to: editingChore.assigned_to === m.user_id ? null : m.user_id })}
-                      className={`flex items-center gap-1.5 px-3 py-2 font-mono text-xs font-bold border-2 border-brutal-black transition-all ${
-                        editingChore.assigned_to === m.user_id ? 'bg-brutal-orange text-brutal-white' : 'bg-brutal-white'
+                      onClick={() =>
+                        setEditingChore({
+                          ...editingChore,
+                          assigned_to: editingChore.assigned_to === m.user_id ? null : m.user_id,
+                        })
+                      }
+                      className={`flex items-center gap-1.5 border-2 border-brutal-black px-3 py-2 font-mono text-xs font-bold transition-all ${
+                        editingChore.assigned_to === m.user_id
+                          ? 'bg-brutal-orange text-brutal-white'
+                          : 'bg-brutal-white'
                       }`}
                     >
-                      <Avatar name={m.profiles.display_name} color={m.profiles.avatar_color} size="sm" imageUrl={m.profiles.avatar_url} />
+                      <Avatar
+                        name={m.profiles.display_name}
+                        color={m.profiles.avatar_color}
+                        size="sm"
+                        imageUrl={m.profiles.avatar_url}
+                      />
                       {m.profiles.display_name}
                     </button>
                   ))}
@@ -1005,7 +1251,10 @@ export function ChoresPage() {
                       points: editingChore.points,
                       area: editingChore.area,
                       reminder_day: editingChore.reminder_day,
-                      reminder_time: editingChore.reminder_day !== null ? (editingChore.reminder_time ?? '09:00') : null,
+                      reminder_time:
+                        editingChore.reminder_day !== null
+                          ? (editingChore.reminder_time ?? '09:00')
+                          : null,
                       assigned_to: editingChore.assigned_to,
                     },
                   })
@@ -1013,7 +1262,7 @@ export function ChoresPage() {
                   setEditingChore(null)
                 }}
                 disabled={editChore.isPending || !editingChore.name.trim()}
-                className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-40"
+                className="h-12 w-full border-2 border-brutal-black bg-brutal-black font-mono text-sm font-bold text-brutal-white uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none disabled:opacity-40"
               >
                 {editChore.isPending ? 'SAVING...' : 'SAVE CHANGES'}
               </Button>
@@ -1022,7 +1271,7 @@ export function ChoresPage() {
                   setEditingChore(null)
                   handleDelete(editingChore.id)
                 }}
-                className="w-full mt-2 font-mono text-xs font-bold text-brutal-pink py-2 active:text-brutal-pink/60"
+                className="mt-2 w-full py-2 font-mono text-xs font-bold text-brutal-pink active:text-brutal-pink/60"
               >
                 DELETE CHORE
               </button>
@@ -1047,66 +1296,80 @@ export function ChoresPage() {
           points={completionOverlay.points}
           totalPoints={completionOverlay.totalPoints}
           choreName={completionOverlay.choreName}
-          onDone={() => { setCompletionOverlay(null); advanceTour('chore-complete') }}
+          onDone={() => {
+            setCompletionOverlay(null)
+            advanceTour('chore-complete')
+          }}
         />
       )}
 
       {/* Just do one mode */}
-      {justDoOne && (() => {
-        const persistent = chores.filter(c => c.is_persistent)
-        if (persistent.length === 0) return null
-        const chore = persistent[justDoOneIndex % persistent.length]
-        return (
-          <div className="fixed inset-0 z-50 bg-brutal-yellow flex flex-col items-center justify-center p-6" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-            <button
-              onClick={() => setJustDoOne(false)}
-              className="absolute top-4 right-4 w-10 h-10 bg-brutal-black text-brutal-white flex items-center justify-center font-bold" style={{ marginTop: 'env(safe-area-inset-top)' }}
+      {justDoOne &&
+        (() => {
+          const persistent = chores.filter((c) => c.is_persistent)
+          if (persistent.length === 0) return null
+          const chore = persistent[justDoOneIndex % persistent.length]
+          return (
+            <div
+              className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-brutal-yellow p-6"
+              style={{ paddingTop: 'env(safe-area-inset-top)' }}
             >
-              <X size={20} />
-            </button>
+              <button
+                onClick={() => setJustDoOne(false)}
+                className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center bg-brutal-black font-bold text-brutal-white"
+                style={{ marginTop: 'env(safe-area-inset-top)' }}
+              >
+                <X size={20} />
+              </button>
 
-            <p className="font-mono text-xs font-bold text-brutal-black/40 tracking-widest mb-4">JUST DO ONE</p>
-            <div className="bg-brutal-white border-4 border-brutal-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 w-full max-w-sm text-center">
-              {chore.area && (
-                <p className="font-mono text-[10px] text-brutal-black/40 font-bold tracking-widest mb-2">{chore.area.toUpperCase()}</p>
-              )}
-              <h2 className="font-mono font-bold text-2xl mb-2">{chore.name}</h2>
-              <div className="inline-flex items-center gap-1 border border-brutal-black px-3 py-1 font-mono text-sm font-bold bg-brutal-yellow">
-                {chore.points} PTS
+              <p className="mb-4 font-mono text-xs font-bold tracking-widest text-brutal-black/40">
+                JUST DO ONE
+              </p>
+              <div className="w-full max-w-sm border-4 border-brutal-black bg-brutal-white p-8 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                {chore.area && (
+                  <p className="mb-2 font-mono text-[10px] font-bold tracking-widest text-brutal-black/40">
+                    {chore.area.toUpperCase()}
+                  </p>
+                )}
+                <h2 className="mb-2 font-mono text-2xl font-bold">{chore.name}</h2>
+                <div className="inline-flex items-center gap-1 border border-brutal-black bg-brutal-yellow px-3 py-1 font-mono text-sm font-bold">
+                  {chore.points} PTS
+                </div>
               </div>
-            </div>
 
-            <div className="flex gap-3 mt-8 w-full max-w-sm">
-              <button
-                onClick={() => {
-                  setJustDoOneIndex((justDoOneIndex + 1) % persistent.length)
-                }}
-                className="flex-1 h-14 bg-brutal-white font-mono font-bold uppercase text-sm border-3 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
-              >
-                SKIP
-              </button>
-              <button
-                onClick={async () => {
-                  await completeChore.mutateAsync({ choreId: chore.id, points: chore.points })
-                  playComplete()
-                  toast(`Done! +${chore.points} pts for ${chore.name}`, 'bg-brutal-lime')
-                  const remaining = persistent.filter(c => c.id !== chore.id)
-                  if (remaining.length === 0) {
-                    setJustDoOne(false)
-                  } else {
-                    setJustDoOneIndex(Math.floor(Math.random() * persistent.length))
-                  }
-                }}
-                className="flex-1 h-14 bg-brutal-lime font-mono font-bold uppercase text-sm border-3 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
-              >
-                DONE ✓
-              </button>
-            </div>
+              <div className="mt-8 flex w-full max-w-sm gap-3">
+                <button
+                  onClick={() => {
+                    setJustDoOneIndex((justDoOneIndex + 1) % persistent.length)
+                  }}
+                  className="h-14 flex-1 border-3 border-brutal-black bg-brutal-white font-mono text-sm font-bold uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
+                >
+                  SKIP
+                </button>
+                <button
+                  onClick={async () => {
+                    await completeChore.mutateAsync({ choreId: chore.id, points: chore.points })
+                    playComplete()
+                    toast(`Done! +${chore.points} pts for ${chore.name}`, 'bg-brutal-lime')
+                    const remaining = persistent.filter((c) => c.id !== chore.id)
+                    if (remaining.length === 0) {
+                      setJustDoOne(false)
+                    } else {
+                      setJustDoOneIndex(Math.floor(Math.random() * persistent.length))
+                    }
+                  }}
+                  className="h-14 flex-1 border-3 border-brutal-black bg-brutal-lime font-mono text-sm font-bold uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
+                >
+                  DONE ✓
+                </button>
+              </div>
 
-            <p className="font-mono text-[10px] text-brutal-black/30 mt-4">Just this one. You've got this.</p>
-          </div>
-        )
-      })()}
+              <p className="mt-4 font-mono text-[10px] text-brutal-black/30">
+                Just this one. You've got this.
+              </p>
+            </div>
+          )
+        })()}
     </div>
   )
 }

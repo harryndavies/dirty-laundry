@@ -12,7 +12,10 @@ Deno.serve(async () => {
       supabase.from('group_members').select('total_points'),
     ])
 
-    const totalPoints = (points.data ?? []).reduce((sum: number, m: { total_points: number }) => sum + m.total_points, 0)
+    const totalPoints = (points.data ?? []).reduce(
+      (sum: number, m: { total_points: number }) => sum + m.total_points,
+      0,
+    )
 
     return new Response(
       JSON.stringify({
@@ -26,7 +29,7 @@ Deno.serve(async () => {
           'Access-Control-Allow-Origin': '*',
           'Cache-Control': 'public, max-age=300',
         },
-      }
+      },
     )
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err) }), {

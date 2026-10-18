@@ -37,20 +37,20 @@ export function ConfirmDialog({
       <div className="absolute inset-0 bg-brutal-black/40" onClick={onCancel} />
       <div
         ref={dialogRef}
-        className="relative bg-brutal-white border-4 border-brutal-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5 w-full max-w-xs"
+        className="relative w-full max-w-xs border-4 border-brutal-black bg-brutal-white p-5 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
       >
-        <h3 className="font-mono font-bold text-lg mb-2">{title}</h3>
-        <p className="font-mono text-sm text-brutal-black/70 mb-5">{message}</p>
+        <h3 className="mb-2 font-mono text-lg font-bold">{title}</h3>
+        <p className="mb-5 font-mono text-sm text-brutal-black/70">{message}</p>
         <div className="flex gap-2">
           <button
             onClick={onCancel}
-            className="flex-1 h-11 bg-brutal-white border-2 border-brutal-black font-mono font-bold text-xs uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            className="h-11 flex-1 border-2 border-brutal-black bg-brutal-white font-mono text-xs font-bold uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
           >
             CANCEL
           </button>
           <button
             onClick={onConfirm}
-            className={`flex-1 h-11 ${confirmColor} border-2 border-brutal-black font-mono font-bold text-xs uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all`}
+            className={`h-11 flex-1 ${confirmColor} border-2 border-brutal-black font-mono text-xs font-bold uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none`}
           >
             {confirmLabel}
           </button>

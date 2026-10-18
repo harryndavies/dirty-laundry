@@ -22,11 +22,19 @@ export interface Report {
   timeMatrix: number[][]
 }
 
-type ReportCompletion = { user_id: string; points_earned: number; chore_name: string | null; completed_at: string }
+type ReportCompletion = {
+  user_id: string
+  points_earned: number
+  chore_name: string | null
+  completed_at: string
+}
 type ReportMember = { user_id: string; profiles: { display_name: string; avatar_color: string } }
 
 export function buildReport(completions: ReportCompletion[], members: ReportMember[]): Report {
-  const memberMap = new Map<string, { points: number; completions: number; choreCounts: Map<string, number> }>()
+  const memberMap = new Map<
+    string,
+    { points: number; completions: number; choreCounts: Map<string, number> }
+  >()
   const matrix: number[][] = Array.from({ length: 7 }, () => new Array(24).fill(0))
 
   for (const c of completions) {
@@ -44,24 +52,29 @@ export function buildReport(completions: ReportCompletion[], members: ReportMemb
     matrix[row][col]++
   }
 
-  const result: MemberStats[] = members.map(m => {
-    const data = memberMap.get(m.user_id)
-    let topChore: string | null = null
-    if (data) {
-      let maxCount = 0
-      for (const [name, count] of data.choreCounts) {
-        if (count > maxCount) { maxCount = count; topChore = name }
+  const result: MemberStats[] = members
+    .map((m) => {
+      const data = memberMap.get(m.user_id)
+      let topChore: string | null = null
+      if (data) {
+        let maxCount = 0
+        for (const [name, count] of data.choreCounts) {
+          if (count > maxCount) {
+            maxCount = count
+            topChore = name
+          }
+        }
       }
-    }
-    return {
-      user_id: m.user_id,
-      display_name: m.profiles.display_name,
-      avatar_color: m.profiles.avatar_color,
-      points: data?.points ?? 0,
-      completions: data?.completions ?? 0,
-      topChore,
-    }
-  }).sort((a, b) => b.points - a.points)
+      return {
+        user_id: m.user_id,
+        display_name: m.profiles.display_name,
+        avatar_color: m.profiles.avatar_color,
+        points: data?.points ?? 0,
+        completions: data?.completions ?? 0,
+        topChore,
+      }
+    })
+    .sort((a, b) => b.points - a.points)
 
   // Build chore breakdown
   const choreMap = new Map<string, Map<string, number>>()
@@ -76,7 +89,7 @@ export function buildReport(completions: ReportCompletion[], members: ReportMemb
     .map(([name, doerMap]) => {
       const doers = Array.from(doerMap.entries())
         .map(([userId, count]) => {
-          const m = members.find(m => m.user_id === userId)
+          const m = members.find((m) => m.user_id === userId)
           return {
             user_id: userId,
             display_name: m?.profiles.display_name ?? '?',

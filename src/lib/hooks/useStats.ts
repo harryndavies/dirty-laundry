@@ -13,8 +13,8 @@ interface MemberStats {
 export function calculateStreak(dates: string[]): number {
   if (dates.length === 0) return 0
 
-  const uniqueDays = [...new Set(dates.map(d => new Date(d).toDateString()))]
-    .map(d => new Date(d))
+  const uniqueDays = [...new Set(dates.map((d) => new Date(d).toDateString()))]
+    .map((d) => new Date(d))
     .sort((a, b) => b.getTime() - a.getTime())
 
   const today = new Date()
@@ -70,7 +70,9 @@ export function useStats() {
   const stats = useMemo(() => {
     const statsMap = new Map<string, MemberStats>()
     for (const member of members) {
-      const dates = (completions ?? []).filter(c => c.user_id === member.user_id).map(c => c.completed_at)
+      const dates = (completions ?? [])
+        .filter((c) => c.user_id === member.user_id)
+        .map((c) => c.completed_at)
       statsMap.set(member.user_id, {
         user_id: member.user_id,
         last_completion: dates[0] ?? null,
@@ -93,7 +95,7 @@ export function useStats() {
           table: 'completions',
           filter: `group_id=eq.${group.id}`,
         },
-        () => queryClient.invalidateQueries({ queryKey: ['stats-completions', group.id] })
+        () => queryClient.invalidateQueries({ queryKey: ['stats-completions', group.id] }),
       )
       .subscribe()
 

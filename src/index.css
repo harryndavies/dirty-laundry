@@ -1,16 +1,16 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-brutal-yellow: #FFE500;
-  --color-brutal-lime: #BFFF00;
-  --color-brutal-pink: #FF2D9B;
-  --color-brutal-blue: #0066FF;
-  --color-brutal-orange: #FF6B00;
-  --color-brutal-white: #FFFFFF;
+  --color-brutal-yellow: #ffe500;
+  --color-brutal-lime: #bfff00;
+  --color-brutal-pink: #ff2d9b;
+  --color-brutal-blue: #0066ff;
+  --color-brutal-orange: #ff6b00;
+  --color-brutal-white: #ffffff;
   --color-brutal-black: #000000;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --font-sans: system-ui, -apple-system, sans-serif;
@@ -30,7 +30,8 @@
   }
 }
 
-html, body {
+html,
+body {
   margin: 0;
   height: 100%;
   overflow: hidden;
@@ -44,32 +45,35 @@ html, body {
 }
 
 @media (min-width: 768px) {
-  html, body {
+  html,
+  body {
     position: static;
     overflow: hidden;
   }
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   font-size: 16px !important;
 }
 
 @theme inline {
-  --color-background: #FFFFFF;
+  --color-background: #ffffff;
   --color-foreground: #000000;
-  --color-card: #FFFFFF;
+  --color-card: #ffffff;
   --color-card-foreground: #000000;
-  --color-popover: #FFFFFF;
+  --color-popover: #ffffff;
   --color-popover-foreground: #000000;
   --color-primary: #000000;
-  --color-primary-foreground: #FFFFFF;
-  --color-secondary: #FFE500;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #ffe500;
   --color-secondary-foreground: #000000;
   --color-muted: #f5f5f5;
   --color-muted-foreground: #444444;
-  --color-accent: #BFFF00;
+  --color-accent: #bfff00;
   --color-accent-foreground: #000000;
-  --color-destructive: #FF2D9B;
+  --color-destructive: #ff2d9b;
   --color-border: #000000;
   --color-input: #000000;
   --color-ring: #000000;
@@ -83,23 +87,23 @@ input, textarea, select {
 }
 
 .dark {
-  --color-brutal-white: #1A1A1A;
-  --color-brutal-black: #F5F5F0;
-  --color-background: #1A1A1A;
-  --color-foreground: #F5F5F0;
-  --color-card: #1A1A1A;
-  --color-card-foreground: #F5F5F0;
+  --color-brutal-white: #1a1a1a;
+  --color-brutal-black: #f5f5f0;
+  --color-background: #1a1a1a;
+  --color-foreground: #f5f5f0;
+  --color-card: #1a1a1a;
+  --color-card-foreground: #f5f5f0;
   --color-popover: #222222;
-  --color-popover-foreground: #F5F5F0;
-  --color-primary: #F5F5F0;
-  --color-primary-foreground: #1A1A1A;
-  --color-secondary: #FFE500;
-  --color-secondary-foreground: #1A1A1A;
-  --color-muted: #2A2A2A;
+  --color-popover-foreground: #f5f5f0;
+  --color-primary: #f5f5f0;
+  --color-primary-foreground: #1a1a1a;
+  --color-secondary: #ffe500;
+  --color-secondary-foreground: #1a1a1a;
+  --color-muted: #2a2a2a;
   --color-muted-foreground: #999999;
-  --color-border: #F5F5F0;
-  --color-input: #F5F5F0;
-  --color-ring: #F5F5F0;
+  --color-border: #f5f5f0;
+  --color-input: #f5f5f0;
+  --color-ring: #f5f5f0;
 }
 
 @layer base {

@@ -8,7 +8,20 @@ interface PointsChartProps {
 const CHART_H = 180
 const CHART_PAD = { top: 12, right: 12, bottom: 28, left: 40 }
 
-const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const MONTH_NAMES = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]
 
 export function PointsChart({ data }: PointsChartProps) {
   const [hoveredUser, setHoveredUser] = useState<string | null>(null)
@@ -17,7 +30,7 @@ export function PointsChart({ data }: PointsChartProps) {
 
   useEffect(() => {
     if (!containerRef.current) return
-    const observer = new ResizeObserver(entries => {
+    const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         setContainerW(entry.contentRect.width)
       }
@@ -28,8 +41,8 @@ export function PointsChart({ data }: PointsChartProps) {
 
   if (data.length === 0 || data[0].daily.length === 0) return null
 
-  const dates = data[0].daily.map(d => d.date)
-  const maxPts = Math.max(1, ...data.map(m => m.daily[m.daily.length - 1]?.cumulative ?? 0))
+  const dates = data[0].daily.map((d) => d.date)
+  const maxPts = Math.max(1, ...data.map((m) => m.daily[m.daily.length - 1]?.cumulative ?? 0))
 
   const innerW = Math.max(containerW - CHART_PAD.left - CHART_PAD.right - 8, 100)
   const svgW = innerW + CHART_PAD.left + CHART_PAD.right
@@ -46,7 +59,7 @@ export function PointsChart({ data }: PointsChartProps) {
   // Y-axis gridlines
   const gridCount = 4
   const gridLines = Array.from({ length: gridCount + 1 }, (_, i) =>
-    Math.round((maxPts / gridCount) * i)
+    Math.round((maxPts / gridCount) * i),
   )
 
   // X-axis labels — pick strategy based on date range length
@@ -55,18 +68,13 @@ export function PointsChart({ data }: PointsChartProps) {
   return (
     <div className="border-2 border-brutal-black bg-brutal-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <div className="px-3 pt-3 pb-1">
-        <h3 className="font-mono font-bold text-xs uppercase">Points Over Time</h3>
+        <h3 className="font-mono text-xs font-bold uppercase">Points Over Time</h3>
       </div>
 
       <div ref={containerRef} className="px-1">
-        <svg
-          width={svgW}
-          height={CHART_H}
-          viewBox={`0 0 ${svgW} ${CHART_H}`}
-          className="block"
-        >
+        <svg width={svgW} height={CHART_H} viewBox={`0 0 ${svgW} ${CHART_H}`} className="block">
           {/* Grid lines */}
-          {gridLines.map(v => (
+          {gridLines.map((v) => (
             <g key={v}>
               <line
                 x1={CHART_PAD.left}
@@ -104,7 +112,7 @@ export function PointsChart({ data }: PointsChartProps) {
           ))}
 
           {/* Lines — one per member */}
-          {data.map(member => {
+          {data.map((member) => {
             const dimmed = hoveredUser !== null && hoveredUser !== member.userId
             const path = member.daily
               .map((d, i) => `${i === 0 ? 'M' : 'L'}${x(i)},${y(d.cumulative)}`)
@@ -126,7 +134,7 @@ export function PointsChart({ data }: PointsChartProps) {
           })}
 
           {/* End dots */}
-          {data.map(member => {
+          {data.map((member) => {
             const last = member.daily[member.daily.length - 1]
             const dimmed = hoveredUser !== null && hoveredUser !== member.userId
             if (!last) return null
@@ -148,19 +156,19 @@ export function PointsChart({ data }: PointsChartProps) {
       </div>
 
       {/* Legend — hover to highlight a member's line */}
-      <div className="flex flex-wrap gap-x-4 gap-y-1 px-3 pb-3 pt-1">
-        {data.map(member => (
+      <div className="flex flex-wrap gap-x-4 gap-y-1 px-3 pt-1 pb-3">
+        {data.map((member) => (
           <button
             key={member.userId}
-            className="flex items-center gap-1.5 group"
+            className="group flex items-center gap-1.5"
             onPointerEnter={() => setHoveredUser(member.userId)}
             onPointerLeave={() => setHoveredUser(null)}
           >
             <span
-              className="w-3 h-3 border border-brutal-black shrink-0"
+              className="h-3 w-3 shrink-0 border border-brutal-black"
               style={{ backgroundColor: member.color }}
             />
-            <span className="font-mono text-[10px] font-bold text-brutal-black/60 group-hover:text-brutal-black transition-colors">
+            <span className="font-mono text-[10px] font-bold text-brutal-black/60 transition-colors group-hover:text-brutal-black">
               {member.displayName}
             </span>
             <span className="font-mono text-[10px] text-brutal-black/30">

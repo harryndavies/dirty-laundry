@@ -18,7 +18,20 @@ export interface WrappedStats {
 }
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
 
 const EMPTY: WrappedStats = {
   year: new Date().getFullYear(),
@@ -57,9 +70,14 @@ export function useWrappedStats(): { stats: WrappedStats; loading: boolean } {
         .gte('completed_at', yearStart)
         .lt('completed_at', yearEnd)
 
-      type Row = { user_id: string; points_earned: number; chore_name: string | null; completed_at: string }
+      type Row = {
+        user_id: string
+        points_earned: number
+        chore_name: string | null
+        completed_at: string
+      }
       const all = (rows ?? []) as unknown as Row[]
-      const mine = all.filter(r => r.user_id === user!.id)
+      const mine = all.filter((r) => r.user_id === user!.id)
       if (mine.length === 0) return { ...EMPTY, year }
 
       // Total chores + points
@@ -123,8 +141,12 @@ export function useWrappedStats(): { stats: WrappedStats; loading: boolean } {
       // Top day-of-week and hour
       const topDayIdx = dayCounts.indexOf(Math.max(...dayCounts))
       const topHourIdx = hourCounts.indexOf(Math.max(...hourCounts))
-      const topDay = dayCounts[topDayIdx] > 0 ? { label: DAY_NAMES[topDayIdx], count: dayCounts[topDayIdx] } : null
-      const topHour = hourCounts[topHourIdx] > 0 ? { hour: topHourIdx, count: hourCounts[topHourIdx] } : null
+      const topDay =
+        dayCounts[topDayIdx] > 0
+          ? { label: DAY_NAMES[topDayIdx], count: dayCounts[topDayIdx] }
+          : null
+      const topHour =
+        hourCounts[topHourIdx] > 0 ? { hour: topHourIdx, count: hourCounts[topHourIdx] } : null
 
       // Monthly wins (how many calendar months you topped the group)
       const groupMonthly = new Map<string, Map<string, number>>()
@@ -143,7 +165,10 @@ export function useWrappedStats(): { stats: WrappedStats; loading: boolean } {
         let topId = ''
         let topPts = 0
         for (const [uid, p] of u) {
-          if (p > topPts) { topPts = p; topId = uid }
+          if (p > topPts) {
+            topPts = p
+            topId = uid
+          }
         }
         if (topId === user!.id) monthlyWins++
       }

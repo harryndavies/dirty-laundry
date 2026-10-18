@@ -21,7 +21,20 @@ Deno.serve(async (req) => {
     const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
     const lastMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1))
 
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ]
     const monthLabel = monthNames[lastMonthStart.getUTCMonth()]
 
     const { data: completions, error } = await supabase
@@ -83,15 +96,36 @@ Deno.serve(async (req) => {
 
       const messages = prize
         ? [
-            { title: `${monthLabel}'s champion! 👑`, body: `${name} won ${monthLabel} with ${maxPoints} pts and claims: ${prize}` },
-            { title: 'Champion crowned 🏆', body: `${name} topped ${monthLabel} (${maxPoints} pts) and walks away with ${prize}.` },
-            { title: 'Prize unlocked 🎁', body: `${name} earned ${maxPoints} pts in ${monthLabel} — prize: ${prize}.` },
+            {
+              title: `${monthLabel}'s champion! 👑`,
+              body: `${name} won ${monthLabel} with ${maxPoints} pts and claims: ${prize}`,
+            },
+            {
+              title: 'Champion crowned 🏆',
+              body: `${name} topped ${monthLabel} (${maxPoints} pts) and walks away with ${prize}.`,
+            },
+            {
+              title: 'Prize unlocked 🎁',
+              body: `${name} earned ${maxPoints} pts in ${monthLabel} — prize: ${prize}.`,
+            },
           ]
         : [
-            { title: `${monthLabel}'s champion! 👑`, body: `${name} smashed ${monthLabel} with ${maxPoints} pts. Legendary.` },
-            { title: 'Monthly MVP 🏆', body: `${name} topped ${monthLabel}'s leaderboard with ${maxPoints} pts!` },
-            { title: 'New month, new winner 🎉', body: `${name} took ${monthLabel} with ${maxPoints} pts. Who's next?` },
-            { title: 'Champion crowned 👑', body: `${name} won ${monthLabel} with ${maxPoints} pts. Well deserved!` },
+            {
+              title: `${monthLabel}'s champion! 👑`,
+              body: `${name} smashed ${monthLabel} with ${maxPoints} pts. Legendary.`,
+            },
+            {
+              title: 'Monthly MVP 🏆',
+              body: `${name} topped ${monthLabel}'s leaderboard with ${maxPoints} pts!`,
+            },
+            {
+              title: 'New month, new winner 🎉',
+              body: `${name} took ${monthLabel} with ${maxPoints} pts. Who's next?`,
+            },
+            {
+              title: 'Champion crowned 👑',
+              body: `${name} won ${monthLabel} with ${maxPoints} pts. Well deserved!`,
+            },
           ]
 
       const pick = messages[Math.floor(Math.random() * messages.length)]
@@ -106,7 +140,7 @@ Deno.serve(async (req) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseServiceKey}`,
+            Authorization: `Bearer ${supabaseServiceKey}`,
           },
           body: JSON.stringify({ toUserId: m.user_id, payload }),
         })

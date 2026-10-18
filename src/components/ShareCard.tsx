@@ -10,7 +10,14 @@ interface ShareCardProps {
   topChore: string | null
 }
 
-export function ShareCard({ groupName, period, totalChores, totalPoints, members, topChore }: ShareCardProps) {
+export function ShareCard({
+  groupName,
+  period,
+  totalChores,
+  totalPoints,
+  members,
+  topChore,
+}: ShareCardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const generate = useCallback(async () => {
@@ -63,7 +70,7 @@ export function ShareCard({ groupName, period, totalChores, totalPoints, members
     const barHeight = 28
     const barGap = 8
     const barMaxWidth = w - 160
-    const maxPts = Math.max(...members.map(m => m.points), 1)
+    const maxPts = Math.max(...members.map((m) => m.points), 1)
 
     members.slice(0, 5).forEach((m, i) => {
       const y = barStartY + i * (barHeight + barGap)
@@ -144,7 +151,7 @@ export function ShareCard({ groupName, period, totalChores, totalPoints, members
       <canvas ref={canvasRef} className="hidden" />
       <button
         onClick={generate}
-        className="w-full h-12 bg-brutal-blue text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all flex items-center justify-center gap-2"
+        className="flex h-12 w-full items-center justify-center gap-2 border-2 border-brutal-black bg-brutal-blue font-mono text-sm font-bold text-brutal-white uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
       >
         📸 SHARE REPORT
       </button>

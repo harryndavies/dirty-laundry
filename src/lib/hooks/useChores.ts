@@ -28,7 +28,21 @@ export function useChores() {
   })
 
   const addChore = useMutation({
-    mutationFn: async ({ name, points, isPersistent, reminderDay, reminderTime, area }: { name: string; points: number; isPersistent: boolean; reminderDay?: number | null; reminderTime?: string | null; area?: string | null }) => {
+    mutationFn: async ({
+      name,
+      points,
+      isPersistent,
+      reminderDay,
+      reminderTime,
+      area,
+    }: {
+      name: string
+      points: number
+      isPersistent: boolean
+      reminderDay?: number | null
+      reminderTime?: string | null
+      area?: string | null
+    }) => {
       if (!group || !user) throw new Error('No group or user')
       const { data, error } = await supabase
         .from('chores')
@@ -55,7 +69,18 @@ export function useChores() {
 
   const completeChore = useMutation({
     // `points` is accepted for older callers but ignored: the database decides what a chore is worth.
-    mutationFn: async ({ choreId, withUserId, photo, photoBefore }: { choreId: string; points?: number; withUserId?: string; photo?: File; photoBefore?: File }) => {
+    mutationFn: async ({
+      choreId,
+      withUserId,
+      photo,
+      photoBefore,
+    }: {
+      choreId: string
+      points?: number
+      withUserId?: string
+      photo?: File
+      photoBefore?: File
+    }) => {
       if (!group || !user) throw new Error('No group or user')
 
       const { data: chore } = await supabase
@@ -74,9 +99,7 @@ export function useChores() {
         if (uploadError) {
           toast('Photo failed to upload', 'bg-brutal-pink')
         } else {
-          const { data: urlData } = supabase.storage
-            .from('completion-photos')
-            .getPublicUrl(path)
+          const { data: urlData } = supabase.storage.from('completion-photos').getPublicUrl(path)
           photoUrl = urlData.publicUrl
         }
       }
@@ -89,9 +112,7 @@ export function useChores() {
           .from('completion-photos')
           .upload(path, photoBefore, { contentType: photoBefore.type })
         if (!uploadError) {
-          const { data: urlData } = supabase.storage
-            .from('completion-photos')
-            .getPublicUrl(path)
+          const { data: urlData } = supabase.storage.from('completion-photos').getPublicUrl(path)
           photoBeforeUrl = urlData.publicUrl
         }
       }
@@ -126,12 +147,12 @@ export function useChores() {
         .select('user_id, total_points')
         .eq('group_id', group.id)
 
-      const myPoints = allMembers?.find(m => m.user_id === user.id)?.total_points ?? 0
+      const myPoints = allMembers?.find((m) => m.user_id === user.id)?.total_points ?? 0
       const previousPoints = myPoints - earnedPoints
 
       if (members) {
         for (const m of members) {
-          const theirPoints = allMembers?.find(am => am.user_id === m.user_id)?.total_points ?? 0
+          const theirPoints = allMembers?.find((am) => am.user_id === m.user_id)?.total_points ?? 0
 
           // Notify if we just overtook them (they were above us, now we're above them)
           if (theirPoints > 0 && previousPoints <= theirPoints && myPoints > theirPoints) {
@@ -221,15 +242,26 @@ export function useChores() {
   })
 
   const editChore = useMutation({
-    mutationFn: async ({ choreId, updates }: { choreId: string; updates: { name?: string; points?: number; is_persistent?: boolean; area?: string | null; reminder_day?: number | null; reminder_time?: string | null; assigned_to?: string | null } }) => {
+    mutationFn: async ({
+      choreId,
+      updates,
+    }: {
+      choreId: string
+      updates: {
+        name?: string
+        points?: number
+        is_persistent?: boolean
+        area?: string | null
+        reminder_day?: number | null
+        reminder_time?: string | null
+        assigned_to?: string | null
+      }
+    }) => {
       const updateData: Record<string, unknown> = { ...updates }
       if (updates.points !== undefined) {
         updateData.base_points = updates.points
       }
-      const { error } = await supabase
-        .from('chores')
-        .update(updateData)
-        .eq('id', choreId)
+      const { error } = await supabase.from('chores').update(updateData).eq('id', choreId)
       if (error) throw error
 
       // Notify assigned person
@@ -241,7 +273,7 @@ export function useChores() {
           .single()
         const choreName = updates.name ?? 'a chore'
         sendPushToUser(updates.assigned_to, {
-          title: 'You\'ve been assigned! 📋',
+          title: "You've been assigned! 📋",
           body: `${profile?.display_name ?? 'Someone'} assigned "${choreName}" to you`,
           url: '/chores',
         }).catch(() => {})
@@ -252,5 +284,13 @@ export function useChores() {
     },
   })
 
-  return { chores: choresQuery.data ?? [], loading: choresQuery.isLoading, addChore, completeChore, deleteChore, boostChore, editChore }
+  return {
+    chores: choresQuery.data ?? [],
+    loading: choresQuery.isLoading,
+    addChore,
+    completeChore,
+    deleteChore,
+    boostChore,
+    editChore,
+  }
 }

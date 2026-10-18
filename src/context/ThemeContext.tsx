@@ -22,14 +22,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme])
 
   function toggle() {
-    setTheme(t => t === 'light' ? 'dark' : 'light')
+    setTheme((t) => (t === 'light' ? 'dark' : 'light'))
   }
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggle }}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={{ theme, toggle }}>{children}</ThemeContext.Provider>
 }
 
 export function useTheme() {

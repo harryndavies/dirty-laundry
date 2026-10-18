@@ -6,12 +6,20 @@ const member = (user_id: string, chore_share = 0) => ({
   chore_share,
   profiles: { display_name: user_id.toUpperCase(), avatar_color: '#000', avatar_url: null },
 })
-const done = (chore_id: string, user_id: string, completed_at: string) => ({ chore_id, user_id, completed_at })
+const done = (chore_id: string, user_id: string, completed_at: string) => ({
+  chore_id,
+  user_id,
+  completed_at,
+})
 const bins = { id: 'bins', name: 'Bins' }
 
 describe('pickFairTurns', () => {
   it('picks whoever has never done the chore', () => {
-    const turns = pickFairTurns([bins], [done('bins', 'ana', '2026-10-10T09:00:00Z')], [member('ana'), member('ben')])
+    const turns = pickFairTurns(
+      [bins],
+      [done('bins', 'ana', '2026-10-10T09:00:00Z')],
+      [member('ana'), member('ben')],
+    )
     expect(turns.get('bins')).toMatchObject({ user_id: 'ben', reason: 'Never done this one' })
   })
 
@@ -26,7 +34,10 @@ describe('pickFairTurns', () => {
   })
 
   it('breaks a tie by who did it least recently', () => {
-    const completions = [done('bins', 'ben', '2026-10-12T09:00:00Z'), done('bins', 'ana', '2026-10-10T09:00:00Z')]
+    const completions = [
+      done('bins', 'ben', '2026-10-12T09:00:00Z'),
+      done('bins', 'ana', '2026-10-10T09:00:00Z'),
+    ]
     const turns = pickFairTurns([bins], completions, [member('ana'), member('ben')])
     expect(turns.get('bins')).toMatchObject({ user_id: 'ana', reason: 'Done it least recently' })
   })

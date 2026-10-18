@@ -17,9 +17,8 @@ export function RoulettePage() {
 
   if (!group) return <Navigate to="/group" replace />
 
-  const items = mode === 'person'
-    ? members.map(m => m.profiles.display_name)
-    : chores.map(c => c.name)
+  const items =
+    mode === 'person' ? members.map((m) => m.profiles.display_name) : chores.map((c) => c.name)
 
   function spin() {
     if (spinning || items.length === 0) return
@@ -54,24 +53,32 @@ export function RoulettePage() {
 
   return (
     <div className="min-h-full">
-      <div className="sticky top-0 z-10 bg-brutal-pink border-b-4 border-brutal-black px-4 py-4">
-        <h1 className="font-mono font-bold text-2xl tracking-tight text-center text-brutal-white">ROULETTE</h1>
-        <p className="font-mono text-xs text-center text-brutal-white/60 mt-0.5">Spin to decide</p>
+      <div className="sticky top-0 z-10 border-b-4 border-brutal-black bg-brutal-pink px-4 py-4">
+        <h1 className="text-center font-mono text-2xl font-bold tracking-tight text-brutal-white">
+          ROULETTE
+        </h1>
+        <p className="mt-0.5 text-center font-mono text-xs text-brutal-white/60">Spin to decide</p>
       </div>
 
       {/* Mode toggle */}
       <div className="flex border-b-2 border-brutal-black">
         <button
-          onClick={() => { setMode('person'); setResult(null) }}
-          className={`flex-1 py-3 font-mono font-bold text-xs uppercase transition-colors ${
+          onClick={() => {
+            setMode('person')
+            setResult(null)
+          }}
+          className={`flex-1 py-3 font-mono text-xs font-bold uppercase transition-colors ${
             mode === 'person' ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white'
           }`}
         >
           WHO DOES IT?
         </button>
         <button
-          onClick={() => { setMode('chore'); setResult(null) }}
-          className={`flex-1 py-3 font-mono font-bold text-xs uppercase border-l-2 border-brutal-black transition-colors ${
+          onClick={() => {
+            setMode('chore')
+            setResult(null)
+          }}
+          className={`flex-1 border-l-2 border-brutal-black py-3 font-mono text-xs font-bold uppercase transition-colors ${
             mode === 'chore' ? 'bg-brutal-black text-brutal-white' : 'bg-brutal-white'
           }`}
         >
@@ -82,15 +89,15 @@ export function RoulettePage() {
       <div className="flex flex-col items-center px-4 py-6 md:py-10">
         {items.length === 0 ? (
           <div className="py-12 text-center">
-            <div className="text-4xl mb-3">🎰</div>
-            <p className="font-mono font-bold text-brutal-black/40 text-sm">
+            <div className="mb-3 text-4xl">🎰</div>
+            <p className="font-mono text-sm font-bold text-brutal-black/40">
               {mode === 'person' ? 'NO MEMBERS YET' : 'NO CHORES YET'}
             </p>
           </div>
         ) : (
           <>
             {/* Pointer */}
-            <div className="text-2xl mb-[-12px] z-10">▼</div>
+            <div className="z-10 mb-[-12px] text-2xl">▼</div>
 
             {/* Wheel */}
             <div className="relative">
@@ -102,7 +109,9 @@ export function RoulettePage() {
                 className="rounded-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
                 style={{
                   transform: `rotate(${rotation}deg)`,
-                  transition: spinning ? 'transform 3.5s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
+                  transition: spinning
+                    ? 'transform 3.5s cubic-bezier(0.17, 0.67, 0.12, 0.99)'
+                    : 'none',
                 }}
               >
                 {items.map((item, i) => {
@@ -117,7 +126,10 @@ export function RoulettePage() {
 
                   const largeArc = sliceAngle > 180 ? 1 : 0
                   const color = COLORS[i % COLORS.length]
-                  const textColor = color === '#FFFFFF' || color === '#FFE500' || color === '#BFFF00' ? '#000' : '#FFF'
+                  const textColor =
+                    color === '#FFFFFF' || color === '#FFE500' || color === '#BFFF00'
+                      ? '#000'
+                      : '#FFF'
 
                   // Text position
                   const textRadius = radius * 0.65
@@ -130,9 +142,10 @@ export function RoulettePage() {
                   return (
                     <g key={i}>
                       <path
-                        d={items.length === 1
-                          ? `M ${center} ${center} m -${radius} 0 a ${radius} ${radius} 0 1 0 ${radius * 2} 0 a ${radius} ${radius} 0 1 0 -${radius * 2} 0`
-                          : `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`
+                        d={
+                          items.length === 1
+                            ? `M ${center} ${center} m -${radius} 0 a ${radius} ${radius} 0 1 0 ${radius * 2} 0 a ${radius} ${radius} 0 1 0 -${radius * 2} 0`
+                            : `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`
                         }
                         fill={color}
                         stroke="#000"
@@ -175,9 +188,9 @@ export function RoulettePage() {
             <button
               onClick={spin}
               disabled={spinning}
-              className={`mt-6 w-full max-w-[320px] h-14 font-mono font-bold uppercase text-sm border-3 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[6px] active:translate-y-[6px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all ${
+              className={`mt-6 h-14 w-full max-w-[320px] border-3 border-brutal-black font-mono text-sm font-bold uppercase shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none ${
                 spinning
-                  ? 'bg-brutal-black/20 text-brutal-black/40 cursor-not-allowed'
+                  ? 'cursor-not-allowed bg-brutal-black/20 text-brutal-black/40'
                   : 'bg-brutal-black text-brutal-yellow'
               }`}
             >
@@ -186,11 +199,11 @@ export function RoulettePage() {
 
             {/* Result */}
             {result && !spinning && (
-              <div className="mt-6 w-full max-w-[320px] bg-brutal-yellow border-3 border-brutal-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-4 text-center">
-                <p className="font-mono text-xs text-brutal-black/50 mb-1">
+              <div className="mt-6 w-full max-w-[320px] border-3 border-brutal-black bg-brutal-yellow p-4 text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                <p className="mb-1 font-mono text-xs text-brutal-black/50">
                   {mode === 'person' ? 'THE CHOSEN ONE IS' : 'THE CHOSEN CHORE IS'}
                 </p>
-                <p className="font-mono font-bold text-2xl">{result}</p>
+                <p className="font-mono text-2xl font-bold">{result}</p>
               </div>
             )}
           </>

@@ -20,15 +20,37 @@ interface UseChampionsResult {
   winCounts: Map<string, number>
 }
 
-const MONTH_NAMES = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+const MONTH_NAMES = [
+  'JAN',
+  'FEB',
+  'MAR',
+  'APR',
+  'MAY',
+  'JUN',
+  'JUL',
+  'AUG',
+  'SEP',
+  'OCT',
+  'NOV',
+  'DEC',
+]
 
-const EMPTY: UseChampionsResult = { lastMonth: null, currentMonth: null, history: [], winCounts: new Map() }
+const EMPTY: UseChampionsResult = {
+  lastMonth: null,
+  currentMonth: null,
+  history: [],
+  winCounts: new Map(),
+}
 
 export function useChampions(): UseChampionsResult {
   const { group, members } = useGroup()
 
   const { data } = useQuery({
-    queryKey: ['champions', group?.id, members.map(m => `${m.user_id}:${m.monthly_prize ?? ''}`).join(',')],
+    queryKey: [
+      'champions',
+      group?.id,
+      members.map((m) => `${m.user_id}:${m.monthly_prize ?? ''}`).join(','),
+    ],
     enabled: !!group && members.length >= 2,
     queryFn: async (): Promise<UseChampionsResult> => {
       const { data: completions } = await supabase
@@ -70,7 +92,7 @@ export function useChampions(): UseChampionsResult {
         }
         if (topPoints === 0) return null
 
-        const member = members.find(m => m.user_id === topUserId)
+        const member = members.find((m) => m.user_id === topUserId)
         if (!member) return null
 
         const [year, monthNum] = monthKey.split('-')
@@ -87,7 +109,10 @@ export function useChampions(): UseChampionsResult {
       }
 
       // Newest first, current month excluded (it's still in progress)
-      const pastMonths = [...monthlyPoints.keys()].filter(k => k !== currentKey).sort().reverse()
+      const pastMonths = [...monthlyPoints.keys()]
+        .filter((k) => k !== currentKey)
+        .sort()
+        .reverse()
       for (const monthKey of pastMonths) {
         const champion = buildChampion(monthKey)
         if (!champion) continue

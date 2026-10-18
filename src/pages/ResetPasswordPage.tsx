@@ -35,25 +35,23 @@ export function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brutal-yellow flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-brutal-white border-4 border-brutal-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6">
-        <h1 className="font-mono text-3xl font-bold text-center mb-1 tracking-tight">
+    <div className="flex min-h-screen items-center justify-center bg-brutal-yellow p-4">
+      <div className="w-full max-w-sm border-4 border-brutal-black bg-brutal-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <h1 className="mb-1 text-center font-mono text-3xl font-bold tracking-tight">
           DIRTY LAUNDRY
         </h1>
-        <p className="text-center font-mono text-xs mb-6 text-brutal-black/60">
+        <p className="mb-6 text-center font-mono text-xs text-brutal-black/60">
           RESET YOUR PASSWORD
         </p>
 
         {done ? (
-          <div className="text-center py-8">
-            <div className="text-4xl mb-4">✓</div>
-            <h2 className="font-mono font-bold text-lg mb-2">PASSWORD UPDATED</h2>
-            <p className="font-mono text-sm text-brutal-black/60 mb-4">
-              You're all set.
-            </p>
+          <div className="py-8 text-center">
+            <div className="mb-4 text-4xl">✓</div>
+            <h2 className="mb-2 font-mono text-lg font-bold">PASSWORD UPDATED</h2>
+            <p className="mb-4 font-mono text-sm text-brutal-black/60">You're all set.</p>
             <Button
               onClick={() => navigate('/chores')}
-              className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+              className="h-12 w-full border-2 border-brutal-black bg-brutal-black font-mono text-sm font-bold text-brutal-white uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
             >
               GO TO APP
             </Button>
@@ -61,29 +59,33 @@ export function ResetPasswordPage() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="bg-brutal-pink/20 border-2 border-brutal-pink p-3 font-mono text-xs font-bold">
+              <div className="border-2 border-brutal-pink bg-brutal-pink/20 p-3 font-mono text-xs font-bold">
                 {error}
               </div>
             )}
             <div>
-              <label className="font-mono text-xs font-bold uppercase block mb-1">NEW PASSWORD</label>
+              <label className="mb-1 block font-mono text-xs font-bold uppercase">
+                NEW PASSWORD
+              </label>
               <Input
                 type="password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="border-2 border-brutal-black font-mono h-12"
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-12 border-2 border-brutal-black font-mono"
                 minLength={6}
                 required
                 autoFocus
               />
             </div>
             <div>
-              <label className="font-mono text-xs font-bold uppercase block mb-1">CONFIRM PASSWORD</label>
+              <label className="mb-1 block font-mono text-xs font-bold uppercase">
+                CONFIRM PASSWORD
+              </label>
               <Input
                 type="password"
                 value={confirm}
-                onChange={e => setConfirm(e.target.value)}
-                className="border-2 border-brutal-black font-mono h-12"
+                onChange={(e) => setConfirm(e.target.value)}
+                className="h-12 border-2 border-brutal-black font-mono"
                 minLength={6}
                 required
               />
@@ -91,7 +93,7 @@ export function ResetPasswordPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-12 bg-brutal-black text-brutal-white font-mono font-bold uppercase text-sm border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+              className="h-12 w-full border-2 border-brutal-black bg-brutal-black font-mono text-sm font-bold text-brutal-white uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
             >
               {loading ? 'UPDATING...' : 'SET NEW PASSWORD'}
             </Button>

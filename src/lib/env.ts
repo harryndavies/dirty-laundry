@@ -10,7 +10,7 @@ const parsed = EnvSchema.safeParse(import.meta.env)
 if (!parsed.success) {
   throw new Error(
     `Missing or invalid environment variables (see .env.example): ${parsed.error.issues
-      .map(i => i.path.join('.'))
+      .map((i) => i.path.join('.'))
       .join(', ')}`,
   )
 }

@@ -4,7 +4,20 @@ import { useAuth } from '@/context/AuthContext'
 
 const WEEKS = 53
 const CELL = 11 // 10px square + 1px gap
-const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const MONTH_NAMES = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]
 const ROW_LABELS = ['Mon', '', 'Wed', '', 'Fri', '', '']
 
 function dayKey(d: Date): string {
@@ -53,7 +66,7 @@ export function HeatMap() {
     if (!isFuture) lastMonth = month
     cells.push({
       date: isFuture ? '' : key,
-      points: isFuture ? -1 : daily.get(key) ?? 0,
+      points: isFuture ? -1 : (daily.get(key) ?? 0),
       row: i % 7,
       col: Math.floor(i / 7),
       monthFirst,
@@ -61,7 +74,7 @@ export function HeatMap() {
     })
   }
 
-  const max = Math.max(1, ...cells.filter(c => c.points > 0).map(c => c.points))
+  const max = Math.max(1, ...cells.filter((c) => c.points > 0).map((c) => c.points))
   const color = profile?.avatar_color ?? '#0066FF'
 
   function intensity(pts: number): number {
@@ -75,11 +88,11 @@ export function HeatMap() {
 
   // Month labels: x position = first cell of that month's column
   const monthLabels = cells
-    .filter(c => c.monthFirst && c.row === 0 && c.col > 0)
-    .map(c => ({ col: c.col, label: MONTH_NAMES[c.month] }))
+    .filter((c) => c.monthFirst && c.row === 0 && c.col > 0)
+    .map((c) => ({ col: c.col, label: MONTH_NAMES[c.month] }))
 
   const totalPoints = Array.from(daily.values()).reduce((a, b) => a + b, 0)
-  const activeDays = Array.from(daily.values()).filter(v => v > 0).length
+  const activeDays = Array.from(daily.values()).filter((v) => v > 0).length
 
   const padLeft = 22 // for row labels
   const padTop = 14 // for month labels
@@ -88,17 +101,17 @@ export function HeatMap() {
 
   return (
     <div className="border-2 border-brutal-black bg-brutal-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      <div className="px-3 pt-3 pb-1 flex items-baseline justify-between">
-        <h3 className="font-mono font-bold text-xs uppercase">365-Day Activity</h3>
+      <div className="flex items-baseline justify-between px-3 pt-3 pb-1">
+        <h3 className="font-mono text-xs font-bold uppercase">365-Day Activity</h3>
         <span className="font-mono text-[10px] text-brutal-black/40">
           {activeDays} active · {totalPoints} pts
         </span>
       </div>
 
-      <div ref={scrollRef} className="px-3 pb-1 overflow-x-auto">
+      <div ref={scrollRef} className="overflow-x-auto px-3 pb-1">
         <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="block">
           {/* Month labels */}
-          {monthLabels.map(m => (
+          {monthLabels.map((m) => (
             <text
               key={`m-${m.col}`}
               x={padLeft + m.col * CELL}
@@ -110,7 +123,7 @@ export function HeatMap() {
             </text>
           ))}
           {/* Row labels */}
-          {ROW_LABELS.map((label, i) => (
+          {ROW_LABELS.map((label, i) =>
             label ? (
               <text
                 key={`r-${i}`}
@@ -121,8 +134,8 @@ export function HeatMap() {
               >
                 {label}
               </text>
-            ) : null
-          ))}
+            ) : null,
+          )}
           {/* Cells */}
           {cells.map((c, i) => {
             if (c.points === -1) return null // future day
@@ -141,7 +154,7 @@ export function HeatMap() {
                 strokeWidth={isHover ? 1.5 : 0}
                 onPointerEnter={() => setHover(c)}
                 onPointerLeave={() => setHover(null)}
-                onClick={() => setHover(prev => prev?.date === c.date ? null : c)}
+                onClick={() => setHover((prev) => (prev?.date === c.date ? null : c))}
                 style={{ cursor: 'pointer' }}
               />
             )
@@ -150,10 +163,12 @@ export function HeatMap() {
       </div>
 
       {/* Tooltip line */}
-      <div className="px-3 pb-1 h-5">
+      <div className="h-5 px-3 pb-1">
         {hover && (
           <span className="font-mono text-[10px] font-bold text-brutal-black/70">
-            {new Date(hover.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}
+            {new Date(hover.date + 'T00:00:00')
+              .toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+              .toUpperCase()}
             {' · '}
             {hover.points} {hover.points === 1 ? 'pt' : 'pts'}
           </span>
@@ -163,10 +178,10 @@ export function HeatMap() {
       {/* Legend */}
       <div className="flex items-center justify-end gap-1 px-3 pb-3">
         <span className="font-mono text-[10px] text-brutal-black/40">LESS</span>
-        {[0, 1, 2, 3, 4].map(i => (
+        {[0, 1, 2, 3, 4].map((i) => (
           <span
             key={i}
-            className="w-2.5 h-2.5 border border-brutal-black/20"
+            className="h-2.5 w-2.5 border border-brutal-black/20"
             style={{
               backgroundColor: i === 0 ? undefined : color,
               opacity: i === 0 ? 0.08 : opacities[i],

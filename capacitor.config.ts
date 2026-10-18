@@ -1,4 +1,4 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'club.dirtylaundry.app',
@@ -10,6 +10,6 @@ const config: CapacitorConfig = {
     contentInset: 'never',
     backgroundColor: '#FFFFFF',
   },
-};
+}
 
-export default config;
+export default config

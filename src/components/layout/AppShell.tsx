@@ -22,7 +22,13 @@ export function AppShell() {
 
   // Auto-start tour for first-time users once they're on the chores page with a group
   useEffect(() => {
-    if (!stillLoading && group && !tour.completed && !tour.active && location.pathname === '/chores') {
+    if (
+      !stillLoading &&
+      group &&
+      !tour.completed &&
+      !tour.active &&
+      location.pathname === '/chores'
+    ) {
       const t = setTimeout(() => startTour(), 500)
       return () => clearTimeout(t)
     }
@@ -37,21 +43,21 @@ export function AppShell() {
 
   if (stillLoading) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-brutal-yellow">
-        <img src="/logo.png" alt="Dirty Laundry" className="w-48 h-auto mb-6" />
+      <div className="flex h-screen flex-col items-center justify-center bg-brutal-yellow">
+        <img src="/logo.png" alt="Dirty Laundry" className="mb-6 h-auto w-48" />
         <Spinner size="lg" />
       </div>
     )
   }
 
   return (
-    <div className="h-screen flex overflow-hidden">
+    <div className="flex h-screen overflow-hidden">
       {showNav && <SideNav />}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden">
         <main
           className={`flex-1 overflow-y-auto overscroll-contain ${showNav ? 'pb-36 md:pb-0' : ''}`}
         >
-          <div className="md:max-w-2xl md:mx-auto">
+          <div className="md:mx-auto md:max-w-2xl">
             <Outlet />
           </div>
         </main>

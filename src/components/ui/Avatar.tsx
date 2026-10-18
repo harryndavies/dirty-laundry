@@ -14,7 +14,7 @@ const sizes = {
 export function Avatar({ name, color, size = 'md', imageUrl }: AvatarProps) {
   const initials = name
     .split(' ')
-    .map(w => w[0])
+    .map((w) => w[0])
     .join('')
     .toUpperCase()
     .slice(0, 2)
@@ -31,7 +31,7 @@ export function Avatar({ name, color, size = 'md', imageUrl }: AvatarProps) {
 
   return (
     <div
-      className={`${sizes[size]} border-2 border-brutal-black flex items-center justify-center font-mono font-bold text-brutal-black`}
+      className={`${sizes[size]} flex items-center justify-center border-2 border-brutal-black font-mono font-bold text-brutal-black`}
       style={{ backgroundColor: color }}
     >
       {initials}

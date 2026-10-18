@@ -25,7 +25,9 @@ export function useNudges() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('nudges')
-        .select('id, from_user_id, created_at, seen, profiles!nudges_from_user_id_fkey(display_name)')
+        .select(
+          'id, from_user_id, created_at, seen, profiles!nudges_from_user_id_fkey(display_name)',
+        )
         .eq('to_user_id', user!.id)
         .eq('group_id', group!.id)
         .order('created_at', { ascending: false })
@@ -34,7 +36,7 @@ export function useNudges() {
       return data as unknown as NudgeWithSender[]
     },
   })
-  const unseenCount = nudges.filter(n => !n.seen).length
+  const unseenCount = nudges.filter((n) => !n.seen).length
 
   useEffect(() => {
     if (!user || !group) return
@@ -49,7 +51,7 @@ export function useNudges() {
           table: 'nudges',
           filter: `to_user_id=eq.${user.id}`,
         },
-        () => queryClient.invalidateQueries({ queryKey: ['nudges', group.id, user.id] })
+        () => queryClient.invalidateQueries({ queryKey: ['nudges', group.id, user.id] }),
       )
       .subscribe()
 
@@ -87,7 +89,9 @@ export function useNudges() {
       .eq('to_user_id', user.id)
       .eq('group_id', group.id)
       .eq('seen', false)
-    queryClient.setQueryData<NudgeWithSender[]>(queryKey, prev => prev?.map(n => ({ ...n, seen: true })))
+    queryClient.setQueryData<NudgeWithSender[]>(queryKey, (prev) =>
+      prev?.map((n) => ({ ...n, seen: true })),
+    )
     queryClient.invalidateQueries({ queryKey })
   }
 

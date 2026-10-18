@@ -14,7 +14,7 @@ export function useMonthlyPoints(): Map<string, number> {
 
   // Refetch whenever any member's all-time points change — refreshMembers()
   // fires after every new completion, so this signal is sufficient.
-  const totalsKey = members.map(m => `${m.user_id}:${m.total_points}`).join(',')
+  const totalsKey = members.map((m) => `${m.user_id}:${m.total_points}`).join(',')
 
   const { data } = useQuery({
     queryKey: ['monthlyPoints', group?.id, start, totalsKey],

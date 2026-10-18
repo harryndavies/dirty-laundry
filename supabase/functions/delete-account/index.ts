@@ -23,10 +23,13 @@ Deno.serve(async (req) => {
     const userClient = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
+      { global: { headers: { Authorization: authHeader } } },
     )
 
-    const { data: { user }, error: userErr } = await userClient.auth.getUser()
+    const {
+      data: { user },
+      error: userErr,
+    } = await userClient.auth.getUser()
     if (userErr || !user) {
       return new Response(JSON.stringify({ error: 'Invalid session' }), {
         status: 401,
@@ -36,7 +39,7 @@ Deno.serve(async (req) => {
 
     const admin = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
 
     const { error: deleteErr } = await admin.auth.admin.deleteUser(user.id)

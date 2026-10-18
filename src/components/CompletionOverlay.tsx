@@ -8,7 +8,12 @@ interface CompletionOverlayProps {
   onDone: () => void
 }
 
-export function CompletionOverlay({ points, totalPoints, choreName, onDone }: CompletionOverlayProps) {
+export function CompletionOverlay({
+  points,
+  totalPoints,
+  choreName,
+  onDone,
+}: CompletionOverlayProps) {
   const previousTotal = totalPoints - points
   const [displayTotal, setDisplayTotal] = useState(previousTotal)
   const [showBadge, setShowBadge] = useState(false)
@@ -50,15 +55,21 @@ export function CompletionOverlay({ points, totalPoints, choreName, onDone }: Co
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: '-20%', scale: 0.95 }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="fixed inset-0 z-[100] bg-brutal-lime flex flex-col items-center justify-center"
-          onClick={() => { setVisible(false); setTimeout(onDone, 400) }}
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-brutal-lime"
+          onClick={() => {
+            setVisible(false)
+            setTimeout(onDone, 400)
+          }}
         >
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            onClick={() => { setVisible(false); setTimeout(onDone, 400) }}
-            className="absolute top-4 right-4 w-10 h-10 bg-brutal-black text-brutal-white flex items-center justify-center font-mono font-bold text-lg"
+            onClick={() => {
+              setVisible(false)
+              setTimeout(onDone, 400)
+            }}
+            className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center bg-brutal-black font-mono text-lg font-bold text-brutal-white"
             style={{ marginTop: 'env(safe-area-inset-top)' }}
           >
             ✕
@@ -68,7 +79,7 @@ export function CompletionOverlay({ points, totalPoints, choreName, onDone }: Co
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="font-mono text-xs font-bold text-brutal-black/40 tracking-widest mb-2"
+            className="mb-2 font-mono text-xs font-bold tracking-widest text-brutal-black/40"
           >
             COMPLETED
           </motion.p>
@@ -77,7 +88,7 @@ export function CompletionOverlay({ points, totalPoints, choreName, onDone }: Co
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="font-mono font-bold text-xl text-brutal-black mb-10 px-8 text-center"
+            className="mb-10 px-8 text-center font-mono text-xl font-bold text-brutal-black"
           >
             {choreName}
           </motion.h2>
@@ -86,7 +97,7 @@ export function CompletionOverlay({ points, totalPoints, choreName, onDone }: Co
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.3, type: 'spring', damping: 12, stiffness: 200 }}
-            className="font-mono font-bold text-7xl text-brutal-black"
+            className="font-mono text-7xl font-bold text-brutal-black"
           >
             {displayTotal}
           </motion.p>
@@ -95,7 +106,7 @@ export function CompletionOverlay({ points, totalPoints, choreName, onDone }: Co
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.4 }}
             transition={{ delay: 0.5 }}
-            className="font-mono text-sm font-bold text-brutal-black mt-1"
+            className="mt-1 font-mono text-sm font-bold text-brutal-black"
           >
             TOTAL POINTS
           </motion.p>
@@ -108,11 +119,10 @@ export function CompletionOverlay({ points, totalPoints, choreName, onDone }: Co
                 transition={{ type: 'spring', damping: 10, stiffness: 300 }}
                 className="mt-4 bg-brutal-black px-5 py-2.5 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
               >
-                <span className="font-mono font-bold text-xl text-brutal-lime">+{points}</span>
+                <span className="font-mono text-xl font-bold text-brutal-lime">+{points}</span>
               </motion.div>
             )}
           </AnimatePresence>
-
         </motion.div>
       )}
     </AnimatePresence>

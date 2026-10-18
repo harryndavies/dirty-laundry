@@ -20,7 +20,7 @@ export function useLeaderboard() {
         },
         () => {
           refreshMembers()
-        }
+        },
       )
       .subscribe()
 

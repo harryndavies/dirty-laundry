@@ -6,9 +6,11 @@ self.addEventListener('install', () => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((names) =>
-      Promise.all(names.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n)))
-    )
+    caches
+      .keys()
+      .then((names) =>
+        Promise.all(names.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n))),
+      ),
   )
 })
 
@@ -38,7 +40,7 @@ self.addEventListener('notificationclick', (event) => {
         }
       }
       return clients.openWindow(url)
-    })
+    }),
   )
 })
 
@@ -52,6 +54,6 @@ self.addEventListener('fetch', (event) => {
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone))
         return response
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => caches.match(event.request)),
   )
 })

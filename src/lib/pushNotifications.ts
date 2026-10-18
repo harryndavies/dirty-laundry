@@ -2,7 +2,8 @@ import { PushNotifications } from '@capacitor/push-notifications'
 import { supabase } from './supabase'
 import { isNativeIOS } from './platform'
 
-const VAPID_PUBLIC_KEY = 'BEJx_b9XKVAgVEp8kaBSnLuTD16wvPNBdtcOULw8S6ZPqwTZ-GEbImYXWXmCf25auu4qwFbI-acwbr8qKYiBWF0'
+const VAPID_PUBLIC_KEY =
+  'BEJx_b9XKVAgVEp8kaBSnLuTD16wvPNBdtcOULw8S6ZPqwTZ-GEbImYXWXmCf25auu4qwFbI-acwbr8qKYiBWF0'
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
@@ -27,11 +28,11 @@ async function subscribeToPushIOS(userId: string): Promise<boolean> {
   })
 
   // Attach listeners BEFORE calling register() so we can't miss the event.
-  const regListener = await PushNotifications.addListener('registration', t => {
+  const regListener = await PushNotifications.addListener('registration', (t) => {
     console.log('[push] APNs token received')
     resolveToken(t.value)
   })
-  const errListener = await PushNotifications.addListener('registrationError', e => {
+  const errListener = await PushNotifications.addListener('registrationError', (e) => {
     console.error('[push] registrationError:', e.error)
     rejectToken(new Error(e.error))
   })
@@ -41,7 +42,7 @@ async function subscribeToPushIOS(userId: string): Promise<boolean> {
 
   // Safety timeout in case neither event fires
   const timeoutPromise = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error('APNs registration timeout (15s)')), 15000)
+    setTimeout(() => reject(new Error('APNs registration timeout (15s)')), 15000),
   )
 
   try {
@@ -56,7 +57,7 @@ async function subscribeToPushIOS(userId: string): Promise<boolean> {
         keys_p256dh: null,
         keys_auth: null,
       },
-      { onConflict: 'device_token' }
+      { onConflict: 'device_token' },
     )
     if (error) {
       console.error('[push] supabase upsert error:', error)
@@ -100,7 +101,7 @@ async function subscribeToPushWeb(userId: string): Promise<boolean> {
       keys_auth: sub.keys!.auth!,
       device_token: null,
     },
-    { onConflict: 'endpoint' }
+    { onConflict: 'endpoint' },
   )
 
   return true
@@ -116,7 +117,7 @@ export function initIOSPushListeners() {
   if (!isNativeIOS || iosListenersAttached) return
   iosListenersAttached = true
 
-  PushNotifications.addListener('pushNotificationActionPerformed', action => {
+  PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
     const url = (action.notification.data?.url as string | undefined) ?? '/'
     try {
       window.location.assign(url)
@@ -139,7 +140,11 @@ export async function unsubscribeFromPush(userId: string): Promise<void> {
   if (subscription) {
     const endpoint = subscription.endpoint
     await subscription.unsubscribe()
-    await supabase.from('push_subscriptions').delete().eq('user_id', userId).eq('endpoint', endpoint)
+    await supabase
+      .from('push_subscriptions')
+      .delete()
+      .eq('user_id', userId)
+      .eq('endpoint', endpoint)
   }
 }
 
@@ -156,7 +161,7 @@ export async function isPushSubscribed(): Promise<boolean> {
 
 export async function sendPushToUser(
   toUserId: string,
-  payload: { title: string; body: string; url?: string }
+  payload: { title: string; body: string; url?: string },
 ): Promise<void> {
   // Sent with the signed-in user's session; the function checks they share a household.
   const { error } = await supabase.functions.invoke('send-push', { body: { toUserId, payload } })

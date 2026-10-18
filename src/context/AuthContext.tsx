@@ -9,14 +9,22 @@ interface AuthContextType {
   user: User | null
   profile: Profile | null
   loading: boolean
-  signUp: (email: string, password: string, displayName: string) => Promise<{ error: string | null }>
+  signUp: (
+    email: string,
+    password: string,
+    displayName: string,
+  ) => Promise<{ error: string | null }>
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
   signInAnonymously: (displayName: string) => Promise<{ error: string | null }>
   signInWithApple: () => Promise<{ error: string | null }>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error: string | null }>
   updatePassword: (password: string) => Promise<{ error: string | null }>
-  updateProfile: (updates: { display_name?: string; avatar_color?: string; avatar_url?: string | null }) => Promise<void>
+  updateProfile: (updates: {
+    display_name?: string
+    avatar_color?: string
+    avatar_url?: string | null
+  }) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -28,11 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   async function fetchProfile(userId: string) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle()
+    const { data } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
     setProfile(data)
   }
 
@@ -46,7 +50,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
@@ -118,7 +124,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: null }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Apple sign-in failed'
-      if (message.toLowerCase().includes('canceled') || message.toLowerCase().includes('cancelled')) {
+      if (
+        message.toLowerCase().includes('canceled') ||
+        message.toLowerCase().includes('cancelled')
+      ) {
         return { error: null }
       }
       return { error: message }
@@ -144,18 +153,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null)
   }
 
-  async function updateProfile(updates: { display_name?: string; avatar_color?: string; avatar_url?: string | null }) {
+  async function updateProfile(updates: {
+    display_name?: string
+    avatar_color?: string
+    avatar_url?: string | null
+  }) {
     if (!user) return
     const { error } = await supabase.from('profiles').update(updates).eq('id', user.id)
     if (error) {
       console.error('Profile update error:', error)
       return
     }
-    setProfile(prev => prev ? { ...prev, ...updates } : prev)
+    setProfile((prev) => (prev ? { ...prev, ...updates } : prev))
   }
 
   return (
-    <AuthContext.Provider value={{ session, user, profile, loading, signUp, signIn, signInAnonymously, signInWithApple, signOut, resetPassword, updatePassword, updateProfile }}>
+    <AuthContext.Provider
+      value={{
+        session,
+        user,
+        profile,
+        loading,
+        signUp,
+        signIn,
+        signInAnonymously,
+        signInWithApple,
+        signOut,
+        resetPassword,
+        updatePassword,
+        updateProfile,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )

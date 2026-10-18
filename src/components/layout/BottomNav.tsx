@@ -13,7 +13,7 @@ export function BottomNav() {
   return (
     <nav
       data-tour="bottom-nav"
-      className="fixed bottom-0 left-0 right-0 bg-brutal-white border-t-4 border-brutal-black flex z-50 md:hidden"
+      className="fixed right-0 bottom-0 left-0 z-50 flex border-t-4 border-brutal-black bg-brutal-white md:hidden"
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 4px)', minHeight: '64px' }}
     >
       {tabs.map(({ to, icon: Icon, label }) => (
@@ -21,7 +21,7 @@ export function BottomNav() {
           key={to}
           to={to}
           className={({ isActive }) =>
-            `flex-1 flex flex-col items-center justify-center gap-0.5 font-mono text-[10px] font-bold tracking-wider transition-colors min-h-[44px] ${
+            `flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 font-mono text-[10px] font-bold tracking-wider transition-colors ${
               isActive
                 ? 'bg-brutal-yellow text-brutal-black'
                 : 'text-brutal-black/60 active:bg-brutal-yellow/50'

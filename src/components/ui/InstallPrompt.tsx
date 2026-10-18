@@ -53,26 +53,26 @@ export function InstallPrompt() {
   if (dismissed || (!deferredPrompt && !showIOSPrompt)) return null
 
   return (
-    <div className="fixed bottom-20 left-3 right-3 z-[100] animate-in slide-in-from-bottom duration-300">
-      <div className="bg-brutal-white border-4 border-brutal-black shadow-[6px_6px_0_0_rgba(0,0,0,1)] p-4 rounded-none">
+    <div className="fixed right-3 bottom-20 left-3 z-[100] animate-in duration-300 slide-in-from-bottom">
+      <div className="rounded-none border-4 border-brutal-black bg-brutal-white p-4 shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
-            <p className="font-bold text-brutal-black text-sm">
-              Install Dirty Laundry
-            </p>
+            <p className="text-sm font-bold text-brutal-black">Install Dirty Laundry</p>
             {deferredPrompt ? (
-              <p className="text-xs text-brutal-black/70 mt-1">
+              <p className="mt-1 text-xs text-brutal-black/70">
                 Add to your home screen for the full app experience.
               </p>
             ) : (
-              <p className="text-xs text-brutal-black/70 mt-1">
-                Tap the share button <span className="inline-block text-base leading-none align-middle">⎙</span> then "Add to Home Screen" to install.
+              <p className="mt-1 text-xs text-brutal-black/70">
+                Tap the share button{' '}
+                <span className="inline-block align-middle text-base leading-none">⎙</span> then
+                "Add to Home Screen" to install.
               </p>
             )}
           </div>
           <button
             onClick={dismiss}
-            className="text-brutal-black/50 hover:text-brutal-black font-bold text-lg leading-none p-1"
+            className="p-1 text-lg leading-none font-bold text-brutal-black/50 hover:text-brutal-black"
             aria-label="Dismiss"
           >
             ✕
@@ -81,7 +81,7 @@ export function InstallPrompt() {
         {deferredPrompt && (
           <button
             onClick={handleInstall}
-            className="mt-3 w-full bg-brutal-black text-brutal-yellow font-bold py-2 px-4 border-2 border-brutal-black text-sm uppercase tracking-wide hover:bg-brutal-yellow hover:text-brutal-black transition-colors"
+            className="mt-3 w-full border-2 border-brutal-black bg-brutal-black px-4 py-2 text-sm font-bold tracking-wide text-brutal-yellow uppercase transition-colors hover:bg-brutal-yellow hover:text-brutal-black"
           >
             Install App
           </button>

@@ -27,7 +27,7 @@ export function pickFairTurns(
   const result = new Map<string, TurnSuggestion>()
 
   for (const chore of chores) {
-    const choreCompletions = completions.filter(c => c.chore_id === chore.id)
+    const choreCompletions = completions.filter((c) => c.chore_id === chore.id)
 
     // Count completions per member for this chore
     const counts = new Map<string, number>()
@@ -46,14 +46,14 @@ export function pickFairTurns(
 
     // Find the member who is furthest behind their fair share
     // If shares are set, weight by share; otherwise use equal weighting
-    const hasShares = members.some(m => m.chore_share > 0)
+    const hasShares = members.some((m) => m.chore_share > 0)
     let minScore = Infinity
     let candidates: string[] = []
 
     for (const [userId, count] of counts) {
       // Score = completions / expected share (lower = more behind)
-      const member = members.find(m => m.user_id === userId)
-      const share = hasShares && member ? (member.chore_share / 100) : (1 / members.length)
+      const member = members.find((m) => m.user_id === userId)
+      const share = hasShares && member ? member.chore_share / 100 : 1 / members.length
       const score = share > 0 ? count / share : Infinity
       if (score < minScore) {
         minScore = score
@@ -65,19 +65,19 @@ export function pickFairTurns(
 
     // If tied, pick whoever did it least recently (or never)
     // If all are tied with no history, use chore ID to distribute evenly
-    const allNeverDone = candidates.every(id => !lastDone.has(id))
+    const allNeverDone = candidates.every((id) => !lastDone.has(id))
     let chosen: string
 
     if (allNeverDone && candidates.length > 1) {
       // Distribute based on chore share weights
       let hash = 0
       for (let i = 0; i < chore.id.length; i++) {
-        hash = ((hash << 5) - hash) + chore.id.charCodeAt(i)
+        hash = (hash << 5) - hash + chore.id.charCodeAt(i)
       }
       // Build weighted pool — higher share = more entries
       const weighted: string[] = []
       for (const id of candidates) {
-        const m = members.find(m => m.user_id === id)
+        const m = members.find((m) => m.user_id === id)
         const weight = hasShares && m ? Math.max(1, Math.round(m.chore_share / 10)) : 1
         for (let i = 0; i < weight; i++) weighted.push(id)
       }
@@ -96,7 +96,7 @@ export function pickFairTurns(
       }
     }
 
-    const member = members.find(m => m.user_id === chosen)
+    const member = members.find((m) => m.user_id === chosen)
     if (!member) continue
 
     const totalForChosen = counts.get(chosen) ?? 0
@@ -150,7 +150,10 @@ export function useFairTurn() {
   })
 
   const suggestions = useMemo(
-    () => (data && members.length >= 2 ? pickFairTurns(data.chores, data.completions, members) : new Map<string, TurnSuggestion>()),
+    () =>
+      data && members.length >= 2
+        ? pickFairTurns(data.chores, data.completions, members)
+        : new Map<string, TurnSuggestion>(),
     [data, members],
   )
 
@@ -167,7 +170,7 @@ export function useFairTurn() {
           table: 'completions',
           filter: `group_id=eq.${group.id}`,
         },
-        () => queryClient.invalidateQueries({ queryKey: ['fair-turn', group.id] })
+        () => queryClient.invalidateQueries({ queryKey: ['fair-turn', group.id] }),
       )
       .subscribe()
 

@@ -11,9 +11,9 @@ const tabs = [
 
 export function SideNav() {
   return (
-    <nav className="hidden md:flex flex-col w-56 shrink-0 bg-brutal-white border-r-4 border-brutal-black h-full">
-      <div className="p-4 border-b-4 border-brutal-black bg-brutal-yellow">
-        <img src="/logo.png" alt="Dirty Laundry" className="w-32 h-auto mx-auto" />
+    <nav className="hidden h-full w-56 shrink-0 flex-col border-r-4 border-brutal-black bg-brutal-white md:flex">
+      <div className="border-b-4 border-brutal-black bg-brutal-yellow p-4">
+        <img src="/logo.png" alt="Dirty Laundry" className="mx-auto h-auto w-32" />
       </div>
       <div className="flex-1 py-2">
         {tabs.map(({ to, icon: Icon, label }) => (
@@ -23,7 +23,7 @@ export function SideNav() {
             className={({ isActive }) =>
               `flex items-center gap-3 px-5 py-3 font-mono text-xs font-bold tracking-wider transition-colors ${
                 isActive
-                  ? 'bg-brutal-yellow text-brutal-black border-r-4 border-brutal-black'
+                  ? 'border-r-4 border-brutal-black bg-brutal-yellow text-brutal-black'
                   : 'text-brutal-black/60 hover:bg-brutal-yellow/30 hover:text-brutal-black'
               }`
             }

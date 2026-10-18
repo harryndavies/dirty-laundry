@@ -38,7 +38,7 @@ export function plantHint(mood: PlantMood): string {
 
 export function usePlantState(): { state: PlantState; loading: boolean } {
   const { group, members } = useGroup()
-  const totalsKey = members.map(m => `${m.user_id}:${m.total_points}`).join(',')
+  const totalsKey = members.map((m) => `${m.user_id}:${m.total_points}`).join(',')
 
   const { data, isLoading } = useQuery({
     queryKey: ['plant', group?.id, totalsKey],
@@ -68,14 +68,13 @@ export function usePlantState(): { state: PlantState; loading: boolean } {
           .order('completed_at', { ascending: false })
           .limit(1)
         const last = (anyRows ?? []) as { completed_at: string }[]
-        hoursSinceLast = last.length > 0
-          ? (now - new Date(last[0].completed_at).getTime()) / 3_600_000
-          : null
+        hoursSinceLast =
+          last.length > 0 ? (now - new Date(last[0].completed_at).getTime()) / 3_600_000 : null
       }
 
       const startOfToday = new Date()
       startOfToday.setHours(0, 0, 0, 0)
-      const completionsToday = list.filter(r => new Date(r.completed_at) >= startOfToday).length
+      const completionsToday = list.filter((r) => new Date(r.completed_at) >= startOfToday).length
       const completionsLast48h = list.length
 
       const expectedPerDay = Math.max(1, members.length)

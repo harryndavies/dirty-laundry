@@ -23,7 +23,12 @@ interface GroupContextType {
   updateWeeklyGoal: (goal: number | null) => Promise<void>
   updatePocketMoneyRate: (rate: number | null) => Promise<void>
   setMemberRole: (memberId: string, role: 'owner' | 'member' | 'kid') => Promise<void>
-  markAsPaid: (memberId: string, userId: string, amountPence: number, points: number) => Promise<void>
+  markAsPaid: (
+    memberId: string,
+    userId: string,
+    amountPence: number,
+    points: number,
+  ) => Promise<void>
   updateSavingsGoal: (goalPence: number | null, goalName: string | null) => Promise<void>
 }
 
@@ -37,20 +42,23 @@ export function GroupProvider({ children }: { children: ReactNode }) {
   // Whose household is loaded: undefined until the first load, null when signed out.
   const [loadedFor, setLoadedFor] = useState<string | null | undefined>(undefined)
 
-  const refreshMembersForGroup = useCallback(async (groupId: string) => {
-    const { data: membersData } = await supabase
-      .from('group_members')
-      .select('*, profiles(*)')
-      .eq('group_id', groupId)
-      .order('total_points', { ascending: false })
+  const refreshMembersForGroup = useCallback(
+    async (groupId: string) => {
+      const { data: membersData } = await supabase
+        .from('group_members')
+        .select('*, profiles(*)')
+        .eq('group_id', groupId)
+        .order('total_points', { ascending: false })
 
-    const updated: MemberWithProfile[] = (membersData ?? []).map(asMember)
-    setMembers(updated)
-    if (user) {
-      const me = updated.find(m => m.user_id === user.id)
-      if (me) setUserMember(me)
-    }
-  }, [user])
+      const updated: MemberWithProfile[] = (membersData ?? []).map(asMember)
+      setMembers(updated)
+      if (user) {
+        const me = updated.find((m) => m.user_id === user.id)
+        if (me) setUserMember(me)
+      }
+    },
+    [user],
+  )
 
   const fetchGroup = useCallback(async () => {
     if (!user) {
@@ -137,17 +145,15 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'group_members', filter: `group_id=eq.${groupId}` },
-        () => refreshMembersForGroup(groupId)
+        () => refreshMembersForGroup(groupId),
       )
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'groups', filter: `id=eq.${groupId}` },
-        () => fetchGroup()
+        () => fetchGroup(),
       )
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'profiles' },
-        () => refreshMembersForGroup(groupId)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, () =>
+        refreshMembersForGroup(groupId),
       )
       .subscribe()
 
@@ -218,10 +224,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
 
   async function updateMemberShares(shares: { memberId: string; share: number }[]) {
     for (const { memberId, share } of shares) {
-      await supabase
-        .from('group_members')
-        .update({ chore_share: share })
-        .eq('id', memberId)
+      await supabase.from('group_members').update({ chore_share: share }).eq('id', memberId)
     }
     if (group) await refreshMembersForGroup(group.id)
 
@@ -233,9 +236,9 @@ export function GroupProvider({ children }: { children: ReactNode }) {
         .eq('id', user.id)
         .single()
 
-      const otherMembers = members.filter(m => m.user_id !== user.id)
+      const otherMembers = members.filter((m) => m.user_id !== user.id)
       for (const m of otherMembers) {
-        const memberShare = shares.find(s => s.memberId === m.id)
+        const memberShare = shares.find((s) => s.memberId === m.id)
         sendPushToUser(m.user_id, {
           title: 'Chore split updated! ⚖️',
           body: `${profile?.display_name ?? 'The owner'} changed the split — your share is now ${memberShare?.share ?? 0}%`,
@@ -247,7 +250,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
 
   async function updateMyPrize(prize: string) {
     if (!user || !group) return
-    const member = members.find(m => m.user_id === user.id)
+    const member = members.find((m) => m.user_id === user.id)
     if (!member) return
     await supabase
       .from('group_members')
@@ -262,7 +265,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
         .eq('id', user.id)
         .single()
 
-      const others = members.filter(m => m.user_id !== user.id)
+      const others = members.filter((m) => m.user_id !== user.id)
       for (const m of others) {
         sendPushToUser(m.user_id, {
           title: 'New prize on the line! 🏆',
@@ -283,11 +286,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     }
 
     // Delete membership from database
-    await supabase
-      .from('group_members')
-      .delete()
-      .eq('group_id', group.id)
-      .eq('user_id', user.id)
+    await supabase.from('group_members').delete().eq('group_id', group.id).eq('user_id', user.id)
 
     localStorage.removeItem('dirtylaundry_group_id')
     setGroup(null)
@@ -298,10 +297,15 @@ export function GroupProvider({ children }: { children: ReactNode }) {
   async function updateWeeklyGoal(goal: number | null) {
     if (!group) return
     try {
-      const { error } = await supabase.from('groups').update({ weekly_goal: goal }).eq('id', group.id)
+      const { error } = await supabase
+        .from('groups')
+        .update({ weekly_goal: goal })
+        .eq('id', group.id)
       if (error) throw error
-      setGroup(prev => prev ? { ...prev, weekly_goal: goal } : prev)
-    } catch { toast('Failed to update goal', 'bg-brutal-pink') }
+      setGroup((prev) => (prev ? { ...prev, weekly_goal: goal } : prev))
+    } catch {
+      toast('Failed to update goal', 'bg-brutal-pink')
+    }
   }
 
   async function updatePocketMoneyRate(rate: number | null) {
@@ -311,10 +315,15 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       return
     }
     try {
-      const { error } = await supabase.from('groups').update({ pocket_money_rate: rate }).eq('id', group.id)
+      const { error } = await supabase
+        .from('groups')
+        .update({ pocket_money_rate: rate })
+        .eq('id', group.id)
       if (error) throw error
-      setGroup(prev => prev ? { ...prev, pocket_money_rate: rate } : prev)
-    } catch { toast('Failed to update rate', 'bg-brutal-pink') }
+      setGroup((prev) => (prev ? { ...prev, pocket_money_rate: rate } : prev))
+    } catch {
+      toast('Failed to update rate', 'bg-brutal-pink')
+    }
   }
 
   async function setMemberRole(memberId: string, role: 'owner' | 'member' | 'kid') {
@@ -322,32 +331,68 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase.from('group_members').update({ role }).eq('id', memberId)
       if (error) throw error
       if (group) await refreshMembersForGroup(group.id)
-    } catch { toast('Failed to update role', 'bg-brutal-pink') }
+    } catch {
+      toast('Failed to update role', 'bg-brutal-pink')
+    }
   }
 
-  async function markAsPaid(memberId: string, _userId: string, amountPence: number, points: number) {
+  async function markAsPaid(
+    memberId: string,
+    _userId: string,
+    amountPence: number,
+    points: number,
+  ) {
     if (!user || !group) return
     try {
       // Records the payout and moves "paid up to" in one server call.
-      const { error } = await supabase.rpc('mark_paid', { p_member_id: memberId, p_amount_pence: amountPence, p_points: points })
+      const { error } = await supabase.rpc('mark_paid', {
+        p_member_id: memberId,
+        p_amount_pence: amountPence,
+        p_points: points,
+      })
       if (error) throw error
       if (group) await refreshMembersForGroup(group.id)
-    } catch { toast('Failed to mark as paid', 'bg-brutal-pink') }
+    } catch {
+      toast('Failed to mark as paid', 'bg-brutal-pink')
+    }
   }
 
   async function updateSavingsGoal(goalPence: number | null, goalName: string | null) {
     if (!user || !group) return
-    const member = members.find(m => m.user_id === user.id)
+    const member = members.find((m) => m.user_id === user.id)
     if (!member) return
     try {
-      const { error } = await supabase.from('group_members').update({ savings_goal: goalPence, savings_goal_name: goalName }).eq('id', member.id)
+      const { error } = await supabase
+        .from('group_members')
+        .update({ savings_goal: goalPence, savings_goal_name: goalName })
+        .eq('id', member.id)
       if (error) throw error
       await refreshMembersForGroup(group.id)
-    } catch { toast('Failed to update savings goal', 'bg-brutal-pink') }
+    } catch {
+      toast('Failed to update savings goal', 'bg-brutal-pink')
+    }
   }
 
   return (
-    <GroupContext.Provider value={{ group, members, userMember, loading: authLoading || loadedFor !== (user?.id ?? null), createGroup, joinGroup, refreshMembers, leaveGroup, updateMemberShares, updateMyPrize, updateWeeklyGoal, updatePocketMoneyRate, setMemberRole, markAsPaid, updateSavingsGoal }}>
+    <GroupContext.Provider
+      value={{
+        group,
+        members,
+        userMember,
+        loading: authLoading || loadedFor !== (user?.id ?? null),
+        createGroup,
+        joinGroup,
+        refreshMembers,
+        leaveGroup,
+        updateMemberShares,
+        updateMyPrize,
+        updateWeeklyGoal,
+        updatePocketMoneyRate,
+        setMemberRole,
+        markAsPaid,
+        updateSavingsGoal,
+      }}
+    >
       {children}
     </GroupContext.Provider>
   )

@@ -31,45 +31,45 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <ThemeProvider>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <GroupProvider>
-            <ToastContainer />
-            <InstallPrompt />
-            <Routes>
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route
-                path="/wrapped"
-                element={
-                  <ProtectedRoute>
-                    <WrappedPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                element={
-                  <ProtectedRoute>
-                    <AppShell />
-                  </ProtectedRoute>
-                }
-              >
-                <Route path="/chores" element={<ChoresPage />} />
-                <Route path="/leaderboard" element={<LeaderboardPage />} />
-                <Route path="/activity" element={<ActivityPage />} />
-                <Route path="/roulette" element={<RoulettePage />} />
-                <Route path="/report" element={<WeeklyReportPage />} />
-                <Route path="/group" element={<GroupPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/plant" element={<PlantPage />} />
-              </Route>
-              <Route path="*" element={<Navigate to="/chores" replace />} />
-            </Routes>
-          </GroupProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AuthProvider>
+            <GroupProvider>
+              <ToastContainer />
+              <InstallPrompt />
+              <Routes>
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route
+                  path="/wrapped"
+                  element={
+                    <ProtectedRoute>
+                      <WrappedPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  element={
+                    <ProtectedRoute>
+                      <AppShell />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route path="/chores" element={<ChoresPage />} />
+                  <Route path="/leaderboard" element={<LeaderboardPage />} />
+                  <Route path="/activity" element={<ActivityPage />} />
+                  <Route path="/roulette" element={<RoulettePage />} />
+                  <Route path="/report" element={<WeeklyReportPage />} />
+                  <Route path="/group" element={<GroupPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/plant" element={<PlantPage />} />
+                </Route>
+                <Route path="*" element={<Navigate to="/chores" replace />} />
+              </Routes>
+            </GroupProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
     </ThemeProvider>
   )
 }

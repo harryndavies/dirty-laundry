@@ -45,14 +45,14 @@ export function TimeOfDayHeatmap({ matrix }: TimeOfDayHeatmapProps) {
 
   return (
     <div className="border-2 border-brutal-black bg-brutal-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      <div className="px-3 pt-3 pb-1 flex items-baseline justify-between">
-        <h3 className="font-mono font-bold text-xs uppercase">When Chores Get Done</h3>
+      <div className="flex items-baseline justify-between px-3 pt-3 pb-1">
+        <h3 className="font-mono text-xs font-bold uppercase">When Chores Get Done</h3>
         <span className="font-mono text-[10px] text-brutal-black/40">peak {peakLabel}</span>
       </div>
-      <div className="px-3 pb-3 overflow-x-auto">
+      <div className="overflow-x-auto px-3 pb-3">
         <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="block">
           {/* Hour labels */}
-          {HOURS.map(h => (
+          {HOURS.map((h) => (
             <text
               key={h}
               x={padLeft + h * cellW}
@@ -76,19 +76,21 @@ export function TimeOfDayHeatmap({ matrix }: TimeOfDayHeatmapProps) {
             </text>
           ))}
           {/* Cells */}
-          {matrix.map((row, r) => row.map((v, c) => (
-            <rect
-              key={`${r}-${c}`}
-              x={padLeft + c * cellW}
-              y={padTop + r * cellH}
-              width={cellW - 1}
-              height={cellH - 1}
-              fill={v > 0 ? 'var(--color-brutal-blue)' : 'currentColor'}
-              opacity={v > 0 ? opacities[intensity(v)] : 0.06}
-            >
-              <title>{`${ROWS[r]} ${String(c).padStart(2, '0')}:00 — ${v} ${v === 1 ? 'completion' : 'completions'}`}</title>
-            </rect>
-          )))}
+          {matrix.map((row, r) =>
+            row.map((v, c) => (
+              <rect
+                key={`${r}-${c}`}
+                x={padLeft + c * cellW}
+                y={padTop + r * cellH}
+                width={cellW - 1}
+                height={cellH - 1}
+                fill={v > 0 ? 'var(--color-brutal-blue)' : 'currentColor'}
+                opacity={v > 0 ? opacities[intensity(v)] : 0.06}
+              >
+                <title>{`${ROWS[r]} ${String(c).padStart(2, '0')}:00 — ${v} ${v === 1 ? 'completion' : 'completions'}`}</title>
+              </rect>
+            )),
+          )}
         </svg>
       </div>
     </div>

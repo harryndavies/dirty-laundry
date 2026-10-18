@@ -32,7 +32,9 @@ export function PlantPage() {
   // The plant's name is kept per household on this device.
   const [renamed, setRenamed] = useState<{ key: string; name: string } | null>(null)
   const name =
-    renamed?.key === nameKey ? renamed.name : (nameKey && localStorage.getItem(nameKey)) || DEFAULT_NAME
+    renamed?.key === nameKey
+      ? renamed.name
+      : (nameKey && localStorage.getItem(nameKey)) || DEFAULT_NAME
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(DEFAULT_NAME)
 
@@ -46,24 +48,24 @@ export function PlantPage() {
   }
 
   return (
-    <div className="relative min-h-[calc(100dvh-9rem)] flex flex-col">
+    <div className="relative flex min-h-[calc(100dvh-9rem)] flex-col">
       <div
         aria-hidden
         className={`fixed inset-0 ${MOOD_BG[state.mood]} pointer-events-none transition-colors`}
         style={{ zIndex: -1 }}
       />
-      <div className="sticky top-0 z-10 bg-brutal-black text-brutal-white border-b-4 border-brutal-black px-4 py-4 flex items-center gap-3">
+      <div className="sticky top-0 z-10 flex items-center gap-3 border-b-4 border-brutal-black bg-brutal-black px-4 py-4 text-brutal-white">
         <button
           onClick={() => navigate(-1)}
-          className="w-9 h-9 bg-brutal-white text-brutal-black border-2 border-brutal-white flex items-center justify-center active:opacity-70"
+          className="flex h-9 w-9 items-center justify-center border-2 border-brutal-white bg-brutal-white text-brutal-black active:opacity-70"
           aria-label="Back"
         >
           <ArrowLeft size={16} strokeWidth={3} />
         </button>
-        <h1 className="font-mono font-bold text-lg tracking-tight">HOUSEPLANT</h1>
+        <h1 className="font-mono text-lg font-bold tracking-tight">HOUSEPLANT</h1>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center pt-4 pb-4 px-4">
+      <div className="flex flex-1 flex-col items-center justify-center px-4 pt-4 pb-4">
         <Plant mood={state.mood} size={220} />
 
         <div className="mt-6 flex items-center gap-2">
@@ -71,24 +73,27 @@ export function PlantPage() {
             <>
               <input
                 value={draft}
-                onChange={e => setDraft(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && saveName()}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && saveName()}
                 maxLength={16}
                 autoFocus
-                className="border-2 border-brutal-black font-mono font-black text-3xl text-center bg-brutal-white w-44 h-12 uppercase"
+                className="h-12 w-44 border-2 border-brutal-black bg-brutal-white text-center font-mono text-3xl font-black uppercase"
               />
               <button
                 onClick={saveName}
-                className="w-12 h-12 bg-brutal-lime border-2 border-brutal-black flex items-center justify-center active:opacity-70"
+                className="flex h-12 w-12 items-center justify-center border-2 border-brutal-black bg-brutal-lime active:opacity-70"
               >
                 <Check size={18} strokeWidth={3} />
               </button>
             </>
           ) : (
             <>
-              <span className="font-mono font-black text-3xl tracking-tighter">{name}</span>
+              <span className="font-mono text-3xl font-black tracking-tighter">{name}</span>
               <button
-                onClick={() => { setDraft(name); setEditing(true) }}
+                onClick={() => {
+                  setDraft(name)
+                  setEditing(true)
+                }}
                 className="text-brutal-black/50 active:text-brutal-black"
                 aria-label="Rename plant"
               >
@@ -98,15 +103,15 @@ export function PlantPage() {
           )}
         </div>
 
-        <div className="mt-2 px-4 py-1.5 bg-brutal-black text-brutal-white border-2 border-brutal-black font-mono font-bold text-xs tracking-widest">
+        <div className="mt-2 border-2 border-brutal-black bg-brutal-black px-4 py-1.5 font-mono text-xs font-bold tracking-widest text-brutal-white">
           IS {plantLabel(state.mood)}
         </div>
-        <p className="mt-3 font-mono text-sm text-brutal-black/70 max-w-xs text-center">
+        <p className="mt-3 max-w-xs text-center font-mono text-sm text-brutal-black/70">
           {plantHint(state.mood)}
         </p>
       </div>
 
-      <div className="px-4 pb-4 grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2 px-4 pb-4">
         <Stat label="LAST WATERED" value={formatHours(state.hoursSinceLast)} />
         <Stat label="TODAY" value={`${state.completionsToday}`} />
         <Stat label="48H" value={`${state.completionsLast48h}`} />
@@ -115,7 +120,7 @@ export function PlantPage() {
       <div className="px-4 pb-8">
         <button
           onClick={() => navigate('/chores')}
-          className="w-full bg-brutal-black text-brutal-white border-2 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] py-4 font-mono font-bold text-base tracking-wider transition-all"
+          className="w-full border-2 border-brutal-black bg-brutal-black py-4 font-mono text-base font-bold tracking-wider text-brutal-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
         >
           WATER {name} → DO A CHORE
         </button>
@@ -127,8 +132,10 @@ export function PlantPage() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="border-2 border-brutal-black bg-brutal-white p-3 text-center">
-      <div className="font-mono text-[9px] font-bold tracking-widest text-brutal-black/40">{label}</div>
-      <div className="font-mono font-black text-lg mt-0.5">{value}</div>
+      <div className="font-mono text-[9px] font-bold tracking-widest text-brutal-black/40">
+        {label}
+      </div>
+      <div className="mt-0.5 font-mono text-lg font-black">{value}</div>
     </div>
   )
 }
