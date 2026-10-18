@@ -65,6 +65,6 @@ library to learn.
 
 ## Deploy
 
-Hosted on Vercel as the `whoseturn-landing` project: framework preset **Astro**, Root Directory
+Hosted on Vercel as the `dirtylaundry-site` project: framework preset **Astro**, Root Directory
 `site`, output `dist/`. It only rebuilds when something in `site/` changes. The custom domain
 `dirtylaundry.club` points at it. There are no environment variables.
