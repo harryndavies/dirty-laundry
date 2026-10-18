@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { isServiceCall } from '../_shared/auth.ts'
 
 // This function should be invoked on a cron schedule (e.g. every 15 minutes)
 // via Supabase Dashboard > Edge Functions > Schedules
@@ -9,6 +10,9 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 // then sends push notifications to all group members via the send-push function.
 
 Deno.serve(async (req) => {
+  // Scheduled job: only callable with the service role key.
+  if (!isServiceCall(req)) return new Response('Forbidden', { status: 403 })
+
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!

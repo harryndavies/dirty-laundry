@@ -24,4 +24,9 @@ dist-ssr
 *.sw?
 
 # Local tool logs
-.claude/hooks/.logs/
+**/.claude/hooks/.logs/
+
+# Supabase CLI
+supabase/.temp
+supabase/.branches
+supabase/functions/.env*

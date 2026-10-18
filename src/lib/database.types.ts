@@ -256,7 +256,12 @@ export interface Database {
       }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      join_group_by_code: {
+        Args: { p_code: string }
+        Returns: Database['public']['Tables']['groups']['Row']
+      }
+    }
     Enums: Record<string, never>
     CompositeTypes: Record<string, never>
   }

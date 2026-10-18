@@ -63,17 +63,11 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       const pendingCode = localStorage.getItem('dirtylaundry_invite_code')
       if (pendingCode) {
         localStorage.removeItem('dirtylaundry_invite_code')
-        const { data: foundGroup } = await supabase
-          .from('groups')
-          .select('*')
-          .eq('invite_code', pendingCode.toUpperCase().trim())
-          .maybeSingle()
+        // Households can't be looked up by code directly; the database does it.
+        const { data: joined } = await supabase.rpc('join_group_by_code', { p_code: pendingCode })
+        const foundGroup = joined as Group | null
 
         if (foundGroup) {
-          await supabase
-            .from('group_members')
-            .insert({ group_id: foundGroup.id, user_id: user.id, role: 'member' })
-
           localStorage.setItem('dirtylaundry_group_id', foundGroup.id)
           setGroup(foundGroup)
           await refreshMembersForGroup(foundGroup.id)
@@ -116,7 +110,8 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       .eq('group_id', groupId)
       .order('total_points', { ascending: false })
 
-    const updated = (membersData as MemberWithProfile[]) ?? []
+    // The hand-written types have no relationships, so the profiles join is untyped.
+    const updated = (membersData as unknown as MemberWithProfile[]) ?? []
     setMembers(updated)
     if (user) {
       const me = updated.find(m => m.user_id === user.id)
@@ -184,23 +179,14 @@ export function GroupProvider({ children }: { children: ReactNode }) {
   async function joinGroup(inviteCode: string) {
     if (!user) return { error: 'Not logged in' }
 
-    const { data: foundGroup, error: lookupError } = await supabase
-      .from('groups')
-      .select('*')
-      .eq('invite_code', inviteCode.toUpperCase().trim())
-      .maybeSingle()
-
-    if (lookupError) return { error: 'Something went wrong' }
-    if (!foundGroup) return { error: 'Invalid invite code' }
-
-    const { error } = await supabase
-      .from('group_members')
-      .insert({ group_id: foundGroup.id, user_id: user.id, role: 'member' })
-
+    // Looks the code up and joins in one step, on the server.
+    const { data: joined, error } = await supabase.rpc('join_group_by_code', { p_code: inviteCode })
     if (error) {
-      if (error.code === '23505') return { error: 'You are already in this group' }
-      return { error: error.message }
+      if (error.message === 'invalid_code') return { error: 'Invalid invite code' }
+      if (error.message === 'already_member') return { error: 'You are already in this group' }
+      return { error: 'Something went wrong' }
     }
+    const foundGroup = joined as Group
 
     localStorage.setItem('dirtylaundry_group_id', foundGroup.id)
 

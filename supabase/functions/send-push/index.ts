@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { adminClient, callerUserId, isServiceCall } from '../_shared/auth.ts'
 import webpush from 'https://esm.sh/web-push@3.6.7'
 
 const VAPID_PUBLIC_KEY = 'BEJx_b9XKVAgVEp8kaBSnLuTD16wvPNBdtcOULw8S6ZPqwTZ-GEbImYXWXmCf25auu4qwFbI-acwbr8qKYiBWF0'
@@ -91,16 +91,37 @@ async function sendApns(deviceToken: string, payload: { title: string; body: str
   return { ok: false, status: res.status, reason }
 }
 
+const reply = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', ...cors } })
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: cors })
 
   try {
-    const { toUserId, payload } = await req.json()
+    const { toUserId, payload: rawPayload } = await req.json()
+    const supabase = adminClient()
 
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    )
+    // Only other functions (service key) or a signed-in housemate may send.
+    if (!isServiceCall(req)) {
+      const caller = await callerUserId(req, supabase)
+      if (!caller) return reply({ error: 'unauthorised' }, 401)
+      const { data: shared } = await supabase
+        .from('group_members')
+        .select('group_id, user_id')
+        .in('user_id', [caller, toUserId])
+      const groupsOf = (id: string) => new Set((shared ?? []).filter(r => r.user_id === id).map(r => r.group_id))
+      const callerGroups = groupsOf(caller)
+      const sharesHousehold = [...groupsOf(toUserId)].some(g => callerGroups.has(g))
+      if (!sharesHousehold) return reply({ error: 'forbidden' }, 403)
+    }
+
+    // Plain text only, and links may only point inside the app.
+    const payload = {
+      title: String(rawPayload?.title ?? '').slice(0, 120),
+      body: String(rawPayload?.body ?? '').slice(0, 300),
+      url: typeof rawPayload?.url === 'string' && /^\/(?!\/)/.test(rawPayload.url) ? rawPayload.url : '/',
+    }
+    if (!toUserId || !payload.title) return reply({ error: 'bad request' }, 400)
 
     const { data: subscriptions } = await supabase
       .from('push_subscriptions')
