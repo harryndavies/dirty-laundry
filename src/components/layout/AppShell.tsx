@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { SideNav } from './SideNav'
@@ -6,8 +6,13 @@ import { useRealtime } from '@/lib/hooks/useRealtime'
 import { useGroup } from '@/context/GroupContext'
 import { useAuth } from '@/context/AuthContext'
 import { Spinner } from '@/components/ui/Spinner'
-import { AppTour } from '@/components/tour/AppTour'
+import { PageFallback } from '@/components/ui/PageFallback'
 import { useTour } from '@/lib/hooks/useTour'
+
+// The tour (and its animation library) is only needed by first-time users.
+const AppTour = lazy(() =>
+  import('@/components/tour/AppTour').then((m) => ({ default: m.AppTour })),
+)
 
 export function AppShell() {
   useRealtime()
@@ -58,20 +63,27 @@ export function AppShell() {
           className={`flex-1 overflow-y-auto overscroll-contain ${showNav ? 'pb-36 md:pb-0' : ''}`}
         >
           <div className="md:mx-auto md:max-w-2xl">
-            <Outlet />
+            {/* Keeps the nav on screen while a page's code loads. */}
+            <Suspense fallback={<PageFallback />}>
+              <Outlet />
+            </Suspense>
           </div>
         </main>
         {showNav && <BottomNav />}
       </div>
-      <AppTour
-        active={tour.visible}
-        step={tour.step}
-        onNext={tour.next}
-        onPrev={tour.prev}
-        onFinish={tour.finish}
-        onDismiss={tour.dismiss}
-        onTapTarget={tour.beginWait}
-      />
+      {tour.active && (
+        <Suspense fallback={null}>
+          <AppTour
+            active={tour.visible}
+            step={tour.step}
+            onNext={tour.next}
+            onPrev={tour.prev}
+            onFinish={tour.finish}
+            onDismiss={tour.dismiss}
+            onTapTarget={tour.beginWait}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }

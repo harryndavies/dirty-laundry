@@ -1,8 +1,7 @@
-import { useState, useRef } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Spinner } from '@/components/ui/Spinner'
 import { useGroup } from '@/context/GroupContext'
 import { useChores } from '@/lib/hooks/useChores'
-import { CompletionOverlay } from '@/components/CompletionOverlay'
 import { useFairTurn } from '@/lib/hooks/useFairTurn'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar } from '@/components/ui/Avatar'
@@ -27,6 +26,12 @@ import {
 } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { advanceTour } from '@/lib/hooks/useTour'
+
+// The celebration (and its animation library) loads after the chore list, ready for the first tick.
+const loadCompletionOverlay = () => import('@/components/CompletionOverlay')
+const CompletionOverlay = lazy(() =>
+  loadCompletionOverlay().then((m) => ({ default: m.CompletionOverlay })),
+)
 
 type Filter = 'all' | 'persistent' | 'one-time' | 'mine'
 
@@ -95,6 +100,9 @@ const CHORE_PACKS: {
 
 export function ChoresPage() {
   const { group, members, loading: groupLoading } = useGroup()
+  useEffect(() => {
+    loadCompletionOverlay()
+  }, [])
   const { user } = useAuth()
   const { chores, loading, addChore, completeChore, deleteChore, boostChore, editChore } =
     useChores()
@@ -1292,15 +1300,17 @@ export function ChoresPage() {
 
       {/* Completion overlay */}
       {completionOverlay && (
-        <CompletionOverlay
-          points={completionOverlay.points}
-          totalPoints={completionOverlay.totalPoints}
-          choreName={completionOverlay.choreName}
-          onDone={() => {
-            setCompletionOverlay(null)
-            advanceTour('chore-complete')
-          }}
-        />
+        <Suspense fallback={null}>
+          <CompletionOverlay
+            points={completionOverlay.points}
+            totalPoints={completionOverlay.totalPoints}
+            choreName={completionOverlay.choreName}
+            onDone={() => {
+              setCompletionOverlay(null)
+              advanceTour('chore-complete')
+            }}
+          />
+        </Suspense>
       )}
 
       {/* Just do one mode */}

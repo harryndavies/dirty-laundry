@@ -36,6 +36,8 @@ const GroupContext = createContext<GroupContextType | null>(null)
 
 export function GroupProvider({ children }: { children: ReactNode }) {
   const { user, loading: authLoading } = useAuth()
+  // Keyed on the id: the user object is replaced on every token refresh.
+  const userId = user?.id ?? null
   const [group, setGroup] = useState<Group | null>(null)
   const [members, setMembers] = useState<MemberWithProfile[]>([])
   const [userMember, setUserMember] = useState<GroupMember | null>(null)
@@ -52,16 +54,16 @@ export function GroupProvider({ children }: { children: ReactNode }) {
 
       const updated: MemberWithProfile[] = (membersData ?? []).map(asMember)
       setMembers(updated)
-      if (user) {
-        const me = updated.find((m) => m.user_id === user.id)
+      if (userId) {
+        const me = updated.find((m) => m.user_id === userId)
         if (me) setUserMember(me)
       }
     },
-    [user],
+    [userId],
   )
 
   const fetchGroup = useCallback(async () => {
-    if (!user) {
+    if (!userId) {
       setGroup(null)
       setMembers([])
       setUserMember(null)
@@ -76,7 +78,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     const { data: membership } = await supabase
       .from('group_members')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .limit(1)
       .maybeSingle()
 
@@ -93,7 +95,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
           localStorage.setItem('dirtylaundry_group_id', foundGroup.id)
           setGroup(foundGroup)
           await refreshMembersForGroup(foundGroup.id)
-          setLoadedFor(user.id)
+          setLoadedFor(userId)
           return
         }
       }
@@ -102,7 +104,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
       setGroup(null)
       setMembers([])
       setUserMember(null)
-      setLoadedFor(user.id)
+      setLoadedFor(userId)
       return
     }
 
@@ -122,8 +124,8 @@ export function GroupProvider({ children }: { children: ReactNode }) {
     setGroup(groupData)
 
     await refreshMembersForGroup(groupId)
-    setLoadedFor(user.id)
-  }, [user, refreshMembersForGroup])
+    setLoadedFor(userId)
+  }, [userId, refreshMembersForGroup])
 
   const refreshMembers = useCallback(async () => {
     if (group) {
@@ -379,7 +381,7 @@ export function GroupProvider({ children }: { children: ReactNode }) {
         group,
         members,
         userMember,
-        loading: authLoading || loadedFor !== (user?.id ?? null),
+        loading: authLoading || loadedFor !== userId,
         createGroup,
         joinGroup,
         refreshMembers,
