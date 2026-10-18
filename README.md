@@ -8,6 +8,23 @@ families.
 **About:** [dirtylaundry.club](https://dirtylaundry.club) ·
 **Marketing site:** [`site/`](site)
 
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/01-chores.jpg" width="180" alt="Chore list with points, reminders and whose turn it is"><br><sub>Chores and whose turn</sub></td>
+    <td align="center"><img src="docs/screenshots/02-complete.jpg" width="180" alt="Completing a chore together with a housemate, with optional before and after photos"><br><sub>Did it together?</sub></td>
+    <td align="center"><img src="docs/screenshots/03-done.jpg" width="180" alt="Completion screen showing the points earned"><br><sub>Points!</sub></td>
+    <td align="center"><img src="docs/screenshots/04-leaderboard.jpg" width="180" alt="Monthly leaderboard with streaks and last active"><br><sub>Leaderboard</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/05-activity.jpg" width="180" alt="Activity log with team completions, photos and reactions"><br><sub>Activity and reactions</sub></td>
+    <td align="center"><img src="docs/screenshots/06-report.jpg" width="180" alt="Weekly report with top contributor, fair share score and points chart"><br><sub>Weekly report</sub></td>
+    <td align="center"><img src="docs/screenshots/07-roulette.jpg" width="180" alt="Chore roulette wheel"><br><sub>Chore roulette</sub></td>
+    <td align="center"><img src="docs/screenshots/08-plant.jpg" width="180" alt="The household houseplant, thriving"><br><sub>The houseplant</sub></td>
+  </tr>
+</table>
+
+<sub>Screenshots are from the demo household in `supabase/seed.sql` (`npm run dev:local`).</sub>
+
 1. Create a group and invite your housemates with a share link.
 2. Add chores and give each one points. Scrubbing the oven is worth more than wiping a counter.
 3. Agree a fair split (say 40/35/25), so everyone is scored against their own share.
