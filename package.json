@@ -23,7 +23,7 @@
   "dependencies": {
     "@base-ui/react": "^1.9.0",
     "@capacitor-community/apple-sign-in": "^7.1.0",
-    "@capacitor/cli": "^7.6.1",
+    "@capacitor/cli": "^8.5.3",
     "@capacitor/core": "^8.5.3",
     "@capacitor/ios": "^8.5.3",
     "@capacitor/push-notifications": "^8.1.3",
