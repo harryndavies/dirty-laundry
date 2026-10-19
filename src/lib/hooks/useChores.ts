@@ -1,10 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
+import type { Database } from '@/lib/database.types'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { useGroup } from '@/context/GroupContext'
 import { sendPushToUser } from '@/lib/pushNotifications'
 import { toast } from '@/components/ui/Toast'
+
+type ChoreUpdate = Database['public']['Tables']['chores']['Update']
 
 const CompleteChoreResult = z.object({ completion_id: z.uuid(), points_earned: z.number().int() })
 
@@ -257,7 +260,8 @@ export function useChores() {
         assigned_to?: string | null
       }
     }) => {
-      const updateData: Record<string, unknown> = { ...updates }
+      // Editing the points resets the base too (it's what bounties fall back to).
+      const updateData: ChoreUpdate = { ...updates }
       if (updates.points !== undefined) {
         updateData.base_points = updates.points
       }

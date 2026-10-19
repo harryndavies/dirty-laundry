@@ -261,7 +261,11 @@ export function ChoresPage() {
     setConfirmDelete(null)
   }
 
-  function onTouchStart(e: React.TouchEvent, id: string) {
+  // Handlers are passed straight to each row (with its id in data-swipe-id), so
+  // the refs they use are only ever read inside events.
+  function onTouchStart(e: React.TouchEvent<HTMLElement>) {
+    const id = e.currentTarget.dataset.swipeId
+    if (!id) return
     touchStartX.current = e.touches[0].clientX
     swipingIdRef.current = id
     swipeOffsetRef.current = 0
@@ -276,11 +280,12 @@ export function ChoresPage() {
     setSwipeOffset(diff)
   }
 
-  function onTouchEnd(chore: (typeof chores)[0]) {
+  function onTouchEnd() {
+    const chore = chores.find((c) => c.id === swipingIdRef.current)
     const offset = swipeOffsetRef.current
-    if (offset < -80 && !isKid) {
+    if (chore && offset < -80 && !isKid) {
       setAssigningChore({ id: chore.id, name: chore.name, assigned_to: chore.assigned_to })
-    } else if (offset > 80 && !isKid) {
+    } else if (chore && offset > 80 && !isKid) {
       setEditingChore({
         id: chore.id,
         name: chore.name,
@@ -305,6 +310,14 @@ export function ChoresPage() {
     { label: 'ONE-TIME', value: 'one-time' },
   ]
 
+  // Chores grouped by area, in first-seen order ('' when no chore has an area).
+  const hasAreas = filtered.some((c) => c.area)
+  const grouped = new Map<string, typeof filtered>()
+  for (const c of filtered) {
+    const key = c.area ?? (hasAreas ? 'Uncategorised' : '')
+    grouped.set(key, [...(grouped.get(key) ?? []), c])
+  }
+  const choresByArea = Array.from(grouped.entries())
   return (
     <div className="min-h-full">
       {/* Header */}
@@ -476,217 +489,207 @@ export function ChoresPage() {
             </div>
           )
         ) : (
-          (() => {
-            const hasAreas = filtered.some((c) => c.area)
-            const grouped = new Map<string, typeof filtered>()
-            for (const c of filtered) {
-              const key = c.area ?? (hasAreas ? 'Uncategorised' : '')
-              if (!grouped.has(key)) grouped.set(key, [])
-              grouped.get(key)!.push(c)
-            }
-            return Array.from(grouped.entries()).map(([area, areaChores]) => (
-              <div key={area} className="mb-4">
-                {area && (
-                  <div className="sticky top-0 z-[5] mb-2 bg-brutal-white px-1 py-2 font-mono text-[11px] font-bold tracking-widest text-brutal-black/40">
-                    {area.toUpperCase()}
-                  </div>
-                )}
-                <div className="space-y-3">
-                  {areaChores.map((chore) => {
-                    const isSwiping = swipingId === chore.id
-                    const offset = isSwiping ? swipeOffset : 0
-                    const showEdit = offset > 40 && !isKid
-                    const showAssign = offset < -40 && !isKid
+          choresByArea.map(([area, areaChores]) => (
+            <div key={area} className="mb-4">
+              {area && (
+                <div className="sticky top-0 z-[5] mb-2 bg-brutal-white px-1 py-2 font-mono text-[11px] font-bold tracking-widest text-brutal-black/40">
+                  {area.toUpperCase()}
+                </div>
+              )}
+              <div className="space-y-3">
+                {areaChores.map((chore) => {
+                  const isSwiping = swipingId === chore.id
+                  const offset = isSwiping ? swipeOffset : 0
+                  const showEdit = offset > 40 && !isKid
+                  const showAssign = offset < -40 && !isKid
 
-                    return (
-                      <div key={chore.id} className="group/chore relative overflow-hidden">
-                        {/* Swipe backgrounds */}
-                        <div className="absolute inset-0 flex md:hidden">
-                          <div
-                            className={`flex flex-1 items-center bg-brutal-blue px-4 font-mono text-sm font-bold text-brutal-white transition-opacity ${showEdit ? 'opacity-100' : 'opacity-0'}`}
-                          >
-                            EDIT ✎
-                          </div>
-                          <div
-                            className={`flex flex-1 items-center justify-end bg-brutal-orange px-4 font-mono text-sm font-bold text-brutal-white transition-opacity ${showAssign ? 'opacity-100' : 'opacity-0'}`}
-                          >
-                            ASSIGN 📋
-                          </div>
-                        </div>
-
+                  return (
+                    <div key={chore.id} className="group/chore relative overflow-hidden">
+                      {/* Swipe backgrounds */}
+                      <div className="absolute inset-0 flex md:hidden">
                         <div
-                          className="relative flex touch-pan-y items-center gap-3 border-2 border-brutal-black bg-brutal-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:transition-all md:hover:translate-x-[2px] md:hover:translate-y-[2px] md:hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                          style={{
-                            transform: isSwiping ? `translateX(${offset}px)` : 'translateX(0)',
-                            transition: isSwiping ? 'none' : 'transform 0.2s',
-                          }}
-                          onTouchStart={(e) => onTouchStart(e, chore.id)}
-                          onTouchMove={onTouchMove}
-                          onTouchEnd={() => onTouchEnd(chore)}
+                          className={`flex flex-1 items-center bg-brutal-blue px-4 font-mono text-sm font-bold text-brutal-white transition-opacity ${showEdit ? 'opacity-100' : 'opacity-0'}`}
                         >
-                          <div className="min-w-0 flex-1">
-                            <h3 className="truncate font-mono text-base font-bold">{chore.name}</h3>
-                            <div className="mt-1 flex items-center gap-2">
-                              <button
-                                onClick={() => {
-                                  setBountyChore({
-                                    id: chore.id,
-                                    name: chore.name,
-                                    points: chore.points,
-                                  })
-                                  setBountyAmount(10)
-                                }}
-                                className={`inline-flex items-center gap-1 border border-brutal-black px-2 py-0.5 font-mono text-xs font-bold transition-colors active:opacity-70 ${
-                                  chore.points > chore.base_points
-                                    ? 'animate-pulse bg-brutal-orange text-brutal-white'
-                                    : 'bg-brutal-yellow'
-                                }`}
-                              >
-                                {chore.points > chore.base_points && '🔥 '}
-                                {chore.points} PTS <TrendingUp size={10} />
-                              </button>
-                              <span
-                                className={`inline-flex items-center gap-1 border px-2 py-0.5 font-mono text-[10px] font-bold ${
-                                  chore.is_persistent
-                                    ? 'border-brutal-blue bg-brutal-blue/10 text-brutal-blue'
-                                    : 'border-brutal-orange bg-brutal-orange/10 text-brutal-orange'
-                                }`}
-                              >
-                                {chore.is_persistent ? (
-                                  <>
-                                    <RotateCw size={10} /> RECURRING
-                                  </>
-                                ) : (
-                                  <>
-                                    <Zap size={10} /> ONE-TIME
-                                  </>
-                                )}
-                              </span>
-                              {chore.reminder_day !== null &&
-                                (chore.reminder_day === today ? (
-                                  <span className="inline-flex items-center gap-1 border border-brutal-pink bg-brutal-pink/20 px-2 py-0.5 font-mono text-[10px] font-bold text-brutal-pink">
-                                    <Bell size={10} /> DUE TODAY
-                                  </span>
-                                ) : (
-                                  <span className="inline-flex items-center gap-1 border border-brutal-yellow bg-brutal-yellow/20 px-2 py-0.5 font-mono text-[10px] font-bold text-brutal-black/60">
-                                    <Bell size={10} />{' '}
-                                    {
-                                      ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][
-                                        chore.reminder_day
-                                      ]
-                                    }{' '}
-                                    {chore.reminder_time?.slice(0, 5)}
-                                  </span>
-                                ))}
-                            </div>
-                            {chore.assigned_to &&
-                              (() => {
-                                const assignee = members.find(
-                                  (m) => m.user_id === chore.assigned_to,
-                                )
-                                if (!assignee) return null
-                                return (
-                                  <div className="mt-1.5 flex items-center gap-1.5">
-                                    {assignee.profiles.avatar_url ? (
-                                      <img
-                                        src={assignee.profiles.avatar_url}
-                                        alt=""
-                                        className="h-4 w-4 shrink-0 border border-brutal-black object-cover"
-                                      />
-                                    ) : (
-                                      <div
-                                        className="flex h-4 w-4 shrink-0 items-center justify-center border border-brutal-black font-mono text-[8px] font-bold text-white"
-                                        style={{ background: assignee.profiles.avatar_color }}
-                                      >
-                                        {assignee.profiles.display_name[0]}
-                                      </div>
-                                    )}
-                                    <span className="font-mono text-[10px] text-brutal-black/50">
-                                      {assignee.profiles.display_name}'s job
-                                    </span>
-                                  </div>
-                                )
-                              })()}
-                            {!chore.assigned_to &&
-                              chore.is_persistent &&
-                              suggestions.get(chore.id) && (
+                          EDIT ✎
+                        </div>
+                        <div
+                          className={`flex flex-1 items-center justify-end bg-brutal-orange px-4 font-mono text-sm font-bold text-brutal-white transition-opacity ${showAssign ? 'opacity-100' : 'opacity-0'}`}
+                        >
+                          ASSIGN 📋
+                        </div>
+                      </div>
+
+                      <div
+                        className="relative flex touch-pan-y items-center gap-3 border-2 border-brutal-black bg-brutal-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:transition-all md:hover:translate-x-[2px] md:hover:translate-y-[2px] md:hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                        style={{
+                          transform: isSwiping ? `translateX(${offset}px)` : 'translateX(0)',
+                          transition: isSwiping ? 'none' : 'transform 0.2s',
+                        }}
+                        data-swipe-id={chore.id}
+                        onTouchStart={onTouchStart}
+                        onTouchMove={onTouchMove}
+                        onTouchEnd={onTouchEnd}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <h3 className="truncate font-mono text-base font-bold">{chore.name}</h3>
+                          <div className="mt-1 flex items-center gap-2">
+                            <button
+                              onClick={() => {
+                                setBountyChore({
+                                  id: chore.id,
+                                  name: chore.name,
+                                  points: chore.points,
+                                })
+                                setBountyAmount(10)
+                              }}
+                              className={`inline-flex items-center gap-1 border border-brutal-black px-2 py-0.5 font-mono text-xs font-bold transition-colors active:opacity-70 ${
+                                chore.points > chore.base_points
+                                  ? 'animate-pulse bg-brutal-orange text-brutal-white'
+                                  : 'bg-brutal-yellow'
+                              }`}
+                            >
+                              {chore.points > chore.base_points && '🔥 '}
+                              {chore.points} PTS <TrendingUp size={10} />
+                            </button>
+                            <span
+                              className={`inline-flex items-center gap-1 border px-2 py-0.5 font-mono text-[10px] font-bold ${
+                                chore.is_persistent
+                                  ? 'border-brutal-blue bg-brutal-blue/10 text-brutal-blue'
+                                  : 'border-brutal-orange bg-brutal-orange/10 text-brutal-orange'
+                              }`}
+                            >
+                              {chore.is_persistent ? (
+                                <>
+                                  <RotateCw size={10} /> RECURRING
+                                </>
+                              ) : (
+                                <>
+                                  <Zap size={10} /> ONE-TIME
+                                </>
+                              )}
+                            </span>
+                            {chore.reminder_day !== null &&
+                              (chore.reminder_day === today ? (
+                                <span className="inline-flex items-center gap-1 border border-brutal-pink bg-brutal-pink/20 px-2 py-0.5 font-mono text-[10px] font-bold text-brutal-pink">
+                                  <Bell size={10} /> DUE TODAY
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 border border-brutal-yellow bg-brutal-yellow/20 px-2 py-0.5 font-mono text-[10px] font-bold text-brutal-black/60">
+                                  <Bell size={10} />{' '}
+                                  {
+                                    ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][
+                                      chore.reminder_day
+                                    ]
+                                  }{' '}
+                                  {chore.reminder_time?.slice(0, 5)}
+                                </span>
+                              ))}
+                          </div>
+                          {chore.assigned_to &&
+                            (() => {
+                              const assignee = members.find((m) => m.user_id === chore.assigned_to)
+                              if (!assignee) return null
+                              return (
                                 <div className="mt-1.5 flex items-center gap-1.5">
-                                  {suggestions.get(chore.id)!.avatar_url ? (
+                                  {assignee.profiles.avatar_url ? (
                                     <img
-                                      src={suggestions.get(chore.id)!.avatar_url!}
+                                      src={assignee.profiles.avatar_url}
                                       alt=""
                                       className="h-4 w-4 shrink-0 border border-brutal-black object-cover"
                                     />
                                   ) : (
                                     <div
                                       className="flex h-4 w-4 shrink-0 items-center justify-center border border-brutal-black font-mono text-[8px] font-bold text-white"
-                                      style={{
-                                        background: suggestions.get(chore.id)!.avatar_color,
-                                      }}
+                                      style={{ background: assignee.profiles.avatar_color }}
                                     >
-                                      {suggestions.get(chore.id)!.display_name[0]}
+                                      {assignee.profiles.display_name[0]}
                                     </div>
                                   )}
                                   <span className="font-mono text-[10px] text-brutal-black/50">
-                                    {suggestions.get(chore.id)!.display_name}'s turn
+                                    {assignee.profiles.display_name}'s job
                                   </span>
                                 </div>
-                              )}
-                          </div>
-
-                          {/* Desktop action buttons — hidden on mobile, shown on hover */}
-                          {!isKid && (
-                            <div className="hidden gap-1 opacity-0 transition-opacity group-hover/chore:opacity-100 md:flex">
-                              <button
-                                onClick={() =>
-                                  setEditingChore({
-                                    id: chore.id,
-                                    name: chore.name,
-                                    points: chore.points,
-                                    is_persistent: chore.is_persistent,
-                                    area: chore.area,
-                                    reminder_day: chore.reminder_day,
-                                    reminder_time: chore.reminder_time,
-                                    assigned_to: chore.assigned_to,
-                                  })
-                                }
-                                className="flex h-10 w-10 items-center justify-center border-2 border-brutal-black bg-brutal-blue font-mono text-xs font-bold text-brutal-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
-                                title="Edit"
-                              >
-                                ✎
-                              </button>
-                              <button
-                                onClick={() =>
-                                  setAssigningChore({
-                                    id: chore.id,
-                                    name: chore.name,
-                                    assigned_to: chore.assigned_to,
-                                  })
-                                }
-                                className="flex h-10 w-10 items-center justify-center border-2 border-brutal-black bg-brutal-orange font-mono text-xs font-bold text-brutal-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
-                                title="Assign"
-                              >
-                                📋
-                              </button>
-                            </div>
-                          )}
-                          <button
-                            onClick={() => handleComplete(chore.id, chore.points, chore.name)}
-                            {...(filtered.indexOf(chore) === 0
-                              ? { 'data-tour': 'chore-complete' }
-                              : {})}
-                            className="flex h-12 w-12 items-center justify-center border-2 border-brutal-black bg-brutal-lime font-mono text-sm font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
-                          >
-                            ✓
-                          </button>
+                              )
+                            })()}
+                          {!chore.assigned_to &&
+                            chore.is_persistent &&
+                            suggestions.get(chore.id) && (
+                              <div className="mt-1.5 flex items-center gap-1.5">
+                                {suggestions.get(chore.id)!.avatar_url ? (
+                                  <img
+                                    src={suggestions.get(chore.id)!.avatar_url!}
+                                    alt=""
+                                    className="h-4 w-4 shrink-0 border border-brutal-black object-cover"
+                                  />
+                                ) : (
+                                  <div
+                                    className="flex h-4 w-4 shrink-0 items-center justify-center border border-brutal-black font-mono text-[8px] font-bold text-white"
+                                    style={{
+                                      background: suggestions.get(chore.id)!.avatar_color,
+                                    }}
+                                  >
+                                    {suggestions.get(chore.id)!.display_name[0]}
+                                  </div>
+                                )}
+                                <span className="font-mono text-[10px] text-brutal-black/50">
+                                  {suggestions.get(chore.id)!.display_name}'s turn
+                                </span>
+                              </div>
+                            )}
                         </div>
+
+                        {/* Desktop action buttons — hidden on mobile, shown on hover */}
+                        {!isKid && (
+                          <div className="hidden gap-1 opacity-0 transition-opacity group-hover/chore:opacity-100 md:flex">
+                            <button
+                              onClick={() =>
+                                setEditingChore({
+                                  id: chore.id,
+                                  name: chore.name,
+                                  points: chore.points,
+                                  is_persistent: chore.is_persistent,
+                                  area: chore.area,
+                                  reminder_day: chore.reminder_day,
+                                  reminder_time: chore.reminder_time,
+                                  assigned_to: chore.assigned_to,
+                                })
+                              }
+                              className="flex h-10 w-10 items-center justify-center border-2 border-brutal-black bg-brutal-blue font-mono text-xs font-bold text-brutal-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                              title="Edit"
+                            >
+                              ✎
+                            </button>
+                            <button
+                              onClick={() =>
+                                setAssigningChore({
+                                  id: chore.id,
+                                  name: chore.name,
+                                  assigned_to: chore.assigned_to,
+                                })
+                              }
+                              className="flex h-10 w-10 items-center justify-center border-2 border-brutal-black bg-brutal-orange font-mono text-xs font-bold text-brutal-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                              title="Assign"
+                            >
+                              📋
+                            </button>
+                          </div>
+                        )}
+                        <button
+                          onClick={() => handleComplete(chore.id, chore.points, chore.name)}
+                          {...(filtered.indexOf(chore) === 0
+                            ? { 'data-tour': 'chore-complete' }
+                            : {})}
+                          className="flex h-12 w-12 items-center justify-center border-2 border-brutal-black bg-brutal-lime font-mono text-sm font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
+                        >
+                          ✓
+                        </button>
                       </div>
-                    )
-                  })}
-                </div>
+                    </div>
+                  )
+                })}
               </div>
-            ))
-          })()
+            </div>
+          ))
         )}
       </div>
 

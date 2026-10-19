@@ -74,7 +74,11 @@ export function ActivityPage() {
   const [swipingId, setSwipingId] = useState<string | null>(null)
   const [swipeOffset, setSwipeOffset] = useState(0)
 
-  function onTouchStart(e: React.TouchEvent, id: string) {
+  // Handlers are passed straight to each row (with its id in data-swipe-id), so
+  // the refs they use are only ever read inside events.
+  function onTouchStart(e: React.TouchEvent<HTMLElement>) {
+    const id = e.currentTarget.dataset.swipeId
+    if (!id) return
     touchStartX.current = e.touches[0].clientX
     swipingIdRef.current = id
     swipeOffsetRef.current = 0
@@ -91,9 +95,10 @@ export function ActivityPage() {
     setSwipeOffset(clamped)
   }
 
-  function onTouchEnd(entry: ActivityEntry) {
+  function onTouchEnd() {
+    const entry = activity.find((a) => a.id === swipingIdRef.current)
     const offset = swipeOffsetRef.current
-    if (offset < -80 && entry.user_id === user?.id) {
+    if (entry && offset < -80 && entry.user_id === user?.id) {
       setConfirmUndo({ id: entry.id, name: entry.chore_name ?? 'a chore' })
     }
     swipingIdRef.current = null
@@ -167,9 +172,11 @@ export function ActivityPage() {
                           transform: isSwiping ? `translateX(${offset}px)` : 'translateX(0)',
                           transition: isSwiping ? 'none' : 'transform 0.2s',
                         }}
-                        onTouchStart={isMine ? (e) => onTouchStart(e, entry.id) : undefined}
-                        onTouchMove={isMine ? onTouchMove : undefined}
-                        onTouchEnd={isMine ? () => onTouchEnd(entry) : undefined}
+                        // Only your own entries swipe (to undo).
+                        data-swipe-id={isMine ? entry.id : undefined}
+                        onTouchStart={onTouchStart}
+                        onTouchMove={onTouchMove}
+                        onTouchEnd={onTouchEnd}
                       >
                         <div className="flex items-center gap-3">
                           <Avatar

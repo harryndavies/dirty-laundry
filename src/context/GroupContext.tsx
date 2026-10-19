@@ -63,13 +63,8 @@ export function GroupProvider({ children }: { children: ReactNode }) {
   )
 
   const fetchGroup = useCallback(async () => {
-    if (!userId) {
-      setGroup(null)
-      setMembers([])
-      setUserMember(null)
-      setLoadedFor(null)
-      return
-    }
+    // Signed out: nothing to load (the provider hides any previous user's household).
+    if (!userId) return
 
     // Check localStorage for cached group
     const cachedGroupId = localStorage.getItem('dirtylaundry_group_id')
@@ -134,7 +129,10 @@ export function GroupProvider({ children }: { children: ReactNode }) {
   }, [group, refreshMembersForGroup])
 
   useEffect(() => {
-    fetchGroup()
+    // Data fetching: fetchGroup is async and only sets state after its awaits,
+    // which the rule can't see through.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchGroup()
   }, [fetchGroup])
 
   // Realtime: refresh when group settings or member roles change
@@ -378,10 +376,11 @@ export function GroupProvider({ children }: { children: ReactNode }) {
   return (
     <GroupContext.Provider
       value={{
-        group,
-        members,
-        userMember,
-        loading: authLoading || loadedFor !== userId,
+        // Signed out: never expose a previous user's household.
+        group: userId ? group : null,
+        members: userId ? members : [],
+        userMember: userId ? userMember : null,
+        loading: authLoading || (userId !== null && loadedFor !== userId),
         createGroup,
         joinGroup,
         refreshMembers,
